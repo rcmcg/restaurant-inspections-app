@@ -71,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
                 itemView = getLayoutInflater().inflate(R.layout.restaurant_item_view, parent, false);
             }
 
-            // Find the car to work with
-            TestCar currentCar = myCars.get(position);
+            // Find the restaurant to work with
+            // TestCar currentCar = myCars.get(position);
 
             // Fill the restaurantIcon, redundant if we're using a generic image
             ImageView imageView = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
@@ -92,26 +92,24 @@ public class MainActivity extends AppCompatActivity {
 
             // Set restaurant name text
             TextView restaurantName = itemView.findViewById(R.id.restaurant_item_txtRestaurantName);
-            restaurantName.setText(currentCar.getMake());
+            // restaurantName.setText();
 
             // Set last inspection date text
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
-            lastInspectionDate.setText("" + currentCar.getYear());
+            // lastInspectionDate.setText();
 
             // Set number of violations text
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
-            numViolationsLastInspection.setText("" + currentCar.getYear()%5);
+            // numViolationsLastInspection.setText();
 
             // Set background color based on hazard level (optional)
-            // int[] colors = {0x3300FF00, 0x33FFFF00, 0x33FFA500, 0x33FF0000};
-            // itemView.setBackgroundColor(colors[position%4]);
+            int[] colors = {0x3300FF00, 0x33FFFF00, 0x33FFA500, 0x33FF0000};
+            itemView.setBackgroundColor(colors[position%4]);
 
-            // Update first index with test data
-            if (position == 0) {
-                restaurantName.setText(testName);
-                lastInspectionDate.setText(testDate);
-                numViolationsLastInspection.setText("Violations: " + testNumInspections);
-            }
+            // Set text to test data
+            restaurantName.setText(testName);
+            lastInspectionDate.setText(testDate);
+            numViolationsLastInspection.setText("Violations: " + testNumInspections);
 
             return itemView;
         }
