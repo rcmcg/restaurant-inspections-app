@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,16 +22,18 @@ public class MainActivity extends AppCompatActivity {
     // private RestaurantManager restaurants = RestaurantManager.getInstance();
     private List<TestCar> myCars = new ArrayList<TestCar>();
 
+    private String testName = "Lee Yuen Seafood Restaurant";
+    private String testDate = "Last inspection: Jan 22";
+    private int testNumInspections = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String testName = "Lee Yuen Seafood Restaurant";
-        String testDate = "Jan 22";
-        int testNumInspections = 5;
-
+        // Following code/functions taken from Dr. Fraser's video linked below
+        // https://www.youtube.com/watch?v=WRANgDgM2Zg
+        // TODO: Update code so it works with the RestaurantManager after it has been filled
         populateRestaurantList();
         populateListView();
         registerClickCallback();
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void populateRestaurantList() {
         // This function will populate the RestaurantManager with Restaurants
+        // For now uses the TestCar class
         myCars.add(new TestCar("Ford", 1940, 0, "Needing work"));
         myCars.add(new TestCar("Toyota", 1994, 0, "Lovable"));
         myCars.add(new TestCar("Honda", 1999, 0, "Wet"));
@@ -70,21 +74,44 @@ public class MainActivity extends AppCompatActivity {
             // Find the car to work with
             TestCar currentCar = myCars.get(position);
 
-            // Fill the view
+            // Fill the restaurantIcon, redundant if we're using a generic image
             ImageView imageView = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
             // imageView.setImageDrawable(currentCar.getIconID());
 
-            // Set Restaurant Name
+            // Fill the hazard icon
+            ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardIcon);
+
+            // Change which icon is shown for demonstration
+            if (position%4 == 1) {
+                imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
+            } else if (position%4 == 2) {
+                imgHazardIcon.setImageResource(R.drawable.orange_diamond);
+            } else if (position%4 == 3) {
+                imgHazardIcon.setImageResource(R.drawable.red_octogon);
+            }
+
+            // Set restaurant name text
             TextView restaurantName = itemView.findViewById(R.id.restaurant_item_txtRestaurantName);
             restaurantName.setText(currentCar.getMake());
 
-            // Set last inspection date
+            // Set last inspection date text
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
             lastInspectionDate.setText("" + currentCar.getYear());
 
-            // Set number of violations
+            // Set number of violations text
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
             numViolationsLastInspection.setText("" + currentCar.getYear()%5);
+
+            // Set background color based on hazard level (optional)
+            // int[] colors = {0x3300FF00, 0x33FFFF00, 0x33FFA500, 0x33FF0000};
+            // itemView.setBackgroundColor(colors[position%4]);
+
+            // Update first index with test data
+            if (position == 0) {
+                restaurantName.setText(testName);
+                lastInspectionDate.setText(testDate);
+                numViolationsLastInspection.setText("Violations: " + testNumInspections);
+            }
 
             return itemView;
         }
