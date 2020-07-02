@@ -16,10 +16,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void initializeInspectionLists() {
 
-
-        for (Restaurant restaurant : RestaurantManager.getInstance())
+        /*for (Restaurant restaurant : RestaurantManager.getInstance())
         {
 
-        }
+        }*/
     }
 }
