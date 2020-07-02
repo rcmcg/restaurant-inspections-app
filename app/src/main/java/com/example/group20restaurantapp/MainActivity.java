@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Following code/functions taken from Dr. Fraser's video linked below
+        // Following functions taken from Dr. Fraser's video linked below
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         // TODO: Update code so it works with the RestaurantManager after it has been filled
         populateRestaurantList();
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             // Find the restaurant to work with
             // TestCar currentCar = myCars.get(position);
 
-            // Fill the restaurantIcon, redundant if we're using a generic image
+            // Fill the restaurantIcon
             ImageView imageView = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
             // imageView.setImageDrawable(currentCar.getIconID());
 
@@ -92,15 +92,12 @@ public class MainActivity extends AppCompatActivity {
 
             // Set restaurant name text
             TextView restaurantName = itemView.findViewById(R.id.restaurant_item_txtRestaurantName);
-            // restaurantName.setText();
 
             // Set last inspection date text
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
-            // lastInspectionDate.setText();
 
             // Set number of violations text
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
-            // numViolationsLastInspection.setText();
 
             // Set background color based on hazard level (optional)
             int[] colors = {0x3300FF00, 0x33FFFF00, 0x33FFA500, 0x33FF0000};
@@ -121,8 +118,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
                 TestCar clickedCar = myCars.get(position);
-                String message = "You clicked position " + position
-                                + " Which is car make " + clickedCar.getMake();
+                String message = "You clicked position " + position;
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
