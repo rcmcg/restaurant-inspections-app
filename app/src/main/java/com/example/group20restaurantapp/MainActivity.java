@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,6 +15,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         populateRestaurantList();
         populateListView();
         registerClickCallback();
+        InitInspectionLists();
     }
 
     private void populateRestaurantList() {
@@ -118,5 +124,57 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void InitInspectionLists() {
+        InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(is, Charset.forName("UTF-8"))
+        );
+
+        String line = "";
+
+        for (Restaurant restaurant : RestaurantManager.getInstance()){
+            try {
+                reader.readLine();
+
+                while ( (line = reader.readLine()) != null){
+                    //Log.d("MyActivity", "Line: " + line);
+                    String[] fileLineTokens = line.split(",", 7);
+                    if (fileLineTokens[0] != restaurant.getTrackingNumber()){
+                        continue;
+                    }
+
+                    Inspection inspection = new Inspection();
+                    inspection.setTrackingNumber(fileLineTokens[0]);
+                    inspection.setInspectionDate(fileLineTokens[1]);
+                    inspection.setInspType(fileLineTokens[2]);
+                    inspection.setNumCritical(Integer.parseInt(fileLineTokens[3]));
+                    inspection.setNumNonCritical(Integer.parseInt(fileLineTokens[4]));
+                    inspection.setHazardRating(fileLineTokens[5]);
+                    String violations = fileLineTokens[6];
+
+                    String[] violationsTokens = violations.split("\\|");
+                    for (String token : violationsTokens){
+                        inspection.getViolLump().add(token);
+                    }
+                    //Log.d("MyActivity", "Inspection: " + inspection);
+
+                    restaurant.getInspectionList().add(inspection);
+                }
+
+            } catch (IOException e){
+                Log.wtf("MyActivity", "Error reading data file on line" + line, e);
+                e.printStackTrace();
+            }
+        }
+
+
+
+
+
+        /*for (Restaurant restaurant : RestaurantManager.getInstance()){
+
+        }*/
     }
 }
