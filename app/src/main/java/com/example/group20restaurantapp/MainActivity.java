@@ -72,11 +72,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Find the restaurant to work with
-            // TestCar currentCar = myCars.get(position);
+            // Restaurant currentRestaurant = RestaurantManager.getIndex(position);
 
             // Fill the restaurantIcon
-            ImageView imageView = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
-            // imageView.setImageDrawable(currentCar.getIconID());
+            ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
+            // imgRestaurant.setImageDrawable(currentRestaurant.getIconID());
 
             // Fill the hazard icon
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardIcon);
