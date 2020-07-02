@@ -10,5 +10,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initializeInspectionLists();
+    }
+
+    private void initializeInspectionLists() {
+
+
+        for (Restaurant restaurant : RestaurantManager.getInstance())
+        {
+
+        }
     }
 }
