@@ -99,10 +99,6 @@ public class MainActivity extends AppCompatActivity {
             // Set number of violations text
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
 
-            // Set background color based on hazard level (optional)
-            int[] colors = {0x3300FF00, 0x33FFFF00, 0x33FFA500, 0x33FF0000};
-            itemView.setBackgroundColor(colors[position%4]);
-
             // Set text to test data
             restaurantName.setText(testName);
             lastInspectionDate.setText(testDate);
