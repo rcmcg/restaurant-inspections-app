@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private Restaurantmanager manager;
+    private RestaurantManager manager;
     // private RestaurantManager restaurants = RestaurantManager.getInstance();
     private List<TestCar> myCars = new ArrayList<TestCar>();
 
@@ -42,18 +41,21 @@ public class MainActivity extends AppCompatActivity {
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         // TODO: Update code so it works with the RestaurantManager after it has been filled
         populateRestaurantList();
+
+        readRestaurantData();
         populateListView();
         registerClickCallback();
-
-        readrestaurantdata();
     }
-    private void readrestaurantdata() {
-        //manager is the instance of restaurant manager.Use this one to populate list
-        manager=Restaurantmanager.getInstance();
-        //To read a resource, need an input stream
+
+    private void readRestaurantData() {
+        // manager is the instance of restaurant manager. Use this one to populate list
+        manager= RestaurantManager.getInstance();
+
+        // To read a resource, need an input stream
         InputStream is = getResources().openRawResource(R.raw.restaurants_name_itr11);
-        //To read from stream reader line by line, need a bufferreader
-        //Need a build an input stream based on a character set
+
+        // To read from stream reader line by line, need a bufferreader
+        // Need a build an input stream based on a character set
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
         String line = "";
         try {
@@ -62,31 +64,26 @@ public class MainActivity extends AppCompatActivity {
             while ((line = reader.readLine()) != null) {
                 //Splitting every line based on "," , Tokens are variables of Restaurant class
                 String[] tokens=line.split(",");
-                Restaurants r1=new Restaurants();
-                r1.setTrackinngnumber(tokens[0]);
+                Restaurant r1=new Restaurant();
+                r1.setTrackingNumber(tokens[0]);
                 r1.setName(tokens[1]);
-                r1.setAdress(tokens[2]);
+                r1.setAddress(tokens[2]);
                 r1.setCity(tokens[3]);
-                r1.setFactype(tokens[4]);
-                r1.setLattitude(Double.parseDouble(tokens[5]));
+                r1.setFacType(tokens[4]);
+                r1.setLatitude(Double.parseDouble(tokens[5]));
                 r1.setLongitude(Double.parseDouble(tokens[6]));
                 r1.setIcon(0);
                 //Adding the created Restaurants object to the manager instance
                 manager.add(r1);
                 Log.d("Main activity","Just created" + r1);
-
-
             }
-            // Log.d("Mainactivity","Just checking"+manager.getibjectbyindex(2));
         } catch (IOException e) {
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
             e.printStackTrace();
         }
-
-
     }
 
-     //TODO:I already have added the restaurants in manager instance so U can remove this function
+    // TODO:I already have added the restaurants in manager instance so U can remove this function
     private void populateRestaurantList() {
         // This function will populate the RestaurantManager with Restaurants
         // For now uses the TestCar class
@@ -101,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void populateListView() {
         ArrayAdapter<TestCar> adapter = new MyListAdapter();
+        // ArrayAdapter<RestaurantManager> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
