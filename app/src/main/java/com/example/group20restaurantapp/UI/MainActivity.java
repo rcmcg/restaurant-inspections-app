@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+
+import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.Model.TestCar;
@@ -166,15 +168,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void registerClickCallback() {
-        ListView list = (ListView) findViewById(R.id.restaurantsListView);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                TestCar clickedCar = myCars.get(position);
-                String message = "You clicked position " + position;
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-        });
+            ListView list = (ListView) findViewById(R.id.restaurantsListView);
+            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
+                    TestCar clickedCar = myCars.get(position);
+                    String message = "You clicked position " + position;
+                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+            });
     }
 
     private void InitInspectionLists() {
@@ -191,26 +193,25 @@ public class MainActivity extends AppCompatActivity {
 
                 while ( (line = reader.readLine()) != null){
                     //Log.d("MyActivity", "Line: " + line);
-                    String[] fileLineTokens = line.split(",", 7);
-                    if (fileLineTokens[0] != restaurant.getTrackingNumber()){
+                    String[] lineSplit = line.split(",", 7);
+                    if (lineSplit[0] != restaurant.getTrackingNumber()){
                         continue;
                     }
 
                     Inspection inspection = new Inspection();
-                    inspection.setTrackingNumber(fileLineTokens[0]);
-                    inspection.setInspectionDate(fileLineTokens[1]);
-                    inspection.setInspType(fileLineTokens[2]);
-                    inspection.setNumCritical(Integer.parseInt(fileLineTokens[3]));
-                    inspection.setNumNonCritical(Integer.parseInt(fileLineTokens[4]));
-                    inspection.setHazardRating(fileLineTokens[5]);
-                    String violations = fileLineTokens[6];
+                    inspection.setTrackingNumber(lineSplit[0]);
+                    inspection.setInspectionDate(lineSplit[1]);
+                    inspection.setInspType(lineSplit[2]);
+                    inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
+                    inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
+                    inspection.setHazardRating(lineSplit[5]);
+                    String violations = lineSplit[6];
 
-                    String[] violationsTokens = violations.split("\\|");
-                    for (String token : violationsTokens){
+                    String[] violationsSplit = violations.split("\\|");
+                    for (String token : violationsSplit){
                         inspection.getViolLump().add(token);
                     }
                     //Log.d("MyActivity", "Inspection: " + inspection);
-
                     restaurant.getInspectionList().add(inspection);
                 }
 
@@ -220,12 +221,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-
-
-
-        /*for (Restaurant restaurant : RestaurantManager.getInstance()){
-
-        }*/
     }
 }
