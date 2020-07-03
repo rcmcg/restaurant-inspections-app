@@ -1,4 +1,4 @@
-package com.example.group20restaurantapp;
+package com.example.group20restaurantapp.Model;
 
 import java.util.ArrayList;
 import java.util.List;

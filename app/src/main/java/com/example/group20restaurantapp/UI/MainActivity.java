@@ -1,4 +1,4 @@
-package com.example.group20restaurantapp;
+package com.example.group20restaurantapp.UI;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +14,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.group20restaurantapp.Model.Restaurant;
+import com.example.group20restaurantapp.Model.RestaurantManager;
+import com.example.group20restaurantapp.Model.TestCar;
+import com.example.group20restaurantapp.R;
 
 import java.io.BufferedReader;
 import java.io.IOException;
