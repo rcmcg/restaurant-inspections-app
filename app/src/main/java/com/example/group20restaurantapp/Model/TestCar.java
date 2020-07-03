@@ -1,4 +1,4 @@
-package com.example.group20restaurantapp;
+package com.example.group20restaurantapp.Model;
 
 public class TestCar {
     private String make;
