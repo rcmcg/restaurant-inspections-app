@@ -55,6 +55,20 @@ public class MainActivity extends AppCompatActivity {
         populateListView();
         registerClickCallback();
         InitInspectionLists();
+
+        setupTestButton();
+    }
+
+    private void setupTestButton() {
+        Button btn = findViewById(R.id.btnTest);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Launch inspection activity
+                Intent intent = InspectionActivity.makeIntent(MainActivity.this);
+                startActivity(intent);
+            }
+        });
     }
 
     private void readRestaurantData() {
