@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 import com.example.group20restaurantapp.Model.Inspection;
+import com.example.group20restaurantapp.Model.Violation;
 import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
@@ -229,19 +230,33 @@ public class MainActivity extends AppCompatActivity {
                 inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
                 inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
                 inspection.setHazardRating(lineSplit[5]);
-                String violations = lineSplit[6];
 
-                String[] violationsSplit = violations.split("\\|"); //Split 'lump' of violations into array, each element containing a violation
+                String[] violationsArr = lineSplit[6].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
 
-                if (violationsSplit[0] != ""){ //Transfer each violation to class object's arraylist
-                    Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsSplit));
-                    for (String token : violationsSplit){
-                        Log.d("MyActivity", "--Violations split: " + token);
-                        // For each token, split it up farther into number, crit, details, repeat
-                        // inspection.getViolLump().add(token);
+                if (violationsArr[0] != ""){ //Transfer each violation to class object's arraylist
+                    Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsArr));
+                    for (String violation : violationsArr){ // For each token, split it up farther into number, crit, details, repeat
+                        Log.d("MyActivity", "--Violations split: " + violation);
+                        String[] violSplit = violation.split(",");
+
+                        boolean crit = false;
+                        if (violSplit[1].replace("\"","").equals("Critical")){
+                            crit = true;
+                        }
+
+                        boolean repeat = false;
+                        if (violSplit[3].replace("\"","").equals("\"Repeat\"")){
+                            repeat = true;
+                        }
+
+                        Violation violObj = new Violation(Integer.parseInt(violSplit[0].replace("\"", "")), crit, violSplit[2], repeat); //Create violation object
+                        Log.d("MyActivity", "----violation.violNum: " + violObj.getViolNumber());
+                        Log.d("MyActivity", "----violation.crit: " + violObj.getCritical());
+                        Log.d("MyActivity", "----violation.violDetails: " + violObj.getViolDetails());
+                        Log.d("MyActivity", "----violation.repeat: " + violObj.getRepeat());
+                        inspection.getViolLump().add(violObj); //Append violation to violLump arraylist
                     }
                 }
-                //Log.d("MyActivity", "Inspection: " + inspection);
                 RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
             }
 
