@@ -17,6 +17,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+
+import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
@@ -27,6 +34,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,27 +54,18 @@ public class MainActivity extends AppCompatActivity {
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
-        setupTestButton();
-    }
-
-    private void setupTestButton() {
-        Button btn = findViewById(R.id.btnTest);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Launch InspectionActivity
-                Intent intent = InspectionActivity.makeIntent(MainActivity.this);
-                startActivity(intent);
-            }
-        });
+        InitInspectionLists();
     }
 
     private void readRestaurantData() {
         // Get instance of RestaurantManager
         manager = RestaurantManager.getInstance();
 
+        // TODO: Remove double quotes around strings where necessary
+        // Can use substring.() to return the string without the first and last chars, ie, the double quotes
+
         // To read a resource, need an input stream
-        InputStream is = getResources().openRawResource(R.raw.restaurants_name_itr11);
+        InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
 
         // To read from stream reader line by line, need a bufferreader
         // Need to build an input stream based on a character set
@@ -134,13 +133,13 @@ public class MainActivity extends AppCompatActivity {
             Restaurant currentRestaurant = manager.getIndex(position);
 
             // Fill the restaurantIcon
-            ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.violation_item_imgViolationIcon);
+            ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
             // TODO: Give each restaurant a custom icon?
             // imgRestaurant.setImageDrawable(currentRestaurant.getIconID());
 
             // Fill the hazard icon
             // TODO: Set the appropriate icon based on the restaurant's last inspections hazard level and remove if structure
-            ImageView imgHazardIcon = itemView.findViewById(R.id.violation_item_imgSeverityIcon);
+            ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardIcon);
 
             // Change which icon is shown for demonstration
             if (position%4 == 1) {
@@ -152,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Set restaurant name text
-            TextView restaurantName = itemView.findViewById(R.id.violation_item_txtBriefDescription);
+            TextView restaurantName = itemView.findViewById(R.id.restaurant_item_txtRestaurantName);
             restaurantName.setText(currentRestaurant.getName());
 
             // Set last inspection date text
@@ -179,10 +178,68 @@ public class MainActivity extends AppCompatActivity {
                 Restaurant clickedRestaurant = manager.getIndex(position);
                 String message = "You clicked position " + position
                         + " which is restaurant " + clickedRestaurant.getName();
+                        // + " with inspections " + clickedRestaurant.getInspectionList();
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
 
                 // Launch restaurant activity
             }
         });
+    }
+
+    private void InitInspectionLists() {
+        InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(is, Charset.forName("UTF-8"))
+        ); //Create reader
+
+        String line = "";
+
+        try {
+            reader.readLine();
+            while ( (line = reader.readLine()) != null){ //Iterate through lines (reports) in CSV
+                //Log.d("MyActivity", "Line: " + line);
+                int i = 0;
+
+                String[] lineSplit = line.split(",", 7);
+                //Find corresponding restaurant to the report currently being read
+                String trackNumCompare[] = {lineSplit[0], RestaurantManager.getInstance().getIndex(i).getTrackingNumber()};
+                while (!trackNumCompare[0].equals(trackNumCompare[1])){
+                    i++;
+                    trackNumCompare[1] = RestaurantManager.getInstance().getIndex(i).getTrackingNumber();
+                }
+                //Initializing inspection object variables
+                Inspection inspection = new Inspection();
+                inspection.setTrackingNumber(lineSplit[0]);
+                inspection.setInspectionDate(lineSplit[1]);
+                inspection.setInspType(lineSplit[2]);
+                inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
+                inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
+                inspection.setHazardRating(lineSplit[5]);
+                String violations = lineSplit[6];
+
+                String[] violationsSplit = violations.split("\\|"); //Split 'lump' of violations into array, each element containing a violation
+
+                if (violationsSplit[0] != ""){ //Transfer each violation to class object's arraylist
+                    Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsSplit));
+                    for (String token : violationsSplit){
+                        Log.d("MyActivity", "--Violations split: " + token);
+                        inspection.getViolLump().add(token);
+                    }
+                }
+                //Log.d("MyActivity", "Inspection: " + inspection);
+                RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+            }
+
+        } catch (IOException e){
+            Log.wtf("MyActivity", "Error reading data file on line" + line, e);
+            e.printStackTrace();
+        }
+
+        /*int j = 0;
+        while(j < 8){
+            Log.d("MyActivity", "Num Inspections: " + RestaurantManager.getInstance().getIndex(j).getInspectionList().size());
+            j++;
+        }*/
+
     }
 }

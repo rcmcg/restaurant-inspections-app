@@ -16,7 +16,7 @@ public class Inspection {
     private String inspType;    // Critical or non-critical
     private int numCritical;
     private int numNonCritical;
-    private int hazardRating;
+    private String hazardRating;
 
     static class Violation{
         String violType;        // Follow-up or routine
@@ -85,6 +85,7 @@ public class Inspection {
     }
 
     List <Violation> violLump = new ArrayList<>();
+    // List <String> violLump = new ArrayList<>();
 
     public String getTrackingNumber() {
         return trackingNumber;
@@ -126,11 +127,11 @@ public class Inspection {
         this.numNonCritical = numNonCritical;
     }
 
-    public int getHazardRating() {
+    public String getHazardRating() {
         return hazardRating;
     }
 
-    public void setHazardRating(int hazardRating) {
+    public void setHazardRating(String hazardRating) {
         this.hazardRating = hazardRating;
     }
 
@@ -142,4 +143,16 @@ public class Inspection {
         this.violLump = violLump;
     }
 
+    @Override
+    public String toString() {
+        return "Inspection{" +
+                "trackingNumber='" + trackingNumber + '\'' +
+                ", inspectionDate='" + inspectionDate + '\'' +
+                ", inspType='" + inspType + '\'' +
+                ", numCritical=" + numCritical +
+                ", numNonCritical=" + numNonCritical +
+                ", hazardRating=" + hazardRating +
+                ", violLump= " + Arrays.toString(getViolLump().toArray()) +
+                '}';
+    }
 }
