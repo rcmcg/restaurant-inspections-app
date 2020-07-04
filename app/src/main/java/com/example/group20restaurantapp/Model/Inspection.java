@@ -1,5 +1,7 @@
 package com.example.group20restaurantapp.Model;
 
+import com.example.group20restaurantapp.R;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,12 +9,13 @@ import java.util.List;
 public class Inspection {
     private String trackingNumber;
     private String inspectionDate;
-    private String inspType; //Critical or non-critical
+    private String inspType;    // Follow-up or routine
     private int numCritical;
     private int numNonCritical;
     private String hazardRating;
 
-    List <String> violLump = new ArrayList<>();
+    List <Violation> violLump = new ArrayList<>();
+    // List <String> violLump = new ArrayList<>();
 
     public String getTrackingNumber() {
         return trackingNumber;
@@ -62,11 +65,11 @@ public class Inspection {
         this.hazardRating = hazardRating;
     }
 
-    public List<String> getViolLump() {
+    public List<Violation> getViolLump() {
         return violLump;
     }
 
-    public void setViolLump(List<String> violLump) {
+    public void setViolLump(List<Violation> violLump) {
         this.violLump = violLump;
     }
 
