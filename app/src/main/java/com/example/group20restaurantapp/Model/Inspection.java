@@ -1,6 +1,7 @@
 package com.example.group20restaurantapp.Model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Inspection {
@@ -9,14 +10,9 @@ public class Inspection {
     private String inspType; //Critical or non-critical
     private int numCritical;
     private int numNonCritical;
-    private int hazardRating;
+    private String hazardRating;
 
-    class Violation{
-        String violType; //Follow-up or routine
-        String violationDetails;
-    }
-
-    List <Violation> violLump = new ArrayList<>();
+    List <String> violLump = new ArrayList<>();
 
     public String getTrackingNumber() {
         return trackingNumber;
@@ -58,20 +54,32 @@ public class Inspection {
         this.numNonCritical = numNonCritical;
     }
 
-    public int getHazardRating() {
+    public String getHazardRating() {
         return hazardRating;
     }
 
-    public void setHazardRating(int hazardRating) {
+    public void setHazardRating(String hazardRating) {
         this.hazardRating = hazardRating;
     }
 
-    public List<Violation> getViolLump() {
+    public List<String> getViolLump() {
         return violLump;
     }
 
-    public void setViolLump(List<Violation> violLump) {
+    public void setViolLump(List<String> violLump) {
         this.violLump = violLump;
     }
 
+    @Override
+    public String toString() {
+        return "Inspection{" +
+                "trackingNumber='" + trackingNumber + '\'' +
+                ", inspectionDate='" + inspectionDate + '\'' +
+                ", inspType='" + inspType + '\'' +
+                ", numCritical=" + numCritical +
+                ", numNonCritical=" + numNonCritical +
+                ", hazardRating=" + hazardRating +
+                ", violLump= " + Arrays.toString(getViolLump().toArray()) +
+                '}';
+    }
 }

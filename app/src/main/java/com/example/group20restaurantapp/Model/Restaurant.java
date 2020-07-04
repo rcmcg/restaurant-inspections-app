@@ -1,5 +1,8 @@
 package com.example.group20restaurantapp.Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Restaurant {
 
         private String name;
@@ -10,7 +13,7 @@ public class Restaurant {
         private String city;
         private String facType;
         private int icon;
-
+        List<Inspection> inspectionList = new ArrayList<>();
         //Constructor
         public Restaurant(String name, String address, double latitude, double longitude, String trackingNumber, String city, String facType, int icon) {
             this.name = name;
@@ -91,6 +94,14 @@ public class Restaurant {
 
         public void setIcon(int icon) {
             this.icon = icon;
+        }
+
+        public List<Inspection> getInspectionList() {
+            return inspectionList;
+        }
+
+        public void setInspectionList(List<Inspection> inspectionList) {
+            this.inspectionList = inspectionList;
         }
 
 
