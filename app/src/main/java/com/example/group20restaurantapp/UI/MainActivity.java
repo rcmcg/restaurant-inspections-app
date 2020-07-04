@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Fill the hazard icon
             // TODO: Set the appropriate icon based on the restaurant's last inspections hazard level and remove if structure
-            ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardIcon);
+            ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
 
             // Change which icon is shown for demonstration
             if (position%4 == 1) {
@@ -223,7 +223,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsSplit));
                     for (String token : violationsSplit){
                         Log.d("MyActivity", "--Violations split: " + token);
-                        inspection.getViolLump().add(token);
+                        // For each token, split it up farther into number, crit, details, repeat
+                        // inspection.getViolLump().add(token);
                     }
                 }
                 //Log.d("MyActivity", "Inspection: " + inspection);

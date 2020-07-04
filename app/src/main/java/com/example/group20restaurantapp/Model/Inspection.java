@@ -13,21 +13,23 @@ import java.util.List;
 public class Inspection {
     private String trackingNumber;
     private String inspectionDate;
-    private String inspType;    // Critical or non-critical
+    private String inspType;    // Follow-up or routine
     private int numCritical;
     private int numNonCritical;
     private String hazardRating;
 
     static class Violation{
-        String violType;        // Follow-up or routine
-        String violationDetails;
         int violNumber;
+        Boolean critical;
+        String violationDetails;
+        Boolean repeat;
         int violImgId;
 
-        public Violation(String violType, String violDetails, int violNumber) {
-            this.violType = violType;
-            this.violationDetails = violDetails;
+        public Violation(int violNumber, Boolean critical, String violDetails, Boolean repeat) {
             this.violNumber = violNumber;
+            this.critical = critical;
+            this.violationDetails = violDetails;
+            this.repeat = repeat;
             setViolImgId(violNumber);
         }
 
