@@ -65,8 +65,14 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Launch inspection activity
+                // Grab restaurant with multiple inspections for testing
+                RestaurantManager manager = RestaurantManager.getInstance();
+                Restaurant testRestaurant = manager.getIndex(5);
+                Inspection testInspection = testRestaurant.getInspectionList().get(0);
+
+                // Launch inspection activity with an Inspection object for testing
                 Intent intent = InspectionActivity.makeIntent(MainActivity.this);
+                intent.putExtra("inspection", testInspection);
                 startActivity(intent);
             }
         });
