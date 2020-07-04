@@ -184,24 +184,24 @@ public class MainActivity extends AppCompatActivity {
         InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(is, Charset.forName("UTF-8"))
-        );
+        ); //Create reader
 
         String line = "";
 
         try {
             reader.readLine();
-            while ( (line = reader.readLine()) != null){
+            while ( (line = reader.readLine()) != null){ //Iterate through lines (reports) in CSV
                 //Log.d("MyActivity", "Line: " + line);
                 int i = 0;
 
                 String[] lineSplit = line.split(",", 7);
+                //Find corresponding restaurant to the report currently being read
                 String trackNumCompare[] = {lineSplit[0], RestaurantManager.getInstance().getIndex(i).getTrackingNumber()};
-
                 while (!trackNumCompare[0].equals(trackNumCompare[1])){
                     i++;
                     trackNumCompare[1] = RestaurantManager.getInstance().getIndex(i).getTrackingNumber();
                 }
-
+                //Initializing inspection object variables
                 Inspection inspection = new Inspection();
                 inspection.setTrackingNumber(lineSplit[0]);
                 inspection.setInspectionDate(lineSplit[1]);
@@ -211,9 +211,9 @@ public class MainActivity extends AppCompatActivity {
                 inspection.setHazardRating(lineSplit[5]);
                 String violations = lineSplit[6];
 
-                String[] violationsSplit = violations.split("\\|");
+                String[] violationsSplit = violations.split("\\|"); //Split 'lump' of violations into array, each element containing a violation
 
-                if (violationsSplit[0] != ""){
+                if (violationsSplit[0] != ""){ //Transfer each violation to class object's arraylist
                     Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsSplit));
                     for (String token : violationsSplit){
                         Log.d("MyActivity", "--Violations split: " + token);
@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 //Log.d("MyActivity", "Inspection: " + inspection);
-                RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection);
+                RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
             }
 
         } catch (IOException e){
