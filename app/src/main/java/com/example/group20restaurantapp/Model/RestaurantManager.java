@@ -20,7 +20,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     //Return a restaurant object by taking an input of index in restaurant List
     public Restaurant getIndex(int n){
-        // System.out.println("This is the specific Restaurant" + restaurantList.get(n));
         return restaurantList.get(n);
     }
 
