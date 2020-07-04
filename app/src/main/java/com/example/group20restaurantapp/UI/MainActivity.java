@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
-import com.example.group20restaurantapp.Model.TestCar;
 import com.example.group20restaurantapp.R;
 
 import java.io.BufferedReader;
@@ -37,11 +36,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private RestaurantManager manager;
-    // private RestaurantManager restaurants = RestaurantManager.getInstance();
-    private List<TestCar> myCars = new ArrayList<TestCar>();
+    private RestaurantManager manager = RestaurantManager.getInstance();
 
-    private String testName = "Lee Yuen Seafood Restaurant";
     private String testDate = "Last inspection: Jan 22";
     private int testNumInspections = 5;
 
@@ -50,26 +46,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        readRestaurantData();
+
         // Following functions taken from Dr. Fraser's video linked below
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
-        // TODO: Update code so it works with the RestaurantManager after it has been filled
-        populateRestaurantList();
-
-        readRestaurantData();
         populateListView();
         registerClickCallback();
         InitInspectionLists();
     }
 
     private void readRestaurantData() {
-        // manager is the instance of restaurant manager. Use this one to populate list
-        manager= RestaurantManager.getInstance();
+        // Get instance of RestaurantManager
+        manager = RestaurantManager.getInstance();
 
         // To read a resource, need an input stream
         InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
 
         // To read from stream reader line by line, need a bufferreader
-        // Need a build an input stream based on a character set
+        // Need to build an input stream based on a character set
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
         String line = "";
         try {
@@ -89,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 r1.setIcon(0);
                 //Adding the created Restaurants object to the manager instance
                 manager.add(r1);
-                //Log.d("Main activity","Just created" + r1);
+                Log.d("Main activity","Just created" + r1);
             }
         } catch (IOException e) {
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
@@ -97,29 +91,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // TODO:I already have added the restaurants in manager instance so U can remove this function
-    private void populateRestaurantList() {
-        // This function will populate the RestaurantManager with Restaurants
-        // For now uses the TestCar class
-        myCars.add(new TestCar("Ford", 1940, 0, "Needing work"));
-        myCars.add(new TestCar("Toyota", 1994, 0, "Lovable"));
-        myCars.add(new TestCar("Honda", 1999, 0, "Wet"));
-        myCars.add(new TestCar("Porche", 2005, 0, "Fast!"));
-        myCars.add(new TestCar("Jeep", 200, 0, "Awesome"));
-        myCars.add(new TestCar("Rust-Bucket", 2010, 0, "Not *very* good"));
-        myCars.add(new TestCar("Moon Lander", 1971, 0, "Out of this world"));
-    }
-
     private void populateListView() {
-        ArrayAdapter<TestCar> adapter = new MyListAdapter();
-        // ArrayAdapter<RestaurantManager> adapter = new MyListAdapter();
+        // Construct a new ArrayList from the manager Singleton
+        List<Restaurant> restaurantList = restaurantList();
+
+        // Setup the listView
+        ArrayAdapter<Restaurant> adapter = new MyListAdapter(restaurantList);
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
 
-    private class MyListAdapter extends ArrayAdapter<TestCar> {
-        public MyListAdapter() {
-            super(MainActivity.this, R.layout.restaurant_item_view, myCars);
+    public ArrayList<Restaurant> restaurantList() {
+        ArrayList<Restaurant> newRestaurantList = new ArrayList<>();
+        for (int i = 0; i < manager.getSize(); i++) {
+            newRestaurantList.add(manager.getIndex(i));
+        }
+        return newRestaurantList;
+    };
+
+    private class MyListAdapter extends ArrayAdapter<Restaurant> {
+
+        public MyListAdapter(List<Restaurant> restaurantList) {
+            super(MainActivity.this, R.layout.restaurant_item_view, restaurantList);
         }
 
         @NonNull
@@ -132,13 +125,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Find the restaurant to work with
-            // Restaurant currentRestaurant = RestaurantManager.getIndex(position);
+            Restaurant currentRestaurant = manager.getIndex(position);
 
             // Fill the restaurantIcon
             ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
+            // TODO: Give each restaurant a custom icon?
             // imgRestaurant.setImageDrawable(currentRestaurant.getIconID());
 
             // Fill the hazard icon
+            // TODO: Set the appropriate icon based on the restaurant's last inspections hazard level and remove if structure
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardIcon);
 
             // Change which icon is shown for demonstration
@@ -152,32 +147,37 @@ public class MainActivity extends AppCompatActivity {
 
             // Set restaurant name text
             TextView restaurantName = itemView.findViewById(R.id.restaurant_item_txtRestaurantName);
+            restaurantName.setText(currentRestaurant.getName());
 
             // Set last inspection date text
+            // TODO: Grab the most recent inspection and display its date
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
+            // lastInspectionDate.setText();
 
             // Set number of violations text
+            // TODO: Display most recent inspections number of violations
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
 
             // Set text to test data
-            restaurantName.setText(testName);
             lastInspectionDate.setText(testDate);
             numViolationsLastInspection.setText("Violations: " + testNumInspections);
-
             return itemView;
         }
     }
 
     private void registerClickCallback() {
-            ListView list = (ListView) findViewById(R.id.restaurantsListView);
-            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                    TestCar clickedCar = myCars.get(position);
-                    String message = "You clicked position " + position;
-                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-                }
-            });
+        ListView list = (ListView) findViewById(R.id.restaurantsListView);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
+                Restaurant clickedRestaurant = manager.getIndex(position);
+                String message = "You clicked position " + position
+                        + " which is restaurant " + clickedRestaurant.getName();
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+
+                // Launch restaurant activity
+            }
+        });
     }
 
     private void InitInspectionLists() {
