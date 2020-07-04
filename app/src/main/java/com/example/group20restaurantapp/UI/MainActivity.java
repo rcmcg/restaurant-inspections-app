@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         manager= RestaurantManager.getInstance();
 
         // To read a resource, need an input stream
-        InputStream is = getResources().openRawResource(R.raw.restaurants_name_itr11);
+        InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
 
         // To read from stream reader line by line, need a bufferreader
         // Need a build an input stream based on a character set
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 r1.setIcon(0);
                 //Adding the created Restaurants object to the manager instance
                 manager.add(r1);
-                Log.d("Main activity","Just created" + r1);
+                //Log.d("Main activity","Just created" + r1);
             }
         } catch (IOException e) {
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
@@ -187,39 +188,52 @@ public class MainActivity extends AppCompatActivity {
 
         String line = "";
 
-        for (Restaurant restaurant : RestaurantManager.getInstance()){
-            try {
-                reader.readLine();
+        try {
+            reader.readLine();
+            while ( (line = reader.readLine()) != null){
+                //Log.d("MyActivity", "Line: " + line);
+                int i = 0;
 
-                while ( (line = reader.readLine()) != null){
-                    //Log.d("MyActivity", "Line: " + line);
-                    String[] lineSplit = line.split(",", 7);
-                    if (lineSplit[0] != restaurant.getTrackingNumber()){
-                        continue;
-                    }
+                String[] lineSplit = line.split(",", 7);
+                String trackNumCompare[] = {lineSplit[0], RestaurantManager.getInstance().getIndex(i).getTrackingNumber()};
 
-                    Inspection inspection = new Inspection();
-                    inspection.setTrackingNumber(lineSplit[0]);
-                    inspection.setInspectionDate(lineSplit[1]);
-                    inspection.setInspType(lineSplit[2]);
-                    inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
-                    inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
-                    inspection.setHazardRating(lineSplit[5]);
-                    String violations = lineSplit[6];
-
-                    String[] violationsSplit = violations.split("\\|");
-                    for (String token : violationsSplit){
-                        inspection.getViolLump().add(token);
-                    }
-                    //Log.d("MyActivity", "Inspection: " + inspection);
-                    restaurant.getInspectionList().add(inspection);
+                while (!trackNumCompare[0].equals(trackNumCompare[1])){
+                    i++;
+                    trackNumCompare[1] = RestaurantManager.getInstance().getIndex(i).getTrackingNumber();
                 }
 
-            } catch (IOException e){
-                Log.wtf("MyActivity", "Error reading data file on line" + line, e);
-                e.printStackTrace();
+                Inspection inspection = new Inspection();
+                inspection.setTrackingNumber(lineSplit[0]);
+                inspection.setInspectionDate(lineSplit[1]);
+                inspection.setInspType(lineSplit[2]);
+                inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
+                inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
+                inspection.setHazardRating(lineSplit[5]);
+                String violations = lineSplit[6];
+
+                String[] violationsSplit = violations.split("\\|");
+
+                if (violationsSplit[0] != ""){
+                    Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsSplit));
+                    for (String token : violationsSplit){
+                        Log.d("MyActivity", "--Violations split: " + token);
+                        inspection.getViolLump().add(token);
+                    }
+                }
+                //Log.d("MyActivity", "Inspection: " + inspection);
+                RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection);
             }
+
+        } catch (IOException e){
+            Log.wtf("MyActivity", "Error reading data file on line" + line, e);
+            e.printStackTrace();
         }
+
+        /*int j = 0;
+        while(j < 8){
+            Log.d("MyActivity", "Num Inspections: " + RestaurantManager.getInstance().getIndex(j).getInspectionList().size());
+            j++;
+        }*/
 
     }
 }
