@@ -33,9 +33,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
     //Returns a single instance of the restaurant objects
     public static RestaurantManager getInstance() {
         if (instance == null) {
-            instance=new RestaurantManager();
+            instance = new RestaurantManager();
         }
         return instance;
+    }
+
+    // TESTING
+    public List<Restaurant> getRestaurantList() {
+        return restaurantList;
     }
 
     @Override
