@@ -4,12 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -44,6 +46,19 @@ public class MainActivity extends AppCompatActivity {
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
+        setupTestButton();
+    }
+
+    private void setupTestButton() {
+        Button btn = findViewById(R.id.btnTest);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Launch InspectionActivity
+                Intent intent = InspectionActivity.makeIntent(MainActivity.this);
+                startActivity(intent);
+            }
+        });
     }
 
     private void readRestaurantData() {
@@ -119,13 +134,13 @@ public class MainActivity extends AppCompatActivity {
             Restaurant currentRestaurant = manager.getIndex(position);
 
             // Fill the restaurantIcon
-            ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
+            ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.violation_item_imgViolationIcon);
             // TODO: Give each restaurant a custom icon?
             // imgRestaurant.setImageDrawable(currentRestaurant.getIconID());
 
             // Fill the hazard icon
             // TODO: Set the appropriate icon based on the restaurant's last inspections hazard level and remove if structure
-            ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardIcon);
+            ImageView imgHazardIcon = itemView.findViewById(R.id.violation_item_imgSeverityIcon);
 
             // Change which icon is shown for demonstration
             if (position%4 == 1) {
@@ -137,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Set restaurant name text
-            TextView restaurantName = itemView.findViewById(R.id.restaurant_item_txtRestaurantName);
+            TextView restaurantName = itemView.findViewById(R.id.violation_item_txtBriefDescription);
             restaurantName.setText(currentRestaurant.getName());
 
             // Set last inspection date text

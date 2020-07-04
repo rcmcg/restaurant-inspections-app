@@ -6,14 +6,22 @@ import java.util.List;
 public class Inspection {
     private String trackingNumber;
     private String inspectionDate;
-    private String inspType; //Critical or non-critical
+    private String inspType;    // Critical or non-critical
     private int numCritical;
     private int numNonCritical;
     private int hazardRating;
 
     class Violation{
-        String violType; //Follow-up or routine
+        String violType;        // Follow-up or routine
         String violationDetails;
+        int violImgId;
+
+        public int getViolImgId() {
+            return violImgId;
+        }
+
+        public void setViolImgId(int violNumber) {
+        }
     }
 
     List <Violation> violLump = new ArrayList<>();
