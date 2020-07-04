@@ -59,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
         // Get instance of RestaurantManager
         manager = RestaurantManager.getInstance();
 
+        // TODO: Remove double quotes around strings where necessary
+        // Can use substring.() to return the string without the first and last chars, ie, the double quotes
+
         // To read a resource, need an input stream
         InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
 
@@ -173,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
                 Restaurant clickedRestaurant = manager.getIndex(position);
                 String message = "You clicked position " + position
                         + " which is restaurant " + clickedRestaurant.getName();
+                        // + " with inspections " + clickedRestaurant.getInspectionList();
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
 
                 // Launch restaurant activity
