@@ -30,7 +30,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private RestaurantManager manager = RestaurantManager.getInstance();
 
-    private String testName = "Lee Yuen Seafood Restaurant";
     private String testDate = "Last inspection: Jan 22";
     private int testNumInspections = 5;
 
