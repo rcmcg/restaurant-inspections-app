@@ -1,11 +1,20 @@
 package com.example.group20restaurantapp.Model;
 
+import android.util.Log;
+
 import com.example.group20restaurantapp.R;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class Inspection implements Serializable {
     private String trackingNumber;
@@ -14,9 +23,15 @@ public class Inspection implements Serializable {
     private int numCritical;
     private int numNonCritical;
     private String hazardRating;
-
     List <Violation> violLump = new ArrayList<>();
-    // List <String> violLump = new ArrayList<>();
+
+    public Inspection(){}
+
+    /* Not being used
+    private String[] parseViolations(String rawViolations) {
+        return rawViolations.replace(",", ", ").split("\\|");
+    }
+     */
 
     public String getTrackingNumber() {
         return trackingNumber;
@@ -30,9 +45,53 @@ public class Inspection implements Serializable {
         return inspectionDate;
     }
 
+    // TODO: Implement fullFormattedDate
+    public String fullFormattedDate() {
+        // Return full date in format Month Day, Year
+        return "";
+    }
+
+    public String intelligentInspectDate() {
+        String intelligentDate = "";
+        try {
+            // Get the current date
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+            Date currentDate = new Date();
+
+            // Get the difference in days between inspectionDate and currentDate
+            String rawInspectionDate = getInspectionDate();
+            Date inspectionD = sdf.parse(rawInspectionDate);
+            long diffInMS = Math.abs(currentDate.getTime() - inspectionD.getTime());
+            long diffInDay = TimeUnit.DAYS.convert(diffInMS, TimeUnit.MILLISECONDS);
+
+            String[] indexToMonth = new DateFormatSymbols().getMonths();
+            Calendar inspectionCalendar = Calendar.getInstance();
+            inspectionCalendar.setTime(inspectionD);
+
+            if (diffInDay <= 1) {
+                intelligentDate = diffInDay + " day";
+            } else if (diffInDay <= 30) {
+                intelligentDate = diffInDay + " days";
+            } else if (diffInDay <= 365) {
+                intelligentDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)]
+                        + " " + inspectionCalendar.get(Calendar.DAY_OF_MONTH);
+            } else {
+                intelligentDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)]
+                        + " " + inspectionCalendar.get(Calendar.YEAR);
+            }
+        } catch (Exception e) {
+            Log.d("Inspection.java", "intelligentInspectDate: Failed to produce date");
+            e.printStackTrace();
+        }
+
+        return intelligentDate;
+    }
+
+
     public void setInspectionDate(String inspectionDate) {
         this.inspectionDate = inspectionDate;
     }
+
 
     public String getInspType() {
         return inspType;
