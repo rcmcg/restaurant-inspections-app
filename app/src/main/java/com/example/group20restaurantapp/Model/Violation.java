@@ -11,13 +11,15 @@ public class Violation implements Serializable {
     private int violNumber;
     private Boolean critical;
     private String violDetails;
+    private String briefDetails;
     private Boolean repeat;
     private int violImgId;
 
-    public Violation(int violNumber, Boolean critical, String violDetails, Boolean repeat) {
+    public Violation(int violNumber, Boolean critical, String violDetails, String briefDetails, Boolean repeat) {
         this.violNumber = violNumber;
         this.critical = critical;
         this.violDetails = violDetails;
+        this.briefDetails = briefDetails;
         this.repeat = repeat;
         setViolImgId(violNumber);
     }
@@ -84,6 +86,8 @@ public class Violation implements Serializable {
     public String getViolDetails() {
         return violDetails;
     }
+
+    public String getBriefDetails() { return briefDetails; }
 
     public Boolean getRepeat() {
         return repeat;

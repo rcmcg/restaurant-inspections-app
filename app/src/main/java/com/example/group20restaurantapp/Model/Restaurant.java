@@ -14,6 +14,7 @@ public class Restaurant {
         private String facType;
         private int icon;
         List<Inspection> inspectionList = new ArrayList<>();
+
         //Constructor
         public Restaurant(String name, String address, double latitude, double longitude, String trackingNumber, String city, String facType, int icon) {
             this.name = name;
