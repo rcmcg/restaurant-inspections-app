@@ -28,12 +28,6 @@ public class Inspection implements Serializable {
 
     public Inspection(){}
 
-    /* Not being used
-    private String[] parseViolations(String rawViolations) {
-        return rawViolations.replace(",", ", ").split("\\|");
-    }
-     */
-
     public String getTrackingNumber() {
         return trackingNumber;
     }

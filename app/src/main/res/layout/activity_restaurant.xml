@@ -84,25 +84,25 @@
 
     <TextView
         android:id="@+id/restaurant_fix_text"
-        android:layout_width="372dp"
-        android:layout_height="50dp"
+        android:layout_width="410dp"
+        android:layout_height="34dp"
         android:text="@string/display_formate_criticalnum_non_criticalnum_relative_type_hazardlevel_icon"
-        android:textSize="18sp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="@+id/fix_txt2"
         app:layout_constraintTop_toBottomOf="@+id/fix_txt2"
-        app:layout_constraintVertical_bias="0.041" />
+        app:layout_constraintVertical_bias="0.052" />
 
     <ListView
         android:id="@+id/restaurant_view"
-        android:layout_width="398dp"
-        android:layout_height="390dp"
+        android:layout_width="407dp"
+        android:layout_height="293dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.461"
+        app:layout_constraintHorizontal_bias="0.09"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

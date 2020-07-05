@@ -24,7 +24,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
 
     //Singleton class and adding restaurants from CSV
-    private static RestaurantManager instance;
+    private static RestaurantManager  instance;
     private RestaurantManager(){
         //Prevent from instantiating
     }

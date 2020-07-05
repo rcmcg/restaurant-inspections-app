@@ -27,7 +27,8 @@ import java.util.List;
 public class RestaurantActivity extends AppCompatActivity {
 
     private RestaurantManager manager;
-    // private Restaurant restaurant;
+    private List<Inspection> inspect = new ArrayList<>();
+    //private Restaurant restaurant;
     // private int size = 0;
 
     // private String[] inspectionStrings = new String[size];
@@ -39,6 +40,7 @@ public class RestaurantActivity extends AppCompatActivity {
     // The Restaurant object contains a list of inspections
     // private ArrayList<Inspection> inspectionList;
     List<Inspection> inspections;
+
 
     public static Intent makeLaunchIntent(Context c, String message) {
         Intent intent = new Intent(c, RestaurantActivity.class);
@@ -66,10 +68,7 @@ public class RestaurantActivity extends AppCompatActivity {
         } else {
              restaurant = manager.getIndex(restaurantIndex);
         }
-
-        assert restaurant != null;
         inspections = restaurant.getInspectionList();
-
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
         setupDefaultIntent();
@@ -81,22 +80,9 @@ public class RestaurantActivity extends AppCompatActivity {
         setResult(Activity.RESULT_OK, i);
     }
 
-    /*
-
-    private void goToMapsActivity() {
-        Intent i = new Intent();
-        i.putExtra("result", 1);
-        i.putExtra("resID", restaurant.getTrackingNumber());
-        setResult(Activity.RESULT_OK, i);
-        finish();
-    }
-
-     */
-
     private void populateInspectionList(Restaurant restaurant) {
 
         manager = RestaurantManager.getInstance();
-
         processInspections(restaurant);
 
         ArrayAdapter<Inspection> adapter = new CustomAdapter();
@@ -118,21 +104,31 @@ public class RestaurantActivity extends AppCompatActivity {
             }
             Inspection currentInspection = inspections.get(position);
             String temp = currentInspection.getHazardRating();
-            if(temp.equals("Moderate"))
-            {   ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
-                imageView.setImageResource(R.drawable.yellow);
-            }if (temp.equals("High")){
-                ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
-                imageView.setImageResource(R.drawable.red);
-
+            if(temp == "Low") {
+                ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
+                imageview.setImageResource(R.drawable.green);
             }
-            else{
-                ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
-                imageView.setImageResource(R.drawable.green);
+            else if(temp == "High"){
+                ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
+                imageview.setImageResource(R.drawable.red);
+            }else if(temp == "Moderate"){
+                ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
+                imageview.setImageResource(R.drawable.yellow);
             }
-            TextView textView = (TextView) itemView.findViewById(R.id.inspectiontext);
-            textView.setText(currentInspection.toString());
-
+            TextView textView = (TextView) itemView.findViewById(R.id.textView);
+            textView.setText("TrankingNumber :"+currentInspection.getTrackingNumber());
+            TextView textView1 = (TextView) itemView.findViewById(R.id.textView1);
+            textView1.setText("inspectionDate :"+currentInspection.intelligentInspectDate());
+            TextView textView2 = (TextView) itemView.findViewById(R.id.textView2);
+            textView2.setText("inspType :"+currentInspection.getInspType());
+            TextView textView3 = (TextView) itemView.findViewById(R.id.textView3);
+            textView3.setText("numCritical :"+currentInspection.getNumCritical());
+            TextView textView4 = (TextView) itemView.findViewById(R.id.textView4);
+            textView4.setText("numNonCritical :"+currentInspection.getNumNonCritical());
+            TextView textView5 = (TextView) itemView.findViewById(R.id.textView5);
+            textView5.setText("hazardRating :"+currentInspection.getHazardRating());
+            TextView textView6 = (TextView) itemView.findViewById(R.id.textView6);
+            textView5.setText("violLump: "+currentInspection.getViolLump());
             return itemView;
         }
 
@@ -182,8 +178,6 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
-        // why is this here?
-        // TextView latLng = findViewById(R.id.latLng_resActivity);
     }
 
 }
