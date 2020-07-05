@@ -2,11 +2,12 @@ package com.example.group20restaurantapp.Model;
 
 import com.example.group20restaurantapp.R;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Inspection {
+public class Inspection implements Serializable {
     private String trackingNumber;
     private String inspectionDate;
     private String inspType;    // Follow-up or routine

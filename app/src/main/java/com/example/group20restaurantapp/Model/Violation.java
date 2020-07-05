@@ -2,11 +2,12 @@ package com.example.group20restaurantapp.Model;
 
 import com.example.group20restaurantapp.R;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Violation {
+public class Violation implements Serializable {
     private int violNumber;
     private Boolean critical;
     private String violDetails;
@@ -70,7 +71,6 @@ public class Violation {
         } else {
             this.violImgId = R.drawable.violation_generic;
         }
-
     }
 
     public int getViolNumber() {
