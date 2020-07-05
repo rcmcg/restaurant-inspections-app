@@ -84,8 +84,8 @@
 
     <TextView
         android:id="@+id/restaurant_fix_text"
-        android:layout_width="408dp"
-        android:layout_height="54dp"
+        android:layout_width="372dp"
+        android:layout_height="50dp"
         android:text="@string/display_formate_criticalnum_non_criticalnum_relative_type_hazardlevel_icon"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -97,8 +97,8 @@
 
     <ListView
         android:id="@+id/restaurant_view"
-        android:layout_width="412dp"
-        android:layout_height="358dp"
+        android:layout_width="398dp"
+        android:layout_height="390dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

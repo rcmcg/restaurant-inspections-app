@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                 Restaurant clickedRestaurant = manager.getIndex(position);
                 String message = "You clicked position " + position
                         + " which is restaurant " + clickedRestaurant.getName();
-                // + " with inspections " + clickedRestaurant.getInspectionList();
+                        // + " with inspections " + clickedRestaurant.getInspectionList();
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
 
                 // Launch restaurant activity

@@ -4,7 +4,8 @@
     <string name="address">Address:</string>
     <string name="longitude">Longitude:</string>
     <string name="latitude">Latitude:</string>
+    <string name="title_activity_restaurant">Restaurant</string>
     <string name="display_formate_criticalnum_non_criticalnum_relative_type_hazardlevel_icon">Display Formate: CriticalNum,Non-CriticalNum,Relative,Type,HazardLevel,Icon</string>
-    <string name="title_activity_restaurant" />
-    <string name="lat">lat:</string>
+    <string name="lat">Lat:</string>
+
 </resources>
