@@ -305,12 +305,5 @@ public class MainActivity extends AppCompatActivity {
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
             e.printStackTrace();
         }
-
-        /*int j = 0;
-        while(j < 8){
-            Log.d("MyActivity", "Num Inspections: " + RestaurantManager.getInstance().getIndex(j).getInspectionList().size());
-            j++;
-        }*/
-
     }
 }
