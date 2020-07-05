@@ -7,6 +7,7 @@ import com.example.group20restaurantapp.R;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +49,31 @@ public class Inspection implements Serializable {
     // TODO: Implement fullFormattedDate
     public String fullFormattedDate() {
         // Return full date in format Month Day, Year
-        return "";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        String rawInspectionDate = getInspectionDate();
+
+        String retString = "";
+
+        try {
+            Date inspectionD = sdf.parse(rawInspectionDate);
+
+            String[] indexToMonth = new DateFormatSymbols().getMonths();
+            Calendar inspectionCalendar = Calendar.getInstance();
+            assert inspectionD != null;
+            inspectionCalendar.setTime(inspectionD);
+
+            retString = indexToMonth[inspectionCalendar.get(Calendar.MONTH)] + " "
+                        + inspectionCalendar.get(Calendar.DAY_OF_MONTH)
+                        + ", "
+                        + inspectionCalendar.get(Calendar.YEAR);
+
+        } catch (Exception e) {
+            Log.e("Inspection.java", "fullFormattedDate: error creating date");
+            e.printStackTrace();
+        }
+
+
+        return retString;
     }
 
     public String intelligentInspectDate() {
