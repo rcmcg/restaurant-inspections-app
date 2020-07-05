@@ -163,11 +163,11 @@ public class MainActivity extends AppCompatActivity {
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                if (lastInspection.getHazardRating() == "Low") {
+                if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
-                } else if (lastInspection.getHazardRating() == "Moderate") {
+                } else if (lastInspection.getHazardRating().equals("Moderate")) {
                     imgHazardIcon.setImageResource(R.drawable.orange_diamond);
-                } else if (lastInspection.getHazardRating() == "High") {
+                } else if (lastInspection.getHazardRating().equals("High")) {
                     imgHazardIcon.setImageResource(R.drawable.red_octogon);
                 }
             } else {
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                lastInspectionDate.setText("Inspection date: " + lastInspection.intelligentInspectDate());
+                lastInspectionDate.setText("Last inspection: " + lastInspection.intelligentInspectDate());
             } else {
                 lastInspectionDate.setText(NO_INSPECTION);
             }
