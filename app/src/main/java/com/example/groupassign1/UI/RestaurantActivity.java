@@ -12,8 +12,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,7 +23,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RestaurantActavity extends AppCompatActivity {
+public class RestaurantActivity extends AppCompatActivity {
 
     private RestaurantManager manager;
     private Restaurant restaurant;
@@ -37,7 +35,7 @@ public class RestaurantActavity extends AppCompatActivity {
     List<Inspection> inspections = new ArrayList<>();
 
     public static Intent makeLaunchIntent(Context c, String message) {
-        Intent intent = new Intent(c, RestaurantActavity.class);
+        Intent intent = new Intent(c, RestaurantActivity.class);
         intent.putExtra(EXTRA_MESSAGE, message);
         return intent;
     }
@@ -79,7 +77,7 @@ public class RestaurantActavity extends AppCompatActivity {
 
     private class CustomAdapter extends ArrayAdapter<Inspection> {
         public CustomAdapter() {
-            super(RestaurantActavity.this, R.layout.layout_inspection, inspections);
+            super(RestaurantActivity.this, R.layout.layout_inspection, inspections);
         }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -138,7 +136,7 @@ public class RestaurantActavity extends AppCompatActivity {
 
                 String restaurantTracking = restaurant.getTrackingNumber();
 
-                Intent intent = InspectionActivity.makeLaunchIntent(RestaurantActavity.this, "InspectionActivity");
+                Intent intent = InspectionActivity.makeLaunchIntent(RestaurantActivity.this, "InspectionActivity");
                 intent.putExtra("Extra", message);
                 intent.putExtra("Restaurant", restaurantTracking);
                 startActivity(intent);
