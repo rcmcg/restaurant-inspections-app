@@ -32,7 +32,7 @@ public class Restaurant {
             this.criticalViolationCount = countCriticalViolation();
         }
 
-        public Restaurant() {
+        public Restaurant(String replace, String s, String replace1, Float aFloat, Float valueOf, String s1) {
 
         }
 
