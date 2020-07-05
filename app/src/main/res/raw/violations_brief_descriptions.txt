@@ -1,0 +1,36 @@
+101,Construction plans ignoring Regulations
+102,Unapproved premise
+103,Invalid permit
+104,Permit hidden
+201,Contaminated food
+202,Food not processed properly
+203,Food not cooled properly
+204,Food not cooked properly
+205,Cold food improperly stored
+206,Hot food improperly stored
+208,Food obtained from unapproved source
+209,Food not protected from contamination
+210,Food not thawed properly
+211,Frozen food not stored properly
+212,Poor written food handling procedures
+301,Kitchen surfaces and equipment dirty
+302,Kitchen surfaces and equipment dirty
+303,Poor sanitation equipment or facilities
+304,Pests found on premise
+305,Poor pest prevention
+306,Premise unsanitary
+307,Poor quality equipment or utensils
+308,Poor maintenance of equipment
+309,Improperly stored cleaning chemicals
+310,Single use items not disposed after use
+311,Poorly maintained premises
+312,Non-kitchen items stored on premise
+313,Non-service animal on premise
+314,Poor written sanitary procedures
+315,Inaccurate or no thermometers
+401,Poor or no handwashing stations
+402,Poor employee handwashing practice
+403,Poor employee personal hygiene
+404,Employee smoking near critical areas
+501,Operator lacks FOODSAFE certification
+502,No FOODSAFE certification on site

@@ -85,7 +85,7 @@ public class InspectionActivity extends AppCompatActivity {
             // Set violation brief description
             // TODO: Add and integrate briefDescriptions.txt
             TextView violationDescription = itemView.findViewById(R.id.violation_item_txtBriefDescription);
-            violationDescription.setText(currentViolation.getViolDetails());
+            violationDescription.setText(currentViolation.getBriefDetails());
 
             // Set the severity icon
             ImageView violationSeverityIcon = itemView.findViewById(R.id.violation_item_imgSeverityIcon);

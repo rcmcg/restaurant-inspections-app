@@ -18,9 +18,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
+import java.nio.Buffer;
 import java.nio.charset.Charset;
 
 import com.example.group20restaurantapp.Model.Inspection;
@@ -208,12 +211,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void InitInspectionLists() {
+        // Create arrays for briefDescriptions of violations
+        InputStream is2 = getResources().openRawResource(R.raw.violations_brief_descriptions);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is2, Charset.forName("UTF-8")));
+        String line = "";
+
+        List<Integer> violNumbers = new ArrayList<>();
+        List<String> violBriefDescriptions = new ArrayList<>();
+
+        try {
+            bufferedReader.readLine();
+            while ( (line = bufferedReader.readLine()) != null) {
+                String[] lineSplit = line.split(",");
+                violNumbers.add(Integer.parseInt(lineSplit[0]));
+                violBriefDescriptions.add(lineSplit[1]);
+                Log.d("MyActivity", "Added brief description " + lineSplit[1] + " to violBriefDescriptions");
+            }
+        } catch (IOException e) {
+            Log.wtf("MyActivity", "Error reading data file on line" + line, e);
+            e.printStackTrace();
+        }
+
+
         InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(is, Charset.forName("UTF-8"))
         ); //Create reader
 
-        String line = "";
+        line = "";
 
         try {
             reader.readLine();
@@ -255,10 +280,20 @@ public class MainActivity extends AppCompatActivity {
                             repeat = true;
                         }
 
-                        Violation violObj = new Violation(Integer.parseInt(violSplit[0].replace("\"", "")), crit, violSplit[2], repeat); //Create violation object
+                        int violNumber = Integer.parseInt(violSplit[0].replace("\"", ""));
+
+                        int briefDescIndex = violNumbers.indexOf(violNumber);
+                        String briefDesc = violBriefDescriptions.get(briefDescIndex);
+
+                        Violation violObj = new Violation(violNumber,
+                                crit,
+                                violSplit[2],
+                                briefDesc,
+                                repeat); //Create violation object
                         Log.d("MyActivity", "----violation.violNum: " + violObj.getViolNumber());
                         Log.d("MyActivity", "----violation.crit: " + violObj.getCritical());
                         Log.d("MyActivity", "----violation.violDetails: " + violObj.getViolDetails());
+                        Log.d("MyActivity", "----violation.briefViolDetails: " + violObj.getBriefDetails());
                         Log.d("MyActivity", "----violation.repeat: " + violObj.getRepeat());
                         inspection.getViolLump().add(violObj); //Append violation to violLump arraylist
                     }
@@ -270,12 +305,5 @@ public class MainActivity extends AppCompatActivity {
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
             e.printStackTrace();
         }
-
-        /*int j = 0;
-        while(j < 8){
-            Log.d("MyActivity", "Num Inspections: " + RestaurantManager.getInstance().getIndex(j).getInspectionList().size());
-            j++;
-        }*/
-
     }
 }
