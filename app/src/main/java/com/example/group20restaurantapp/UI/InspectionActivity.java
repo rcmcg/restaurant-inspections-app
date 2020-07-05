@@ -126,7 +126,7 @@ public class InspectionActivity extends AppCompatActivity {
 
     private void setInspectionDateText(Inspection inspection) {
         TextView inspectionDate = findViewById(R.id.txtInspectionDate);
-        inspectionDate.setText("Date: " + inspection.getInspectionDate());
+        inspectionDate.setText("Date: " + inspection.fullFormattedDate());
     }
 
     private void setInspectionTypeText(Inspection inspection) {
