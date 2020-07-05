@@ -38,9 +38,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
 
     // TESTING
+    /*
     public List<Restaurant> getRestaurantList() {
         return restaurantList;
     }
+
+     */
 
     @Override
     public Iterator<Restaurant> iterator() {

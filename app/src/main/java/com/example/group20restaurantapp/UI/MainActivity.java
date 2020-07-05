@@ -18,12 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.nio.Buffer;
 import java.nio.charset.Charset;
 
 import com.example.group20restaurantapp.Model.Inspection;
@@ -32,21 +29,13 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private RestaurantManager manager = RestaurantManager.getInstance();
-    private int size = 0;
-    private String[] restaurantStrings = new String[size];
-    private String testDate = "Last inspection: Jan 22";
-    private int testNumInspections = 5;
+    private String NO_INSPECTION = "This restaurant has never had an inspection";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,27 +48,12 @@ public class MainActivity extends AppCompatActivity {
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
+
         InitInspectionLists();
-        clickToGetDetial();
-        setupTestButton();
-    }
-    private void clickToGetDetial() {
-        ListView list = findViewById(R.id.restaurantsListView);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                if (restaurantStrings.length == 0) {
-                    String message = manager.getRestaurantList().get(position).toString();
-
-                    Intent intent = RestaurantActivity.makeLaunchIntent(MainActivity.this, "RestaurantActivity");
-                    intent.putExtra("Extra", message);
-                    MainActivity.this.startActivityForResult(intent, 45);
-                }
-            }
-        });
+        // setupTestButton();
     }
 
+    // Will remove when RestaurantActivity is finished
     private void setupTestButton() {
         Button btn = findViewById(R.id.btnTest);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -117,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             reader.readLine();
             while ((line = reader.readLine()) != null) {
                 //Splitting every line based on "," , Tokens are variables of Restaurant class
+                // TODO: This should be replaced with a constructor taking arguments
                 String[] tokens=line.split(",");
                 Restaurant r1=new Restaurant();
                 r1.setTrackingNumber(tokens[0]);
@@ -126,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 r1.setFacType(tokens[4]);
                 r1.setLatitude(Double.parseDouble(tokens[5]));
                 r1.setLongitude(Double.parseDouble(tokens[6]));
-                r1.setIcon(0);
+                r1.setImgId();
                 //Adding the created Restaurants object to the manager instance
                 manager.add(r1);
                 Log.d("Main activity","Just created" + r1);
@@ -135,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
             e.printStackTrace();
         }
+
+        // TODO: After the RestaurantManager has been populated, it needs to be sorted alphabetically
+        // manager.sortAlphabetically();
     }
 
     private void populateListView() {
@@ -175,20 +153,22 @@ public class MainActivity extends AppCompatActivity {
 
             // Fill the restaurantIcon
             ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
-            // TODO: Give each restaurant a custom icon?
-            // imgRestaurant.setImageDrawable(currentRestaurant.getIconID());
+            imgRestaurant.setImageResource(currentRestaurant.getIconImgId());
 
             // Fill the hazard icon
-            // TODO: Set the appropriate icon based on the restaurant's last inspections hazard level and remove if structure
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
-
-            // Change which icon is shown for demonstration
-            if (position%4 == 1) {
-                imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
-            } else if (position%4 == 2) {
-                imgHazardIcon.setImageResource(R.drawable.orange_diamond);
-            } else if (position%4 == 3) {
-                imgHazardIcon.setImageResource(R.drawable.red_octogon);
+            if (currentRestaurant.getInspectionList().size() != 0) {
+                Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+                if (lastInspection.getHazardRating() == "Low") {
+                    imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
+                } else if (lastInspection.getHazardRating() == "Moderate") {
+                    imgHazardIcon.setImageResource(R.drawable.orange_diamond);
+                } else if (lastInspection.getHazardRating() == "High") {
+                    imgHazardIcon.setImageResource(R.drawable.red_octogon);
+                }
+            } else {
+                // TODO: Find a question mark icon for when a restaurant has had no inspections
+                // imgHazardIcon.setImageResource(R.drawable.question_mark);
             }
 
             // Set restaurant name text
@@ -196,17 +176,28 @@ public class MainActivity extends AppCompatActivity {
             restaurantName.setText(currentRestaurant.getName());
 
             // Set last inspection date text
-            // TODO: Grab the most recent inspection and display its date
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
-            // lastInspectionDate.setText();
+            if (currentRestaurant.getInspectionList().size() != 0) {
+                Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+                lastInspectionDate.setText("Inspection date: " + lastInspection.intelligentInspectDate());
+            } else {
+                lastInspectionDate.setText(NO_INSPECTION);
+            }
+
 
             // Set number of violations text
             // TODO: Display most recent inspections number of violations
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
+            if (currentRestaurant.getInspectionList().size() != 0) {
+                Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+                numViolationsLastInspection.setText("Violations: " + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical()));
+            } else {
+                numViolationsLastInspection.setText("0");
+            }
 
             // Set text to test data
-            lastInspectionDate.setText(testDate);
-            numViolationsLastInspection.setText("Violations: " + testNumInspections);
+            // lastInspectionDate.setText(testDate);
+            // numViolationsLastInspection.setText("Violations: " + testNumInspections);
             return itemView;
         }
     }
@@ -217,12 +208,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
                 Restaurant clickedRestaurant = manager.getIndex(position);
-                String message = "You clicked position " + position
-                        + " which is restaurant " + clickedRestaurant.getName();
-                        // + " with inspections " + clickedRestaurant.getInspectionList();
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
 
                 // Launch restaurant activity
+                Intent intent = RestaurantActivity.makeLaunchIntent(MainActivity.this, "RestaurantActivity");
+                intent.putExtra("restaurantIndex", position);
+                startActivity(intent);
             }
         });
     }
@@ -256,6 +246,8 @@ public class MainActivity extends AppCompatActivity {
         ); //Create reader
 
         line = "";
+
+        // TODO: After restaurant is filled with inspections, sort the inspections list by date
 
         try {
             reader.readLine();
@@ -317,7 +309,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
             }
-
         } catch (IOException e){
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
             e.printStackTrace();

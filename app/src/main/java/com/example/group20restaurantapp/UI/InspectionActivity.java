@@ -35,6 +35,7 @@ public class InspectionActivity extends AppCompatActivity {
 
         Inspection inspection = (Inspection) getIntent().getSerializableExtra("inspection");
 
+        assert inspection != null;
         violationList = inspection.getViolLump();
 
         setInspectionDateText(inspection);
@@ -52,6 +53,8 @@ public class InspectionActivity extends AppCompatActivity {
     private void populateListView(Inspection inspection) {
         // Construct a new ArrayList from the list of Violations in inspection
         List<Violation> violationList = inspection.getViolLump();
+
+        // TODO: Do something else if there are no violations
 
         // Setup the listView
         ArrayAdapter<Violation> adapter = new MyListAdapter(violationList);
@@ -80,10 +83,8 @@ public class InspectionActivity extends AppCompatActivity {
             // Set violation icon
             ImageView violationIcon = itemView.findViewById(R.id.violation_item_imgViolationIcon);
             violationIcon.setImageResource(currentViolation.getViolImgId());
-            // violationIcon.setImageResource(R.drawable.violation_rat);
 
             // Set violation brief description
-            // TODO: Add and integrate briefDescriptions.txt
             TextView violationDescription = itemView.findViewById(R.id.violation_item_txtBriefDescription);
             violationDescription.setText(currentViolation.getBriefDetails());
 
@@ -145,11 +146,11 @@ public class InspectionActivity extends AppCompatActivity {
 
     private void setHazardRatingIcon(Inspection inspection) {
         ImageView hazardIcon = findViewById(R.id.imgHazardIcon);
-        if (inspection.getHazardRating() == "Low") {
+        if (inspection.getHazardRating().equals("Low")) {
             hazardIcon.setImageResource(R.drawable.yellow_triangle);
-        } else if (inspection.getHazardRating() == "Moderate") {
+        } else if (inspection.getHazardRating().equals("Moderate")) {
             hazardIcon.setImageResource(R.drawable.orange_diamond);
-        } else if (inspection.getHazardRating() == "High") {
+        } else if (inspection.getHazardRating().equals("High")) {
             hazardIcon.setImageResource(R.drawable.red_octogon);
         }
     }
@@ -158,15 +159,10 @@ public class InspectionActivity extends AppCompatActivity {
         TextView inspectionHazardRating = findViewById(R.id.txtHazardRating);
         inspectionHazardRating.setText("Hazard rating: " + inspection.getHazardRating());
         if (inspection.getHazardRating().equals("Low")) {
-
             inspectionHazardRating.setTextColor(Color.GREEN);
-
         } else if (inspection.getHazardRating().equals("Moderate")) {
-
             inspectionHazardRating.setTextColor(Color.rgb(204, 204, 0));
-
         } else if (inspection.getHazardRating().equals("High")) {
-
             inspectionHazardRating.setTextColor(Color.RED);
 
         }

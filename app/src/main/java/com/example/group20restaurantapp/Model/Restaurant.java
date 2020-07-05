@@ -14,9 +14,9 @@ public class Restaurant {
         private String trackingNumber;
         private String city;
         private String facType;
-        private int icon;
+        private int iconImgId;
         List<Inspection> inspectionList = new ArrayList<>();
-        private int countCritical;
+        // private int countCritical;
 
         //Constructor
         public Restaurant(String name, String address, double latitude, double longitude, String trackingNumber, String city, String facType, int icon) {
@@ -27,9 +27,7 @@ public class Restaurant {
             this.trackingNumber = trackingNumber;
             this.city = city;
             this.facType = facType;
-            //I've add new things here
-            this.icon = matchLogo();
-            this.countCritical = countCriticalNum();
+            setImgId();
         }
 
         public Restaurant() {
@@ -94,12 +92,8 @@ public class Restaurant {
             this.facType = facType;
         }
 
-        public int getIcon() {
-            return icon;
-        }
-
-        public void setIcon(int icon) {
-            this.icon = icon;
+        public int getIconImgId() {
+            return iconImgId;
         }
 
         public List<Inspection> getInspectionList() {
@@ -110,26 +104,34 @@ public class Restaurant {
             this.inspectionList = inspectionList;
         }
 
-        //add new things
-        private int matchLogo(){
+
+        public void setImgId(){
+            // TODO: Check by tracking number since there's a duplicate (Lee Yuen)
+            // Unless you want to use the same logo
             name = this.getName();
             if (name.matches("^(A&W).*")){
-                return R.drawable.a_and_w;
+                iconImgId = R.drawable.a_and_w;
             }
             else if (name.matches("Lee Yuen Seafood Restaurant")){
-                return R.drawable.lee_yuen;
+                iconImgId =  R.drawable.lee_yuen;
             }
             else if (name.matches("The Unfindable Bar")){
-                return R.drawable.the_unfindable_bar;
+                iconImgId =  R.drawable.the_unfindable_bar;
             }
             else if (name.matches("Top in Town Pizza")){
-                return R.drawable.top_in_town_pizza;
+                iconImgId =  R.drawable.top_in_town_pizza;
             }
             else if (name.matches("104 Sushi & Co")){
-                return R.drawable.sushi_and_co;
+                iconImgId =  R.drawable.sushi_and_co;
+            } else if (name.matches("Zugba Flame Grilled Chicken")){
+                iconImgId =  R.drawable.zugba_flame_grilled_chicken;
             }
-            return R.drawable.zugba_flame_grilled_chicken;
+            // Generic image if restaurant not found
+            iconImgId =  R.drawable.restaurant_icon_clipart;
         }
+
+        /*
+        Why do you need to know the number of critical violations in the last 365 days?
         private int  countCriticalNum(){
             int Num = 0;
             for (Inspection inspection : inspectionList) {
@@ -139,6 +141,7 @@ public class Restaurant {
             }
             return Num;
         }
+        */
 
         public int getInspectionSize() {
         return inspectionList.size();
@@ -153,7 +156,7 @@ public class Restaurant {
                     ", trackingNumber='" + trackingNumber + '\'' +
                     ", city='" + city + '\'' +
                     ", facType='" + facType + '\'' +
-                    ", icon=" + icon +
+                    ", icon=" + iconImgId +
                     '}';
         }
     }
