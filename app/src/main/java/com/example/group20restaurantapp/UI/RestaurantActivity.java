@@ -104,14 +104,14 @@ public class RestaurantActivity extends AppCompatActivity {
             }
             Inspection currentInspection = inspections.get(position);
             String temp = currentInspection.getHazardRating();
-            if(temp == "Low") {
+            if(temp.equals("Low")) {
                 ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
                 imageview.setImageResource(R.drawable.green);
             }
-            else if(temp == "High"){
+            else if(temp.equals("High")){
                 ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
                 imageview.setImageResource(R.drawable.red);
-            }else if(temp == "Moderate"){
+            }else if(temp.equals("Moderate")){
                 ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
                 imageview.setImageResource(R.drawable.yellow);
             }
@@ -127,8 +127,6 @@ public class RestaurantActivity extends AppCompatActivity {
             textView4.setText("numNonCritical :"+currentInspection.getNumNonCritical());
             TextView textView5 = (TextView) itemView.findViewById(R.id.textView5);
             textView5.setText("hazardRating :"+currentInspection.getHazardRating());
-            TextView textView6 = (TextView) itemView.findViewById(R.id.textView6);
-            textView5.setText("violLump: "+currentInspection.getViolLump());
             return itemView;
         }
 
