@@ -157,14 +157,21 @@ public class InspectionActivity extends AppCompatActivity {
     private void setHazardRatingText(Inspection inspection) {
         TextView inspectionHazardRating = findViewById(R.id.txtHazardRating);
         inspectionHazardRating.setText("Hazard rating: " + inspection.getHazardRating());
-        if (inspection.getHazardRating() == "Low") {
-            inspectionHazardRating.setBackgroundColor(Color.YELLOW);
-        } else if (inspection.getHazardRating() == "Moderate") {
-            // Set to orange
-            inspectionHazardRating.setBackgroundColor(Color.rgb(255,165,0));
-        } else if (inspection.getHazardRating() == "High") {
-            inspectionHazardRating.setBackgroundColor(Color.RED);
+        if (inspection.getHazardRating().equals("Low")) {
+
+            inspectionHazardRating.setTextColor(Color.GREEN);
+
+        } else if (inspection.getHazardRating().equals("Moderate")) {
+
+            inspectionHazardRating.setTextColor(Color.rgb(204, 204, 0));
+
+        } else if (inspection.getHazardRating().equals("High")) {
+
+            inspectionHazardRating.setTextColor(Color.RED);
+
         }
+
+
     }
 
     public static Intent makeIntent(Context context) {

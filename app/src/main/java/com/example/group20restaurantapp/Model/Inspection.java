@@ -26,36 +26,39 @@ public class Inspection implements Serializable {
     private int diffInDay;
     private String inspectionType;
     private String[] violations;
-    public Inspection(){};
-    public Inspection(String trackingNumber, String inspectionDate, String inspectionType,
-                      int numCritical, int numNonCritical, String hazardRating, String violations) {
-        this.trackingNumber = trackingNumber;
-        this.inspectionDate = inspectionDate;
-        this.inspectionType = inspectionType;
-        this.numCritical = numCritical;
-        this.numNonCritical = numNonCritical;
-        this.hazardRating = hazardRating;
-        this.violations = parseViolations(violations);
-        initDate();
-    }
+    public Inspection(){}
     private String[] parseViolations(String rawViolations) {
         return rawViolations.replace(",", ", ").split("\\|");
     }
     public int getDiffInDay() { return this.diffInDay; }
-    public void initDate() {
+
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
+
+    public String getInspectionDate() {
+        return inspectionDate;
+    }
+
+    public void setInspectionDate(String inspectionDate) {
+        this.inspectionDate = inspectionDate;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
             String rawInspectionDate = getInspectionDate();
-            Date inspectionDate = sdf.parse(rawInspectionDate);
+            Date inspectionD = sdf.parse(rawInspectionDate);
             Date currentDate = new Date();
 
-            long diffInMS = Math.abs(currentDate.getTime() - inspectionDate.getTime());
+            long diffInMS = Math.abs(currentDate.getTime() - inspectionD.getTime());
             long diffInDay = TimeUnit.DAYS.convert(diffInMS, TimeUnit.MILLISECONDS);
             this.diffInDay = (int) diffInDay;
 
             String[] indexToMonth = new DateFormatSymbols().getMonths();
             Calendar inspectionCalendar = Calendar.getInstance();
-            inspectionCalendar.setTime(inspectionDate);
+            inspectionCalendar.setTime(inspectionD);
 
             if (diffInDay <= 1) {
 
@@ -81,39 +84,6 @@ public class Inspection implements Serializable {
             e.printStackTrace();
             this.inspectionDate = "N/A";
         }
-    }
-    public int getHazardIcon() {
-
-        if (hazardRating.equals("Low")) {
-
-            return R.drawable.green;
-
-        } else if (hazardRating.equals("Moderate")) {
-
-            return R.drawable.yellow;
-
-        } else {
-
-            return R.drawable.red;
-
-        }
-
-    }
-
-    public String getTrackingNumber() {
-        return trackingNumber;
-    }
-
-    public void setTrackingNumber(String trackingNumber) {
-        this.trackingNumber = trackingNumber;
-    }
-
-    public String getInspectionDate() {
-        return inspectionDate;
-    }
-
-    public void setInspectionDate(String inspectionDate) {
-        this.inspectionDate = inspectionDate;
     }
 
     public String getInspType() {

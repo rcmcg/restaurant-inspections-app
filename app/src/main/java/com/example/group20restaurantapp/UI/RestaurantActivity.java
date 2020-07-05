@@ -49,7 +49,6 @@ public class RestaurantActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         populateInspectionList();
         registerClickCallback();
         setupDefaultIntent();
@@ -99,12 +98,20 @@ public class RestaurantActivity extends AppCompatActivity {
             if (itemView == null) {
                 itemView = getLayoutInflater().inflate(R.layout.layout_inspection, parent, false);
             }
-
             Inspection currentInspection = inspections.get(position);
+            String temp = currentInspection.getHazardRating();
+            if(temp == "Moderate")
+            {   ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
+                imageView.setImageResource(R.drawable.yellow);
+            }if (temp=="High"){
+                ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
+                imageView.setImageResource(R.drawable.red);
 
-            ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
-            imageView.setImageResource(currentInspection.getHazardIcon());
-
+            }
+            else{
+                ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
+                imageView.setImageResource(R.drawable.green);
+            }
             TextView textView = (TextView) itemView.findViewById(R.id.inspectiontext);
             textView.setText(currentInspection.toString());
 
@@ -159,12 +166,5 @@ public class RestaurantActivity extends AppCompatActivity {
         });
 
         TextView latLng = findViewById(R.id.latLng_resActivity);
-        latLng.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToMapsActivity();
-            }
-        });
     }
-
 }

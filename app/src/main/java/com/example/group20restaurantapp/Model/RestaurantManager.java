@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class RestaurantManager implements Iterable<Restaurant>{
-
     //Implement iterable and a singleton class of restaurants object
     private List<Restaurant> restaurantList = new ArrayList<>();
 
