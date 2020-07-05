@@ -43,7 +43,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private RestaurantManager manager = RestaurantManager.getInstance();
-
+    private int size = 0;
+    private String[] restaurantStrings = new String[size];
     private String testDate = "Last inspection: Jan 22";
     private int testNumInspections = 5;
 
@@ -59,8 +60,24 @@ public class MainActivity extends AppCompatActivity {
         populateListView();
         registerClickCallback();
         InitInspectionLists();
-
+        clickToGetDetial();
         setupTestButton();
+    }
+    private void clickToGetDetial() {
+        ListView list = findViewById(R.id.restaurantsListView);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if (restaurantStrings.length == 0) {
+                    String message = manager.getRestaurantList().get(position).toString();
+
+                    Intent intent = RestaurantActivity.makeLaunchIntent(MainActivity.this, "RestaurantActivity");
+                    intent.putExtra("Extra", message);
+                    MainActivity.this.startActivityForResult(intent, 45);
+                }
+            }
+        });
     }
 
     private void setupTestButton() {

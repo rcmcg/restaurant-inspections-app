@@ -1,5 +1,7 @@
 package com.example.group20restaurantapp.Model;
 
+import com.example.group20restaurantapp.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class Restaurant {
         private String facType;
         private int icon;
         List<Inspection> inspectionList = new ArrayList<>();
+        private int countCritical;
 
         //Constructor
         public Restaurant(String name, String address, double latitude, double longitude, String trackingNumber, String city, String facType, int icon) {
@@ -24,7 +27,9 @@ public class Restaurant {
             this.trackingNumber = trackingNumber;
             this.city = city;
             this.facType = facType;
-            this.icon = icon;
+            //I've add new things here
+            this.icon = matchLogo();
+            this.countCritical = countCriticalNum();
         }
 
         public Restaurant() {
@@ -105,7 +110,39 @@ public class Restaurant {
             this.inspectionList = inspectionList;
         }
 
+        //add new things
+        private int matchLogo(){
+            name = this.getName();
+            if (name.matches("^(A&W).*")){
+                return R.drawable.a_and_w;
+            }
+            else if (name.matches("Lee Yuen Seafood Restaurant")){
+                return R.drawable.lee_yuen;
+            }
+            else if (name.matches("The Unfindable Bar")){
+                return R.drawable.the_unfindable_bar;
+            }
+            else if (name.matches("Top in Town Pizza")){
+                return R.drawable.top_in_town_pizza;
+            }
+            else if (name.matches("104 Sushi & Co")){
+                return R.drawable.sushi_and_co;
+            }
+            return R.drawable.zugba_flame_grilled_chicken;
+        }
+        private int  countCriticalNum(){
+            int Num = 0;
+            for (Inspection inspection : inspectionList) {
+                if (inspection.getDiffInDay() <= 365) {
+                    Num = Num + inspection.getNumCritical();
+                }
+            }
+            return Num;
+        }
 
+        public int getInspectionSize() {
+        return inspectionList.size();
+    }
         @Override
         public String toString() {
             return "Restaurants{" +

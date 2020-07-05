@@ -27,7 +27,7 @@ import java.util.List;
 public class InspectionActivity extends AppCompatActivity {
 
     private static List<Violation> violationList;
-
+    private static final String EXTRA_MESSAGE = "Extra";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,5 +169,11 @@ public class InspectionActivity extends AppCompatActivity {
 
     public static Intent makeIntent(Context context) {
         return new Intent(context, InspectionActivity.class);
+    }
+    //added
+    public static Intent makeLaunchIntent(Context c, String message) {
+        Intent intent = new Intent(c, InspectionActivity.class);
+        intent.putExtra(EXTRA_MESSAGE, message);
+        return intent;
     }
 }

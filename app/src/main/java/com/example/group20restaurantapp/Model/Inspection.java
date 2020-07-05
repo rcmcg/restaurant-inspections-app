@@ -3,9 +3,15 @@ package com.example.group20restaurantapp.Model;
 import com.example.group20restaurantapp.R;
 
 import java.io.Serializable;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class Inspection implements Serializable {
     private String trackingNumber;
@@ -14,9 +20,85 @@ public class Inspection implements Serializable {
     private int numCritical;
     private int numNonCritical;
     private String hazardRating;
-
     List <Violation> violLump = new ArrayList<>();
     // List <String> violLump = new ArrayList<>();
+    //new things I've added
+    private int diffInDay;
+    private String inspectionType;
+    private String[] violations;
+    public Inspection(){};
+    public Inspection(String trackingNumber, String inspectionDate, String inspectionType,
+                      int numCritical, int numNonCritical, String hazardRating, String violations) {
+        this.trackingNumber = trackingNumber;
+        this.inspectionDate = inspectionDate;
+        this.inspectionType = inspectionType;
+        this.numCritical = numCritical;
+        this.numNonCritical = numNonCritical;
+        this.hazardRating = hazardRating;
+        this.violations = parseViolations(violations);
+        initDate();
+    }
+    private String[] parseViolations(String rawViolations) {
+        return rawViolations.replace(",", ", ").split("\\|");
+    }
+    public int getDiffInDay() { return this.diffInDay; }
+    public void initDate() {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+            String rawInspectionDate = getInspectionDate();
+            Date inspectionDate = sdf.parse(rawInspectionDate);
+            Date currentDate = new Date();
+
+            long diffInMS = Math.abs(currentDate.getTime() - inspectionDate.getTime());
+            long diffInDay = TimeUnit.DAYS.convert(diffInMS, TimeUnit.MILLISECONDS);
+            this.diffInDay = (int) diffInDay;
+
+            String[] indexToMonth = new DateFormatSymbols().getMonths();
+            Calendar inspectionCalendar = Calendar.getInstance();
+            inspectionCalendar.setTime(inspectionDate);
+
+            if (diffInDay <= 1) {
+
+                this.inspectionDate = diffInDay + "Day";
+
+            } else if (diffInDay <= 30) {
+
+                this.inspectionDate = diffInDay + " Days";
+
+            } else if (diffInDay <= 365) {
+
+                this.inspectionDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)]
+                        + " " + inspectionCalendar.get(Calendar.DAY_OF_MONTH);
+
+            } else {
+
+                this.inspectionDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)]
+                        + " " + inspectionCalendar.get(Calendar.YEAR);
+
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            this.inspectionDate = "N/A";
+        }
+    }
+    public int getHazardIcon() {
+
+        if (hazardRating.equals("Low")) {
+
+            return R.drawable.green;
+
+        } else if (hazardRating.equals("Moderate")) {
+
+            return R.drawable.yellow;
+
+        } else {
+
+            return R.drawable.red;
+
+        }
+
+    }
 
     public String getTrackingNumber() {
         return trackingNumber;
