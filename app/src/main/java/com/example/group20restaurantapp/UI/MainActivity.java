@@ -328,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
             String formattedDate = newFormat.format(dateObj);
             inspection.setInspectionDate(formattedDate);
         } catch (ParseException e) {
+            Log.wtf("MyActivity", "Error formatting date" + date, e);
             e.printStackTrace();
         }
     }
