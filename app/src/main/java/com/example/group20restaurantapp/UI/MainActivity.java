@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
                 Inspection inspection = new Inspection();
 
                 inspection.setTrackingNumber(lineSplit[0]);
-                formatDate(lineSplit[1], inspection); //Formats and sets inspection date
+                inspection.setInspectionDate(lineSplit[1]);
                 inspection.setInspType(lineSplit[2]);
                 inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
                 inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
@@ -318,18 +318,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void formatDate(String date, Inspection inspection) {
-        //https://stackoverflow.com/questions/25458832/how-can-i-convert-an-integer-e-g-19000101-to-java-util-date#:~:text=Integer%20value%20%3D%2019000101%3B%20SimpleDateFormat%20originalFormat,that%20Date%20has%20no%20format.
-        SimpleDateFormat originalFormat = new SimpleDateFormat("yyyyMMdd");
-        Date dateObj;
-        try {
-            dateObj = originalFormat.parse(date);
-            SimpleDateFormat newFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String formattedDate = newFormat.format(dateObj);
-            inspection.setInspectionDate(formattedDate);
-        } catch (ParseException e) {
-            Log.wtf("MyActivity", "Error formatting date" + date, e);
-            e.printStackTrace();
-        }
-    }
 }
