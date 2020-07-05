@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">GroupAssign1</string>
+    <string name="hazard_rating">Hazard Rating:</string>
+    <string name="violations">Violations:</string>
+    <string name="num_noncritical_issue">Num NonCritical Issue:</string>
+    <string name="num_critical_issue">Num Critical Issue:</string>
+    <string name="inspection_type">Inspection Type:</string>
+    <string name="inspection_date">Inspection Date:</string>
+    <string name="tracking_number">Tracking Number:</string>
+    <string name="name">Name:</string>
+    <string name="address">Address:</string>
+    <string name="lat">Lat:</string>
+    <string name="latitude">Latitude</string>
+    <string name="display_format_ctitical_non_critical_relative_type_hazardlevel_icon">Display Format: Ctitical,Non_Critical,Relative,Type,HazardLevel , Icon</string>
+    <string name="click_to_see_inspection">Click to see inspection</string>
+    <string name="restaurant_detial_restaurant_name_num_critical_num_non_critical_hazard_level_inspection_date">Restaurant Detial Restaurant Name,Num Critical,Num Non-Critical,Hazard Level,Inspection Date</string>
+</resources>
