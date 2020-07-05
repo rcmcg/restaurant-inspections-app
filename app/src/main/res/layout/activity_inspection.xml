@@ -12,7 +12,7 @@
         android:layout_height="410dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgHazardIcon"
+        app:layout_constraintTop_toBottomOf="@+id/txtHazardRating"
         app:layout_constraintVertical_bias="1.0" />
 
     <TextView
@@ -35,7 +35,7 @@
         android:layout_marginTop="20dp"
         android:fontFamily="@font/roboto_light"
         android:text="Type: Follow-up"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtInspectionDate" />
 
@@ -67,23 +67,23 @@
         android:id="@+id/imgHazardIcon"
         android:layout_width="114dp"
         android:layout_height="103dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="16dp"
         android:maxWidth="100dp"
         android:maxHeight="100dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtNumberNonCritViolations"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/btn_star_big_on" />
 
     <TextView
         android:id="@+id/txtHazardRating"
-        android:layout_width="187dp"
+        android:layout_width="wrap_content"
         android:layout_height="29dp"
-        android:layout_marginStart="60dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/roboto_light"
         android:text="Hazard Rating: Medium"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imgHazardIcon"
-        app:layout_constraintStart_toEndOf="@+id/imgHazardIcon" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtNumberNonCritViolations" />
 </androidx.constraintlayout.widget.ConstraintLayout>
