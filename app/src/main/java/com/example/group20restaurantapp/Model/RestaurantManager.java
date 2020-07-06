@@ -2,7 +2,11 @@ package com.example.group20restaurantapp.Model;
 
 
 
+import android.util.Log;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,5 +56,29 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     public int getSize() {
         return restaurantList.size();
+    }
+
+    public void sortRestaurantsByName() {
+        Comparator<Restaurant> compareByName = new Comparator<Restaurant>() { //Compares restaurant names
+            @Override
+            public int compare(Restaurant r1, Restaurant r2) {
+                return r1.getName().compareTo(r2.getName());
+            }
+        };
+
+        Collections.sort(restaurantList, compareByName); //Sort arraylist
+    }
+
+    public void sortInspListsByDate() {
+        Comparator<Inspection> compareByDate = new Comparator<Inspection>() { //Compares inspection dates
+            @Override
+            public int compare(Inspection i1, Inspection i2) {
+                return i1.getInspectionDate().compareTo(i2.getInspectionDate());
+            }
+        };
+
+        for (Restaurant restaurant : restaurantList){
+            Collections.sort(restaurant.inspectionList, compareByDate.reversed()); //Sort arraylist in reverse order
+        }
     }
 }
