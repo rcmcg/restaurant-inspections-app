@@ -106,14 +106,14 @@ public class RestaurantActivity extends AppCompatActivity {
             String temp = currentInspection.getHazardRating();
             if(temp.equals("Low")) {
                 ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
-                imageview.setImageResource(R.drawable.green);
+                imageview.setImageResource(R.drawable.yellow_triangle);
             }
             else if(temp.equals("High")){
                 ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
-                imageview.setImageResource(R.drawable.red);
+                imageview.setImageResource(R.drawable.red_octogon);
             }else if(temp.equals("Moderate")){
                 ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
-                imageview.setImageResource(R.drawable.yellow);
+                imageview.setImageResource(R.drawable.orange_diamond);
             }
             TextView textView = (TextView) itemView.findViewById(R.id.textView);
             textView.setText("TrankingNumber :"+currentInspection.getTrackingNumber());
