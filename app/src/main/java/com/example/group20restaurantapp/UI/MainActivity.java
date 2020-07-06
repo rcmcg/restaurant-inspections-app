@@ -57,42 +57,44 @@ public class MainActivity extends AppCompatActivity {
         // Get instance of RestaurantManager
         manager = RestaurantManager.getInstance();
 
-        // To read a resource, need an input stream
-        InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
+        if (manager.getSize() == 0) {
+            // To read a resource, need an input stream
+            InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
 
-        // To read from stream reader line by line, need a bufferreader
-        // Need to build an input stream based on a character set
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-        String line = "";
-        try {
-            //Escaping the header lines of the CSV file
-            reader.readLine();
-            while ((line = reader.readLine()) != null) {
-                line = line.replace("\"", "");
-                //Splitting every line based on "," , Tokens are variables of Restaurant class
-                // TODO: This should be replaced with a constructor taking arguments
-                String[] tokens=line.split(",");
-                Restaurant r1=new Restaurant();
-                r1.setTrackingNumber(tokens[0]);
-                r1.setName(tokens[1]);
-                r1.setAddress(tokens[2]);
-                r1.setCity(tokens[3]);
-                r1.setFacType(tokens[4]);
-                r1.setLatitude(Double.parseDouble(tokens[5]));
-                r1.setLongitude(Double.parseDouble(tokens[6]));
-                r1.setImgId();
-                //Adding the created Restaurants object to the manager instance
-                manager.add(r1);
-                Log.d("Main activity","Just created" + r1);
+            // To read from stream reader line by line, need a bufferreader
+            // Need to build an input stream based on a character set
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String line = "";
+            try {
+                //Escaping the header lines of the CSV file
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    line = line.replace("\"", "");
+                    //Splitting every line based on "," , Tokens are variables of Restaurant class
+                    // TODO: This should be replaced with a constructor taking arguments
+                    String[] tokens=line.split(",");
+                    Restaurant r1=new Restaurant();
+                    r1.setTrackingNumber(tokens[0]);
+                    r1.setName(tokens[1]);
+                    r1.setAddress(tokens[2]);
+                    r1.setCity(tokens[3]);
+                    r1.setFacType(tokens[4]);
+                    r1.setLatitude(Double.parseDouble(tokens[5]));
+                    r1.setLongitude(Double.parseDouble(tokens[6]));
+                    r1.setImgId();
+                    //Adding the created Restaurants object to the manager instance
+                    manager.add(r1);
+                    Log.d("Main activity","Just created" + r1);
+                }
+            } catch (IOException e) {
+                Log.wtf("MyActivity", "Error reading data file on line" + line, e);
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            Log.wtf("MyActivity", "Error reading data file on line" + line, e);
-            e.printStackTrace();
-        }
-        manager.sortRestaurantsByName();
+            manager.sortRestaurantsByName();
 
-        InitInspectionLists();
-        manager.sortInspListsByDate();
+            InitInspectionLists();
+            manager.sortInspListsByDate();
+        }
     }
 
     private void populateListView() {
