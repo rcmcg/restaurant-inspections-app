@@ -8,101 +8,52 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        android:layout_width="409dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/name_resActivity"
-        android:layout_width="273dp"
-        android:layout_height="37dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="16dp"
         android:text="@string/name"
         android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.007"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.081" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <TextView
         android:id="@+id/address_resActivity"
-        android:layout_width="386dp"
-        android:layout_height="48dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="@string/address"
         android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/name_resActivity"
-        app:layout_constraintTop_toBottomOf="@+id/name_resActivity"
-        app:layout_constraintVertical_bias="0.047" />
+        app:layout_constraintTop_toBottomOf="@+id/name_resActivity" />
 
     <TextView
-        android:id="@+id/fix_txt1"
-        android:layout_width="129dp"
-        android:layout_height="36dp"
-        app:layout_constraintBottom_toBottomOf="@+id/name_resActivity"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/name_resActivity"
-        app:layout_constraintTop_toTopOf="@+id/name_resActivity"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/fix_txt2"
-        android:layout_width="48dp"
-        android:layout_height="36dp"
+        android:id="@+id/coords_resActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="@string/lat"
         android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/address_resActivity"
-        app:layout_constraintTop_toBottomOf="@+id/address_resActivity"
-        app:layout_constraintVertical_bias="0.044" />
-
-    <TextView
-        android:id="@+id/latLng_resActivity"
-        android:layout_width="348dp"
-        android:layout_height="36dp"
-        android:text="@string/latitude"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="@+id/fix_txt2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.476"
-        app:layout_constraintStart_toEndOf="@+id/fix_txt2"
-        app:layout_constraintTop_toBottomOf="@+id/fix_txt1"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/restaurant_fix_text"
-        android:layout_width="410dp"
-        android:layout_height="34dp"
-        android:text="@string/display_formate_criticalnum_non_criticalnum_relative_type_hazardlevel_icon"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.428"
-        app:layout_constraintStart_toStartOf="@+id/fix_txt2"
-        app:layout_constraintTop_toBottomOf="@+id/fix_txt2"
-        app:layout_constraintVertical_bias="0.052" />
+        app:layout_constraintTop_toBottomOf="@+id/address_resActivity" />
 
     <ListView
         android:id="@+id/restaurant_view"
-        android:layout_width="407dp"
-        android:layout_height="293dp"
-        android:layout_marginBottom="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.09"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/inspection_item_txtViewInspectionDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/roboto_light"
+        android:text="Inspection Date Here"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/inspection_item_txtViewCritViolations"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/inspection_item_txtViewInspectionDate"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/roboto_light"
+        android:text="Num crit viols"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/inspection_item_txtViewNonCritViolations"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/inspection_item_txtViewCritViolations"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/roboto_light"
+        android:text="Num nonCrit viols"
+        android:textSize="18sp" />
+
+    <ImageView
+        android:id="@+id/imgViewViolationIcon"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_below="@+id/inspection_item_txtViewInspectionDate"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="-17dp"
+        android:layout_marginEnd="5dp"
+        app:srcCompat="@drawable/no_inspection_qmark" />
+</RelativeLayout>
