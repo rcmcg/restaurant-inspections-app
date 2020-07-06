@@ -115,8 +115,6 @@ public class RestaurantActivity extends AppCompatActivity {
                 ImageView imageview = (ImageView) itemView.findViewById(R.id.imageView);
                 imageview.setImageResource(R.drawable.orange_diamond);
             }
-            TextView textView = (TextView) itemView.findViewById(R.id.textView);
-            textView.setText("TrankingNumber :"+currentInspection.getTrackingNumber());
             TextView textView1 = (TextView) itemView.findViewById(R.id.textView1);
             textView1.setText("inspectionDate :"+currentInspection.intelligentInspectDate());
             TextView textView2 = (TextView) itemView.findViewById(R.id.textView2);
