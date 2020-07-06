@@ -160,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
             // Fill the restaurantIcon
             ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
             imgRestaurant.setImageResource(currentRestaurant.getIconImgId());
+            Log.d("MainActivity", "getView: currentRestaurant.getIconImgId: " + currentRestaurant.getIconImgId());
 
             // Fill the hazard icon
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
@@ -173,8 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     imgHazardIcon.setImageResource(R.drawable.red_octogon);
                 }
             } else {
-                // TODO: Find a question mark icon for when a restaurant has had no inspections
-                // imgHazardIcon.setImageResource(R.drawable.question_mark);
+                imgHazardIcon.setImageResource(R.drawable.no_inspection_qmark);
             }
 
             // Set restaurant name text
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
                 numViolationsLastInspection.setText("Violations: " + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical()));
             } else {
-                numViolationsLastInspection.setText("0");
+                numViolationsLastInspection.setText("");
             }
 
             // Set text to test data
