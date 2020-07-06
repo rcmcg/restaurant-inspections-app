@@ -37,7 +37,7 @@ public class InspectionActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(ACTION_BAR);
 
-        Inspection inspection = (Inspection) getIntent().getSerializableExtra("inspection");
+        Inspection inspection = (Inspection) getIntent().getSerializableExtra(RestaurantActivity.RESTAURANT_ACTIVITY_INSPECTION_TAG);
 
         assert inspection != null;
         violationList = inspection.getViolLump();
@@ -101,7 +101,10 @@ public class InspectionActivity extends AppCompatActivity {
 
             // Set violation brief description
             TextView violationDescription = itemView.findViewById(R.id.violation_item_txtBriefDescription);
-            violationDescription.setText(currentViolation.getBriefDetails());
+            violationDescription.setText(
+                    getString(R.string.inspection_activity_violation_item_brief_description,
+                            currentViolation.getBriefDetails())
+                    );
 
             // Set the severity icon
             ImageView violationSeverityIcon = itemView.findViewById(R.id.violation_item_imgSeverityIcon);
@@ -126,10 +129,12 @@ public class InspectionActivity extends AppCompatActivity {
                 Violation clickedViolation = InspectionActivity.getViolationList().get(position);
                 // Display full details of violation in a toast
                 // TODO: move to strings.xml with placeholder
-                String message = "Violation number: " + clickedViolation.getViolNumber()
-                        + ". Critical: " + clickedViolation.getCritical()
-                        + ". Details: " + clickedViolation.getViolDetails()
-                        + ". Repeat: " + clickedViolation.getRepeat();
+                String message = getString(R.string.inspection_activity_violation_item_full_description,
+                        "" + clickedViolation.getViolNumber(),
+                        "" + clickedViolation.getCritical(),
+                        "" + clickedViolation.getViolDetails(),
+                        "" + clickedViolation.getRepeat()
+                );
                 Toast.makeText(InspectionActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
@@ -141,22 +146,26 @@ public class InspectionActivity extends AppCompatActivity {
 
     private void setInspectionDateText(Inspection inspection) {
         TextView inspectionDate = findViewById(R.id.txtInspectionDate);
-        inspectionDate.setText("Date: " + inspection.fullFormattedDate());
+        inspectionDate.setText(getString(R.string.inspection_activity_date,
+                inspection.fullFormattedDate()));
     }
 
     private void setInspectionTypeText(Inspection inspection) {
         TextView inspectionType = findViewById(R.id.txtInspectionType);
-        inspectionType.setText("Type: " + inspection.getInspType());
+        inspectionType.setText(getString(R.string.inspection_activity_type,
+                inspection.getInspType()));
     }
 
     private void setInspectionCritViolText(Inspection inspection) {
         TextView inspectionNumCrit = findViewById(R.id.txtNumberCritViolations);
-        inspectionNumCrit.setText("Critical violations: " + inspection.getNumCritical());
+        inspectionNumCrit.setText(getString(R.string.inspection_activity_critical_violations,
+                "" + inspection.getNumCritical()));
     }
 
     private void setInspectionNonCritViolText(Inspection inspection) {
         TextView inspectionNumNonCrit = findViewById(R.id.txtNumberNonCritViolations);
-        inspectionNumNonCrit.setText("Non-critical violations: " + inspection.getNumNonCritical());
+        inspectionNumNonCrit.setText(getString(R.string.inspection_activity_non_critical_violations,
+                "" + inspection.getNumNonCritical()));
     }
 
     private void setHazardRatingIcon(Inspection inspection) {
@@ -173,7 +182,8 @@ public class InspectionActivity extends AppCompatActivity {
     private void setHazardRatingText(Inspection inspection) {
         TextView inspectionHazardRating = findViewById(R.id.txtHazardRating);
         inspectionHazardRating.setBackgroundColor(Color.BLACK);
-        inspectionHazardRating.setText("Hazard rating: " + inspection.getHazardRating());
+        inspectionHazardRating.setText(getString(R.string.inspection_activity_hazard_rating,
+                inspection.getHazardRating()));
         if (inspection.getHazardRating().equals("Low")) {
             inspectionHazardRating.setTextColor(Color.YELLOW);
         } else if (inspection.getHazardRating().equals("Moderate")) {
@@ -187,11 +197,5 @@ public class InspectionActivity extends AppCompatActivity {
 
     public static Intent makeIntent(Context context) {
         return new Intent(context, InspectionActivity.class);
-    }
-    //added
-    public static Intent makeLaunchIntent(Context c, String message) {
-        Intent intent = new Intent(c, InspectionActivity.class);
-        intent.putExtra(EXTRA_MESSAGE, message);
-        return intent;
     }
 }

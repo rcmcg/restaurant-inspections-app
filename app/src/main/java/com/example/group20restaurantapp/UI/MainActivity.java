@@ -37,8 +37,8 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
     private RestaurantManager manager = RestaurantManager.getInstance();
-    private String NO_INSPECTION = "This restaurant has never had an inspection";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateListView() {
-        // Construct a new ArrayList from the manager Singleton
+        // Construct a new ArrayList from the manager Singleton to fill the listView
         List<Restaurant> restaurantList = restaurantList();
 
         // Setup the listView
@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
             // Fill the hazard icon
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
             if (currentRestaurant.getInspectionList().size() != 0) {
+                // Inspection list in Restaurant is sorted on startup so the first index is the most recent
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
                 if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
@@ -155,31 +156,34 @@ public class MainActivity extends AppCompatActivity {
 
             // Set restaurant name text
             TextView restaurantName = itemView.findViewById(R.id.restaurant_item_txtRestaurantName);
-            restaurantName.setText(currentRestaurant.getName());
+            restaurantName.setText(getString(R.string.main_activity_restaurant_name,currentRestaurant.getName()));
 
             // Set last inspection date text
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                lastInspectionDate.setText("Last inspection: " + lastInspection.intelligentInspectDate());
+                lastInspectionDate.setText(
+                        getString(R.string.main_activity_restaurant_item_last_inspection_date,
+                                lastInspection.intelligentInspectDate())
+                );
             } else {
-                lastInspectionDate.setText(NO_INSPECTION);
+                lastInspectionDate.setText(getString(R.string.main_activity_restaurant_item_last_inspection_date_no_inspection));
             }
 
 
             // Set number of violations text
-            // TODO: Display most recent inspections number of violations
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
+
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                numViolationsLastInspection.setText("Violations: " + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical()));
+                String sumOfViolations = "" + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical());
+                numViolationsLastInspection.setText(
+                        getString(R.string.main_activity_restaurant_item_violations, sumOfViolations)
+                        );
             } else {
-                numViolationsLastInspection.setText("");
+                numViolationsLastInspection.setText(getString(R.string.main_activity_restaurant_item_violations_no_inspection));
             }
 
-            // Set text to test data
-            // lastInspectionDate.setText(testDate);
-            // numViolationsLastInspection.setText("Violations: " + testNumInspections);
             return itemView;
         }
     }
@@ -192,8 +196,8 @@ public class MainActivity extends AppCompatActivity {
                 Restaurant clickedRestaurant = manager.getIndex(position);
 
                 // Launch restaurant activity
-                Intent intent = RestaurantActivity.makeLaunchIntent(MainActivity.this, "RestaurantActivity");
-                intent.putExtra("restaurantIndex", position);
+                Intent intent = RestaurantActivity.makeLaunchIntent(MainActivity.this);
+                intent.putExtra(RESTAURANT_INDEX_INTENT_TAG, position);
                 startActivity(intent);
             }
         });
@@ -227,8 +231,6 @@ public class MainActivity extends AppCompatActivity {
         ); //Create reader
 
         line = "";
-
-        // TODO: After restaurant is filled with inspections, sort the inspections list by date
 
         try {
             reader.readLine();
@@ -295,5 +297,4 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 }
