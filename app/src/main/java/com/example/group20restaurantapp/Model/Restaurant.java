@@ -131,19 +131,6 @@ public class Restaurant {
             }
         }
 
-        /*
-        Why do you need to know the number of critical violations in the last 365 days?
-        private int  countCriticalNum(){
-            int Num = 0;
-            for (Inspection inspection : inspectionList) {
-                if (inspection.getDiffInDay() <= 365) {
-                    Num = Num + inspection.getNumCritical();
-                }
-            }
-            return Num;
-        }
-        */
-
         public int getInspectionSize() {
         return inspectionList.size();
     }

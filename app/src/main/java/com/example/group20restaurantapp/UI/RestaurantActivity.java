@@ -21,7 +21,6 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantActivity extends AppCompatActivity {
@@ -81,22 +80,9 @@ public class RestaurantActivity extends AppCompatActivity {
         setResult(Activity.RESULT_OK, i);
     }
 
-    /*
-
-    private void goToMapsActivity() {
-        Intent i = new Intent();
-        i.putExtra("result", 1);
-        i.putExtra("resID", restaurant.getTrackingNumber());
-        setResult(Activity.RESULT_OK, i);
-        finish();
-    }
-
-     */
-
     private void populateInspectionList(Restaurant restaurant) {
 
         manager = RestaurantManager.getInstance();
-
         processInspections(restaurant);
 
         ArrayAdapter<Inspection> adapter = new CustomAdapter();
@@ -106,7 +92,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
     private class CustomAdapter extends ArrayAdapter<Inspection> {
         public CustomAdapter() {
-            super(RestaurantActivity.this, R.layout.layout_inspection, inspections);
+            super(RestaurantActivity.this, R.layout.inspection_item_view, inspections);
         }
 
         @Override
@@ -114,24 +100,32 @@ public class RestaurantActivity extends AppCompatActivity {
 
             View itemView = convertView;
             if (itemView == null) {
-                itemView = getLayoutInflater().inflate(R.layout.layout_inspection, parent, false);
+                itemView = getLayoutInflater().inflate(R.layout.inspection_item_view, parent, false);
             }
             Inspection currentInspection = inspections.get(position);
             String temp = currentInspection.getHazardRating();
-            if(temp.equals("Moderate"))
-            {   ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
-                imageView.setImageResource(R.drawable.yellow);
-            }if (temp.equals("High")){
-                ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
-                imageView.setImageResource(R.drawable.red);
+            if (temp.equals("Low")) {
+                ImageView imageview = (ImageView) itemView.findViewById(R.id.imgViewViolationIcon);
+                imageview.setImageResource(R.drawable.yellow_triangle);
+            } else if (temp.equals("Moderate")){
+                ImageView imageview = (ImageView) itemView.findViewById(R.id.imgViewViolationIcon);
+                imageview.setImageResource(R.drawable.orange_diamond);
+            } else if (temp.equals("High")){
+                ImageView imageview = (ImageView) itemView.findViewById(R.id.imgViewViolationIcon);
+                imageview.setImageResource(R.drawable.red_octogon);
+            }
 
-            }
-            else{
-                ImageView imageView = (ImageView) itemView.findViewById(R.id.inspectionimage);
-                imageView.setImageResource(R.drawable.green);
-            }
-            TextView textView = (TextView) itemView.findViewById(R.id.inspectiontext);
-            textView.setText(currentInspection.toString());
+            // Set inspection date
+            TextView inspectionDateTxt = itemView.findViewById(R.id.inspection_item_txtViewInspectionDate);
+            inspectionDateTxt.setText("Inspection date: " + currentInspection.intelligentInspectDate());
+
+            // Set critical violations text
+            TextView critViolationsTxt = itemView.findViewById(R.id.inspection_item_txtViewCritViolations);
+            critViolationsTxt.setText("Critical violaions: " + currentInspection.getNumCritical());
+
+            // Set non-critical violations text
+            TextView nonCritViolationsTxt = itemView.findViewById(R.id.inspection_item_txtViewNonCritViolations);
+            nonCritViolationsTxt.setText("Non-critical violaions: " + currentInspection.getNumNonCritical());
 
             return itemView;
         }
@@ -159,15 +153,14 @@ public class RestaurantActivity extends AppCompatActivity {
         // Populate the list of inspections for the selected restaurant
 
         // inspectionList = (ArrayList<Inspection>) restaurant.getInspectionList();
-        TextView name = findViewById(R.id.name_resActivity);
-        name.setText(restaurant.getName());
+        TextView txtViewRestaurantName = findViewById(R.id.name_resActivity);
+        txtViewRestaurantName.setText(restaurant.getName());
 
-        TextView address = findViewById(R.id.address_resActivity);
-        address.setText(restaurant.getAddress());
+        TextView txtViewAddress = findViewById(R.id.address_resActivity);
+        txtViewAddress.setText("Address: " + restaurant.getAddress());
 
-        TextView latLng = findViewById(R.id.latLng_resActivity);
-        latLng.setText((float) restaurant.getLatitude() + ", " + (float) restaurant.getLongitude());
-
+        TextView txtViewCoords = findViewById(R.id.coords_resActivity);
+        txtViewCoords.setText("Coordinates: " + (float) restaurant.getLatitude() + ", " + (float) restaurant.getLongitude());
     }
 
     private void registerClickCallback(final Restaurant restaurant) {
@@ -181,6 +174,7 @@ public class RestaurantActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
     }
 
 }
