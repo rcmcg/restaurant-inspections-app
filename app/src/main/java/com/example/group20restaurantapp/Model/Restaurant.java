@@ -109,7 +109,7 @@ public class Restaurant {
             // TODO: Check by tracking number since there's a duplicate (Lee Yuen)
             // Unless you want to use the same logo
             name = this.getName();
-            if (name.matches("^(A&W).*")){
+            if (name.matches("(.*)A&W(.*)")){
                 iconImgId = R.drawable.a_and_w;
             }
             else if (name.matches("Lee Yuen Seafood Restaurant")){
@@ -118,16 +118,17 @@ public class Restaurant {
             else if (name.matches("The Unfindable Bar")){
                 iconImgId =  R.drawable.the_unfindable_bar;
             }
-            else if (name.matches("Top in Town Pizza")){
-                iconImgId =  R.drawable.top_in_town_pizza;
+            else if (name.matches("Top in Town Pizza") || name.matches("Top In Town Pizza")){
+                iconImgId =  R.drawable.restaurant_pizza;
             }
-            else if (name.matches("104 Sushi & Co")){
+            else if (name.matches("104 Sushi & Co.")){
                 iconImgId =  R.drawable.sushi_and_co;
             } else if (name.matches("Zugba Flame Grilled Chicken")){
                 iconImgId =  R.drawable.zugba_flame_grilled_chicken;
+            } else {
+                // Generic image if restaurant not found
+                iconImgId =  R.drawable.restaurant_icon_clipart;
             }
-            // Generic image if restaurant not found
-            iconImgId =  R.drawable.restaurant_icon_clipart;
         }
 
         /*

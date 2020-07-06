@@ -181,9 +181,6 @@ public class RestaurantActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        // why is this here?
-        // TextView latLng = findViewById(R.id.latLng_resActivity);
     }
 
 }

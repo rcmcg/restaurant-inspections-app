@@ -51,35 +51,11 @@ public class MainActivity extends AppCompatActivity {
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
-
-        // setupTestButton();
-    }
-
-    // Will remove when RestaurantActivity is finished
-    private void setupTestButton() {
-        Button btn = findViewById(R.id.btnTest);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Grab restaurant with multiple inspections for testing
-                RestaurantManager manager = RestaurantManager.getInstance();
-                Restaurant testRestaurant = manager.getIndex(5);
-                Inspection testInspection = testRestaurant.getInspectionList().get(0);
-
-                // Launch inspection activity with an Inspection object for testing
-                Intent intent = InspectionActivity.makeIntent(MainActivity.this);
-                intent.putExtra("inspection", testInspection);
-                startActivity(intent);
-            }
-        });
     }
 
     private void readRestaurantData() {
         // Get instance of RestaurantManager
         manager = RestaurantManager.getInstance();
-
-        // TODO: Remove double quotes around strings where necessary
-        // Can use substring.() to return the string without the first and last chars, ie, the double quotes
 
         // To read a resource, need an input stream
         InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
@@ -113,8 +89,6 @@ public class MainActivity extends AppCompatActivity {
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
             e.printStackTrace();
         }
-
-        // TODO: After the RestaurantManager has been populated, it needs to be sorted alphabetically
         manager.sortRestaurantsByName();
 
         InitInspectionLists();
@@ -160,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
             // Fill the restaurantIcon
             ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
             imgRestaurant.setImageResource(currentRestaurant.getIconImgId());
+            Log.d("MainActivity", "getView: currentRestaurant.getIconImgId: " + currentRestaurant.getIconImgId());
 
             // Fill the hazard icon
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
@@ -173,8 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     imgHazardIcon.setImageResource(R.drawable.red_octogon);
                 }
             } else {
-                // TODO: Find a question mark icon for when a restaurant has had no inspections
-                // imgHazardIcon.setImageResource(R.drawable.question_mark);
+                imgHazardIcon.setImageResource(R.drawable.no_inspection_qmark);
             }
 
             // Set restaurant name text
@@ -198,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
                 numViolationsLastInspection.setText("Violations: " + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical()));
             } else {
-                numViolationsLastInspection.setText("0");
+                numViolationsLastInspection.setText("");
             }
 
             // Set text to test data
