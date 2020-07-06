@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -32,6 +33,7 @@ public class InspectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inspection);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Inspection inspection = (Inspection) getIntent().getSerializableExtra("inspection");
 
@@ -48,6 +50,18 @@ public class InspectionActivity extends AppCompatActivity {
         // Populate the list view
         populateListView(inspection);
         registerClickCallback();
+    }
+
+    // Source
+    // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void populateListView(Inspection inspection) {
