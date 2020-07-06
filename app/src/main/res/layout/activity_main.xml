@@ -14,6 +14,5 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="31dp" >
-
     </ListView>
 </androidx.constraintlayout.widget.ConstraintLayout>

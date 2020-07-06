@@ -25,23 +25,14 @@ import java.util.List;
 
 public class RestaurantActivity extends AppCompatActivity {
 
+    public static final String RESTAURANT_ACTIVITY_INSPECTION_TAG = "inspection";
     private RestaurantManager manager;
-    // private Restaurant restaurant;
-    // private int size = 0;
-
-    // private String[] inspectionStrings = new String[size];
-
     private static final String EXTRA_MESSAGE = "Extra";
-
-    // The name of the restaurant is stored in the Restaurant object
-    // private String restaurantString;    // Name of calling restaurant object
-    // The Restaurant object contains a list of inspections
-    // private ArrayList<Inspection> inspectionList;
     List<Inspection> inspections;
 
-    public static Intent makeLaunchIntent(Context c, String message) {
+    public static Intent makeLaunchIntent(Context c) {
         Intent intent = new Intent(c, RestaurantActivity.class);
-        intent.putExtra(EXTRA_MESSAGE, message);
+        // intent.putExtra(EXTRA_MESSAGE, message);
         return intent;
     }
 
@@ -53,7 +44,7 @@ public class RestaurantActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        int restaurantIndex = getIntent().getIntExtra("restaurantIndex",-1);
+        int restaurantIndex = getIntent().getIntExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG,-1);
         Log.d("RestaurantActivity", "onCreate: restaurantIndex = " + restaurantIndex);
 
         // Get singleton
@@ -69,9 +60,35 @@ public class RestaurantActivity extends AppCompatActivity {
         assert restaurant != null;
         inspections = restaurant.getInspectionList();
 
+        setRestaurantText(restaurant);
+        setAddressText(restaurant);
+        setCoordsText(restaurant);
+
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
         setupDefaultIntent();
+    }
+
+    private void setCoordsText(Restaurant restaurant) {
+        TextView txtViewCoords = findViewById(R.id.coords_resActivity);
+        String coordsString = "" + restaurant.getLatitude() + "," + restaurant.getLongitude();
+        txtViewCoords.setText(
+                getString(R.string.restaurant_activity_restaurant_coords,coordsString)
+        );
+    }
+
+    private void setAddressText(Restaurant restaurant) {
+        TextView txtViewAddress = findViewById(R.id.address_resActivity);
+        txtViewAddress.setText(
+                getString(R.string.restaurant_activity_restaurant_address,restaurant.getAddress())
+        );
+    }
+
+    private void setRestaurantText(Restaurant restaurant) {
+        TextView txtViewRestaurantName = findViewById(R.id.name_resActivity);
+        txtViewRestaurantName.setText(
+                getString(R.string.restaurant_activity_restaurant_name,restaurant.getName())
+        );
     }
 
     private void setupDefaultIntent() {
@@ -81,7 +98,6 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     private void populateInspectionList(Restaurant restaurant) {
-
         manager = RestaurantManager.getInstance();
         processInspections(restaurant);
 
@@ -117,15 +133,27 @@ public class RestaurantActivity extends AppCompatActivity {
 
             // Set inspection date
             TextView inspectionDateTxt = itemView.findViewById(R.id.inspection_item_txtViewInspectionDate);
-            inspectionDateTxt.setText("Inspection date: " + currentInspection.intelligentInspectDate());
+            inspectionDateTxt.setText(
+                    getString(
+                            R.string.restaurant_activity_inspection_item_date,
+                            currentInspection.intelligentInspectDate())
+            );
 
             // Set critical violations text
             TextView critViolationsTxt = itemView.findViewById(R.id.inspection_item_txtViewCritViolations);
-            critViolationsTxt.setText("Critical violaions: " + currentInspection.getNumCritical());
+            critViolationsTxt.setText(
+                    getString(
+                            R.string.restaurant_activity_inspection_item_crit_viols,
+                            "" + currentInspection.getNumCritical())
+            );
 
             // Set non-critical violations text
             TextView nonCritViolationsTxt = itemView.findViewById(R.id.inspection_item_txtViewNonCritViolations);
-            nonCritViolationsTxt.setText("Non-critical violaions: " + currentInspection.getNumNonCritical());
+            nonCritViolationsTxt.setText(
+                    getString(
+                            R.string.restaurant_activity_inspection_item_non_crit_viols,
+                            "" + currentInspection.getNumNonCritical())
+            );
 
             return itemView;
         }
@@ -134,33 +162,6 @@ public class RestaurantActivity extends AppCompatActivity {
 
 
     private void processInspections(Restaurant restaurant) {
-        // This code now sets the strings outside the listview, has nothing to do with inspections
-        // Consider changing its name/functionality
-
-        // Receive message from MainActivity
-        // Message contains details of selected Restaurant
-        // Intent intent2 = getIntent();
-        // restaurantString = intent2.getStringExtra(EXTRA_MESSAGE);
-
-        // Find the Restaurant and assign it to our local Restaurant object
-        /*
-        for (Restaurant temp : manager) {
-            if (temp.toString().equals(restaurantString)) {
-                restaurant = temp;
-            }
-        }
-         */
-        // Populate the list of inspections for the selected restaurant
-
-        // inspectionList = (ArrayList<Inspection>) restaurant.getInspectionList();
-        TextView txtViewRestaurantName = findViewById(R.id.name_resActivity);
-        txtViewRestaurantName.setText(restaurant.getName());
-
-        TextView txtViewAddress = findViewById(R.id.address_resActivity);
-        txtViewAddress.setText("Address: " + restaurant.getAddress());
-
-        TextView txtViewCoords = findViewById(R.id.coords_resActivity);
-        txtViewCoords.setText("Coordinates: " + (float) restaurant.getLatitude() + ", " + (float) restaurant.getLongitude());
     }
 
     private void registerClickCallback(final Restaurant restaurant) {
@@ -169,12 +170,10 @@ public class RestaurantActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Inspection selectedInspection = restaurant.getInspectionList().get(position);
-                Intent intent = InspectionActivity.makeLaunchIntent(RestaurantActivity.this, "InspectionActivity");
-                intent.putExtra("inspection", selectedInspection);
+                Intent intent = InspectionActivity.makeIntent(RestaurantActivity.this);
+                intent.putExtra(RESTAURANT_ACTIVITY_INSPECTION_TAG, selectedInspection);
                 startActivity(intent);
             }
         });
-
     }
-
 }
