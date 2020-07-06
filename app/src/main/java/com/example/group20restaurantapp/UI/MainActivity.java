@@ -29,8 +29,11 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -48,71 +51,50 @@ public class MainActivity extends AppCompatActivity {
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
-
-        InitInspectionLists();
-        // setupTestButton();
-    }
-
-    // Will remove when RestaurantActivity is finished
-    private void setupTestButton() {
-        Button btn = findViewById(R.id.btnTest);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Grab restaurant with multiple inspections for testing
-                RestaurantManager manager = RestaurantManager.getInstance();
-                Restaurant testRestaurant = manager.getIndex(5);
-                Inspection testInspection = testRestaurant.getInspectionList().get(0);
-
-                // Launch inspection activity with an Inspection object for testing
-                Intent intent = InspectionActivity.makeIntent(MainActivity.this);
-                intent.putExtra("inspection", testInspection);
-                startActivity(intent);
-            }
-        });
     }
 
     private void readRestaurantData() {
         // Get instance of RestaurantManager
         manager = RestaurantManager.getInstance();
 
-        // TODO: Remove double quotes around strings where necessary
-        // Can use substring.() to return the string without the first and last chars, ie, the double quotes
+        if (manager.getSize() == 0) {
+            // To read a resource, need an input stream
+            InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
 
-        // To read a resource, need an input stream
-        InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
-
-        // To read from stream reader line by line, need a bufferreader
-        // Need to build an input stream based on a character set
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-        String line = "";
-        try {
-            //Escaping the header lines of the CSV file
-            reader.readLine();
-            while ((line = reader.readLine()) != null) {
-                //Splitting every line based on "," , Tokens are variables of Restaurant class
-                // TODO: This should be replaced with a constructor taking arguments
-                String[] tokens=line.split(",");
-                Restaurant r1=new Restaurant();
-                r1.setTrackingNumber(tokens[0]);
-                r1.setName(tokens[1]);
-                r1.setAddress(tokens[2]);
-                r1.setCity(tokens[3]);
-                r1.setFacType(tokens[4]);
-                r1.setLatitude(Double.parseDouble(tokens[5]));
-                r1.setLongitude(Double.parseDouble(tokens[6]));
-                r1.setImgId();
-                //Adding the created Restaurants object to the manager instance
-                manager.add(r1);
-                Log.d("Main activity","Just created" + r1);
+            // To read from stream reader line by line, need a bufferreader
+            // Need to build an input stream based on a character set
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String line = "";
+            try {
+                //Escaping the header lines of the CSV file
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    line = line.replace("\"", "");
+                    //Splitting every line based on "," , Tokens are variables of Restaurant class
+                    // TODO: This should be replaced with a constructor taking arguments
+                    String[] tokens=line.split(",");
+                    Restaurant r1=new Restaurant();
+                    r1.setTrackingNumber(tokens[0]);
+                    r1.setName(tokens[1]);
+                    r1.setAddress(tokens[2]);
+                    r1.setCity(tokens[3]);
+                    r1.setFacType(tokens[4]);
+                    r1.setLatitude(Double.parseDouble(tokens[5]));
+                    r1.setLongitude(Double.parseDouble(tokens[6]));
+                    r1.setImgId();
+                    //Adding the created Restaurants object to the manager instance
+                    manager.add(r1);
+                    Log.d("Main activity","Just created" + r1);
+                }
+            } catch (IOException e) {
+                Log.wtf("MyActivity", "Error reading data file on line" + line, e);
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            Log.wtf("MyActivity", "Error reading data file on line" + line, e);
-            e.printStackTrace();
-        }
+            manager.sortRestaurantsByName();
 
-        // TODO: After the RestaurantManager has been populated, it needs to be sorted alphabetically
-        // manager.sortAlphabetically();
+            InitInspectionLists();
+            manager.sortInspListsByDate();
+        }
     }
 
     private void populateListView() {
@@ -154,21 +136,21 @@ public class MainActivity extends AppCompatActivity {
             // Fill the restaurantIcon
             ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
             imgRestaurant.setImageResource(currentRestaurant.getIconImgId());
+            Log.d("MainActivity", "getView: currentRestaurant.getIconImgId: " + currentRestaurant.getIconImgId());
 
             // Fill the hazard icon
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                if (lastInspection.getHazardRating() == "Low") {
+                if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
-                } else if (lastInspection.getHazardRating() == "Moderate") {
+                } else if (lastInspection.getHazardRating().equals("Moderate")) {
                     imgHazardIcon.setImageResource(R.drawable.orange_diamond);
-                } else if (lastInspection.getHazardRating() == "High") {
+                } else if (lastInspection.getHazardRating().equals("High")) {
                     imgHazardIcon.setImageResource(R.drawable.red_octogon);
                 }
             } else {
-                // TODO: Find a question mark icon for when a restaurant has had no inspections
-                // imgHazardIcon.setImageResource(R.drawable.question_mark);
+                imgHazardIcon.setImageResource(R.drawable.no_inspection_qmark);
             }
 
             // Set restaurant name text
@@ -179,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                lastInspectionDate.setText("Inspection date: " + lastInspection.intelligentInspectDate());
+                lastInspectionDate.setText("Last inspection: " + lastInspection.intelligentInspectDate());
             } else {
                 lastInspectionDate.setText(NO_INSPECTION);
             }
@@ -192,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
                 numViolationsLastInspection.setText("Violations: " + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical()));
             } else {
-                numViolationsLastInspection.setText("0");
+                numViolationsLastInspection.setText("");
             }
 
             // Set text to test data
@@ -239,7 +221,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
         InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(is, Charset.forName("UTF-8"))
@@ -254,16 +235,16 @@ public class MainActivity extends AppCompatActivity {
             while ( (line = reader.readLine()) != null){ //Iterate through lines (reports) in CSV
                 //Log.d("MyActivity", "Line: " + line);
                 int i = 0;
+                line = line.replace("\"", "");
 
                 String[] lineSplit = line.split(",", 7);
-                //Find corresponding restaurant to the report currently being read
-                String trackNumCompare[] = {lineSplit[0], RestaurantManager.getInstance().getIndex(i).getTrackingNumber()};
-                while (!trackNumCompare[0].equals(trackNumCompare[1])){
+                //Find restaurant matching report tracking number being read
+                while (!lineSplit[0].equals(RestaurantManager.getInstance().getIndex(i).getTrackingNumber())){
                     i++;
-                    trackNumCompare[1] = RestaurantManager.getInstance().getIndex(i).getTrackingNumber();
                 }
                 //Initializing inspection object variables
                 Inspection inspection = new Inspection();
+
                 inspection.setTrackingNumber(lineSplit[0]);
                 inspection.setInspectionDate(lineSplit[1]);
                 inspection.setInspType(lineSplit[2]);
@@ -273,23 +254,23 @@ public class MainActivity extends AppCompatActivity {
 
                 String[] violationsArr = lineSplit[6].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
 
-                if (violationsArr[0] != ""){ //Transfer each violation to class object's arraylist
-                    Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsArr));
+                if (!violationsArr[0].equals("")){ //Transfer each violation to class object's arraylist
+                    //Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsArr));
                     for (String violation : violationsArr){ // For each token, split it up farther into number, crit, details, repeat
-                        Log.d("MyActivity", "--Violations split: " + violation);
+                        //Log.d("MyActivity", "--Violations split: " + violation);
                         String[] violSplit = violation.split(",");
 
                         boolean crit = false;
-                        if (violSplit[1].replace("\"","").equals("Critical")){
+                        if (violSplit[1].equals("Critical")){
                             crit = true;
                         }
 
                         boolean repeat = false;
-                        if (violSplit[3].replace("\"","").equals("\"Repeat\"")){
+                        if (violSplit[3].equals("Repeat")){
                             repeat = true;
                         }
 
-                        int violNumber = Integer.parseInt(violSplit[0].replace("\"", ""));
+                        int violNumber = Integer.parseInt(violSplit[0]);
 
                         int briefDescIndex = violNumbers.indexOf(violNumber);
                         String briefDesc = violBriefDescriptions.get(briefDescIndex);
@@ -299,11 +280,11 @@ public class MainActivity extends AppCompatActivity {
                                 violSplit[2],
                                 briefDesc,
                                 repeat); //Create violation object
-                        Log.d("MyActivity", "----violation.violNum: " + violObj.getViolNumber());
-                        Log.d("MyActivity", "----violation.crit: " + violObj.getCritical());
-                        Log.d("MyActivity", "----violation.violDetails: " + violObj.getViolDetails());
-                        Log.d("MyActivity", "----violation.briefViolDetails: " + violObj.getBriefDetails());
-                        Log.d("MyActivity", "----violation.repeat: " + violObj.getRepeat());
+                        //Log.d("MyActivity", "----violation.violNum: " + violObj.getViolNumber());
+                        //Log.d("MyActivity", "----violation.crit: " + violObj.getCritical());
+                        //Log.d("MyActivity", "----violation.violDetails: " + violObj.getViolDetails());
+                        //Log.d("MyActivity", "----violation.briefViolDetails: " + violObj.getBriefDetails());
+                        //Log.d("MyActivity", "----violation.repeat: " + violObj.getRepeat());
                         inspection.getViolLump().add(violObj); //Append violation to violLump arraylist
                     }
                 }
@@ -314,4 +295,5 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
 }

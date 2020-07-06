@@ -27,8 +27,7 @@ import java.util.List;
 public class RestaurantActivity extends AppCompatActivity {
 
     private RestaurantManager manager;
-    private List<Inspection> inspect = new ArrayList<>();
-    //private Restaurant restaurant;
+    // private Restaurant restaurant;
     // private int size = 0;
 
     // private String[] inspectionStrings = new String[size];
@@ -40,7 +39,6 @@ public class RestaurantActivity extends AppCompatActivity {
     // The Restaurant object contains a list of inspections
     // private ArrayList<Inspection> inspectionList;
     List<Inspection> inspections;
-
 
     public static Intent makeLaunchIntent(Context c, String message) {
         Intent intent = new Intent(c, RestaurantActivity.class);
@@ -68,7 +66,10 @@ public class RestaurantActivity extends AppCompatActivity {
         } else {
              restaurant = manager.getIndex(restaurantIndex);
         }
+
+        assert restaurant != null;
         inspections = restaurant.getInspectionList();
+
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
         setupDefaultIntent();
