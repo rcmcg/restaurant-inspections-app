@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         populateListView();
         registerClickCallback();
 
-        InitInspectionLists();
         // setupTestButton();
     }
 
@@ -116,7 +115,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // TODO: After the RestaurantManager has been populated, it needs to be sorted alphabetically
-        // manager.sortAlphabetically();
+        manager.sortRestaurantsByName();
+
+        InitInspectionLists();
+        manager.sortInspListsByDate();
     }
 
     private void populateListView() {
