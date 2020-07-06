@@ -29,11 +29,13 @@ public class InspectionActivity extends AppCompatActivity {
 
     private static List<Violation> violationList;
     private static final String EXTRA_MESSAGE = "Extra";
+    private static final String ACTION_BAR = "Inspection";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inspection);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(ACTION_BAR);
 
         Inspection inspection = (Inspection) getIntent().getSerializableExtra("inspection");
 
