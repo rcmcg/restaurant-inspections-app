@@ -71,7 +71,6 @@ public class InspectionActivity extends AppCompatActivity {
         List<Violation> violationList = inspection.getViolLump();
 
         // TODO: Do something else if there are no violations
-
         // Setup the listView
         ArrayAdapter<Violation> adapter = new MyListAdapter(violationList);
         ListView list = findViewById(R.id.lstViewViolations);
