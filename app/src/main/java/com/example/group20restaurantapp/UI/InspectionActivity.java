@@ -28,15 +28,16 @@ import java.util.List;
 public class InspectionActivity extends AppCompatActivity {
 
     private static List<Violation> violationList;
-    private static final String EXTRA_MESSAGE = "Extra";
-    private static final String ACTION_BAR = "Inspection";
+    private static final String ACTION_BAR_TITLE = "Inspection";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inspection);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(ACTION_BAR);
+        getSupportActionBar().setTitle(ACTION_BAR_TITLE);
 
+        // Get inspection passed from RestaurantActivity as a serializableExtra
         Inspection inspection = (Inspection) getIntent().getSerializableExtra(RestaurantActivity.RESTAURANT_ACTIVITY_INSPECTION_TAG);
 
         assert inspection != null;
@@ -70,7 +71,6 @@ public class InspectionActivity extends AppCompatActivity {
         // Construct a new ArrayList from the list of Violations in inspection
         List<Violation> violationList = inspection.getViolLump();
 
-        // TODO: Do something else if there are no violations
         // Setup the listView
         ArrayAdapter<Violation> adapter = new MyListAdapter(violationList);
         ListView list = findViewById(R.id.lstViewViolations);
@@ -127,8 +127,8 @@ public class InspectionActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Get correct violation
                 Violation clickedViolation = InspectionActivity.getViolationList().get(position);
+
                 // Display full details of violation in a toast
-                // TODO: move to strings.xml with placeholder
                 String message = getString(R.string.inspection_activity_violation_item_full_description,
                         "" + clickedViolation.getViolNumber(),
                         "" + clickedViolation.getCritical(),
@@ -191,7 +191,6 @@ public class InspectionActivity extends AppCompatActivity {
             inspectionHazardRating.setTextColor(Color.rgb(204, 204, 0));
         } else if (inspection.getHazardRating().equals("High")) {
             inspectionHazardRating.setTextColor(Color.RED);
-
         }
     }
 

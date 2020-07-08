@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Contains information about a particular violation
+ */
+
 public class Violation implements Serializable {
     private int violNumber;
     private Boolean critical;
