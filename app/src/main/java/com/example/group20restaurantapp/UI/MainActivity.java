@@ -66,30 +66,32 @@ public class MainActivity extends AppCompatActivity {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String line = "";
             try {
-                //Escaping the header lines of the CSV file
+                // Escaping the header lines of the CSV file
                 reader.readLine();
                 while ((line = reader.readLine()) != null) {
                     line = line.replace("\"", "");
-                    //Splitting every line based on "," , Tokens are variables of Restaurant class
-                    // TODO: This should be replaced with a constructor taking arguments
+                    // Splitting every line based on "," , Tokens are variables of Restaurant class
                     String[] tokens=line.split(",");
-                    Restaurant r1=new Restaurant();
-                    r1.setTrackingNumber(tokens[0]);
-                    r1.setName(tokens[1]);
-                    r1.setAddress(tokens[2]);
-                    r1.setCity(tokens[3]);
-                    r1.setFacType(tokens[4]);
-                    r1.setLatitude(Double.parseDouble(tokens[5]));
-                    r1.setLongitude(Double.parseDouble(tokens[6]));
-                    r1.setImgId();
-                    //Adding the created Restaurants object to the manager instance
-                    manager.add(r1);
-                    Log.d("Main activity","Just created" + r1);
+
+                    Restaurant newRestaurant = new Restaurant();
+                    newRestaurant.setTrackingNumber(tokens[0]);
+                    newRestaurant.setName(tokens[1]);
+                    newRestaurant.setAddress(tokens[2]);
+                    newRestaurant.setCity(tokens[3]);
+                    newRestaurant.setFacType(tokens[4]);
+                    newRestaurant.setLatitude(Double.parseDouble(tokens[5]));
+                    newRestaurant.setLongitude(Double.parseDouble(tokens[6]));
+                    newRestaurant.setImgId();
+
+                    // Adding the created Restaurants object to the manager instance
+                    manager.add(newRestaurant);
+                    Log.d("Main activity","Just created" + newRestaurant);
                 }
             } catch (IOException e) {
                 Log.wtf("MyActivity", "Error reading data file on line" + line, e);
                 e.printStackTrace();
             }
+
             manager.sortRestaurantsByName();
 
             InitInspectionLists();
@@ -116,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
-
         public MyListAdapter(List<Restaurant> restaurantList) {
             super(MainActivity.this, R.layout.restaurant_item_view, restaurantList);
         }
@@ -151,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
                     imgHazardIcon.setImageResource(R.drawable.red_octogon);
                 }
             } else {
+                // No inspection for this restaurant
                 imgHazardIcon.setImageResource(R.drawable.no_inspection_qmark);
             }
 
@@ -228,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
         InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(is, Charset.forName("UTF-8"))
-        ); //Create reader
+        );  // Create reader
 
         line = "";
 
@@ -257,9 +259,9 @@ public class MainActivity extends AppCompatActivity {
                 String[] violationsArr = lineSplit[6].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
 
                 if (!violationsArr[0].equals("")){ //Transfer each violation to class object's arraylist
-                    //Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsArr));
+                    // Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsArr));
                     for (String violation : violationsArr){ // For each token, split it up farther into number, crit, details, repeat
-                        //Log.d("MyActivity", "--Violations split: " + violation);
+                        // Log.d("MyActivity", "--Violations split: " + violation);
                         String[] violSplit = violation.split(",");
 
                         boolean crit = false;
@@ -281,13 +283,13 @@ public class MainActivity extends AppCompatActivity {
                                 crit,
                                 violSplit[2],
                                 briefDesc,
-                                repeat); //Create violation object
-                        //Log.d("MyActivity", "----violation.violNum: " + violObj.getViolNumber());
-                        //Log.d("MyActivity", "----violation.crit: " + violObj.getCritical());
-                        //Log.d("MyActivity", "----violation.violDetails: " + violObj.getViolDetails());
-                        //Log.d("MyActivity", "----violation.briefViolDetails: " + violObj.getBriefDetails());
-                        //Log.d("MyActivity", "----violation.repeat: " + violObj.getRepeat());
-                        inspection.getViolLump().add(violObj); //Append violation to violLump arraylist
+                                repeat);
+                        // Log.d("MyActivity", "----violation.violNum: " + violObj.getViolNumber());
+                        // Log.d("MyActivity", "----violation.crit: " + violObj.getCritical());
+                        // Log.d("MyActivity", "----violation.violDetails: " + violObj.getViolDetails());
+                        // Log.d("MyActivity", "----violation.briefViolDetails: " + violObj.getBriefDetails());
+                        // Log.d("MyActivity", "----violation.repeat: " + violObj.getRepeat());
+                        inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
                     }
                 }
                 RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list

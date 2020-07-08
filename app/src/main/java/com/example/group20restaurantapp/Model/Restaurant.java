@@ -5,6 +5,10 @@ import com.example.group20restaurantapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Contains information and list of Inspections for a single restaurant
+ */
+
 public class Restaurant {
 
         private String name;
@@ -16,7 +20,6 @@ public class Restaurant {
         private String facType;
         private int iconImgId;
         List<Inspection> inspectionList = new ArrayList<>();
-        // private int countCritical;
 
         //Constructor
         public Restaurant(String name, String address, double latitude, double longitude, String trackingNumber, String city, String facType, int icon) {
@@ -30,12 +33,9 @@ public class Restaurant {
             setImgId();
         }
 
-        public Restaurant() {
-
-        }
+        public Restaurant() {}
 
         //Setter and Getter for each variable
-
         public String getName() {
             return name;
         }
@@ -106,8 +106,6 @@ public class Restaurant {
 
 
         public void setImgId(){
-            // TODO: Check by tracking number since there's a duplicate (Lee Yuen)
-            // Unless you want to use the same logo
             name = this.getName();
             if (name.matches("(.*)A&W(.*)")){
                 iconImgId = R.drawable.a_and_w;

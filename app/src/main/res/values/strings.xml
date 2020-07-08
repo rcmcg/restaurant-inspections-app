@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Group20RestaurantApp</string>
+    <string name="app_name">Restaurant Inspections: Surrey</string>
     <string name="name">Name:</string>
     <string name="address">Address:</string>
     <string name="longitude">Longitude:</string>

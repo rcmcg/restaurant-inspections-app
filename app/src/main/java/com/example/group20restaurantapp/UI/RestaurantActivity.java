@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,14 +28,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
     public static final String RESTAURANT_ACTIVITY_INSPECTION_TAG = "inspection";
     private RestaurantManager manager;
-    private static final String EXTRA_MESSAGE = "Extra";
     List<Inspection> inspections;
-
-    public static Intent makeLaunchIntent(Context c) {
-        Intent intent = new Intent(c, RestaurantActivity.class);
-        // intent.putExtra(EXTRA_MESSAGE, message);
-        return intent;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +63,22 @@ public class RestaurantActivity extends AppCompatActivity {
         setupDefaultIntent();
     }
 
-    private void setCoordsText(Restaurant restaurant) {
-        TextView txtViewCoords = findViewById(R.id.coords_resActivity);
-        String coordsString = "" + restaurant.getLatitude() + "," + restaurant.getLongitude();
-        txtViewCoords.setText(
-                getString(R.string.restaurant_activity_restaurant_coords,coordsString)
+    // Source
+    // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setRestaurantText(Restaurant restaurant) {
+        TextView txtViewRestaurantName = findViewById(R.id.name_resActivity);
+        txtViewRestaurantName.setText(
+                getString(R.string.restaurant_activity_restaurant_name,restaurant.getName())
         );
     }
 
@@ -84,22 +89,16 @@ public class RestaurantActivity extends AppCompatActivity {
         );
     }
 
-    private void setRestaurantText(Restaurant restaurant) {
-        TextView txtViewRestaurantName = findViewById(R.id.name_resActivity);
-        txtViewRestaurantName.setText(
-                getString(R.string.restaurant_activity_restaurant_name,restaurant.getName())
+    private void setCoordsText(Restaurant restaurant) {
+        TextView txtViewCoords = findViewById(R.id.coords_resActivity);
+        String coordsString = "" + restaurant.getLatitude() + "," + restaurant.getLongitude();
+        txtViewCoords.setText(
+                getString(R.string.restaurant_activity_restaurant_coords,coordsString)
         );
-    }
-
-    private void setupDefaultIntent() {
-        Intent i = new Intent();
-        i.putExtra("result", 0);
-        setResult(Activity.RESULT_OK, i);
     }
 
     private void populateInspectionList(Restaurant restaurant) {
         manager = RestaurantManager.getInstance();
-        processInspections(restaurant);
 
         ArrayAdapter<Inspection> adapter = new CustomAdapter();
         ListView list = (ListView) findViewById(R.id.restaurant_view);
@@ -110,7 +109,6 @@ public class RestaurantActivity extends AppCompatActivity {
         public CustomAdapter() {
             super(RestaurantActivity.this, R.layout.inspection_item_view, inspections);
         }
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -158,12 +156,8 @@ public class RestaurantActivity extends AppCompatActivity {
             return itemView;
         }
 
+
     }
-
-
-    private void processInspections(Restaurant restaurant) {
-    }
-
     private void registerClickCallback(final Restaurant restaurant) {
         ListView list = findViewById(R.id.restaurant_view);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -175,5 +169,15 @@ public class RestaurantActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void setupDefaultIntent() {
+        Intent i = new Intent();
+        i.putExtra("result", 0);
+        setResult(Activity.RESULT_OK, i);
+    }
+
+    public static Intent makeLaunchIntent(Context c) {
+        return new Intent(c, RestaurantActivity.class);
     }
 }

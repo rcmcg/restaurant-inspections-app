@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Contains information about an individual inspection and a list of violations
+ */
+
 public class Inspection implements Serializable {
     private String trackingNumber;
     private String inspectionDate;
@@ -40,13 +44,12 @@ public class Inspection implements Serializable {
         return inspectionDate;
     }
 
-    // TODO: Implement fullFormattedDate
     public String fullFormattedDate() {
         // Return full date in format Month Day, Year
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
         String rawInspectionDate = getInspectionDate();
 
-        String retString = "";
+        String fullFormattedDate = "";
 
         try {
             Date inspectionD = sdf.parse(rawInspectionDate);
@@ -56,7 +59,7 @@ public class Inspection implements Serializable {
             assert inspectionD != null;
             inspectionCalendar.setTime(inspectionD);
 
-            retString = indexToMonth[inspectionCalendar.get(Calendar.MONTH)] + " "
+            fullFormattedDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)] + " "
                         + inspectionCalendar.get(Calendar.DAY_OF_MONTH)
                         + ", "
                         + inspectionCalendar.get(Calendar.YEAR);
@@ -67,7 +70,7 @@ public class Inspection implements Serializable {
         }
 
 
-        return retString;
+        return fullFormattedDate;
     }
 
     public String intelligentInspectDate() {
@@ -110,7 +113,6 @@ public class Inspection implements Serializable {
     public void setInspectionDate(String inspectionDate) {
         this.inspectionDate = inspectionDate;
     }
-
 
     public String getInspType() {
         return inspType;
