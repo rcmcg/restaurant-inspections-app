@@ -187,8 +187,8 @@ public class InspectionActivity extends AppCompatActivity {
         if (inspection.getHazardRating().equals("Low")) {
             inspectionHazardRating.setTextColor(Color.YELLOW);
         } else if (inspection.getHazardRating().equals("Moderate")) {
-            // Set text color to orange
-            inspectionHazardRating.setTextColor(Color.rgb(204, 204, 0));
+            // Set text color to bright orange
+            inspectionHazardRating.setTextColor(Color.rgb(255, 165, 0));
         } else if (inspection.getHazardRating().equals("High")) {
             inspectionHazardRating.setTextColor(Color.RED);
         }
