@@ -117,16 +117,19 @@ public class RestaurantActivity extends AppCompatActivity {
                 itemView = getLayoutInflater().inflate(R.layout.inspection_item_view, parent, false);
             }
             Inspection currentInspection = inspections.get(position);
+
+            // Set icon and background color for each itemView
             String temp = currentInspection.getHazardRating();
+            ImageView imageview = (ImageView) itemView.findViewById(R.id.imgViewViolationIcon);
             if (temp.equals("Low")) {
-                ImageView imageview = (ImageView) itemView.findViewById(R.id.imgViewViolationIcon);
                 imageview.setImageResource(R.drawable.yellow_triangle);
+                itemView.setBackgroundColor(MainActivity.itemViewBackgroundColours[0]);
             } else if (temp.equals("Moderate")){
-                ImageView imageview = (ImageView) itemView.findViewById(R.id.imgViewViolationIcon);
                 imageview.setImageResource(R.drawable.orange_diamond);
+                itemView.setBackgroundColor(MainActivity.itemViewBackgroundColours[1]);
             } else if (temp.equals("High")){
-                ImageView imageview = (ImageView) itemView.findViewById(R.id.imgViewViolationIcon);
                 imageview.setImageResource(R.drawable.red_octogon);
+                itemView.setBackgroundColor(MainActivity.itemViewBackgroundColours[2]);
             }
 
             // Set inspection date

@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
     private RestaurantManager manager = RestaurantManager.getInstance();
 
+    // Yellow, orange, red, with 20% transparency
+    public static int[] itemViewBackgroundColours = {0x33FFFF00, 0x33FFA500, 0x33FF0000};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,17 +142,20 @@ public class MainActivity extends AppCompatActivity {
             imgRestaurant.setImageResource(currentRestaurant.getIconImgId());
             Log.d("MainActivity", "getView: currentRestaurant.getIconImgId: " + currentRestaurant.getIconImgId());
 
-            // Fill the hazard icon
+            // Fill the hazard icon and the background color of each item
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
             if (currentRestaurant.getInspectionList().size() != 0) {
                 // Inspection list in Restaurant is sorted on startup so the first index is the most recent
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
                 if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
+                    itemView.setBackgroundColor(itemViewBackgroundColours[0]);
                 } else if (lastInspection.getHazardRating().equals("Moderate")) {
                     imgHazardIcon.setImageResource(R.drawable.orange_diamond);
+                    itemView.setBackgroundColor(itemViewBackgroundColours[1]);
                 } else if (lastInspection.getHazardRating().equals("High")) {
                     imgHazardIcon.setImageResource(R.drawable.red_octogon);
+                    itemView.setBackgroundColor(itemViewBackgroundColours[2]);
                 }
             } else {
                 // No inspection for this restaurant
