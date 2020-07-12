@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,6 +55,20 @@ public class MainActivity extends AppCompatActivity {
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
+
+        wireLaunchMapButton();
+    }
+
+    private void wireLaunchMapButton() {
+        Button btn = findViewById(R.id.btnLaunchMap);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = MapsActivity.makeIntent(MainActivity.this);
+                finish();
+                startActivity(intent);
+            }
+        });
     }
 
     private void readRestaurantData() {
@@ -304,5 +319,9 @@ public class MainActivity extends AppCompatActivity {
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
             e.printStackTrace();
         }
+    }
+
+    public static Intent makeIntent(Context context) {
+        return new Intent(context, MainActivity.class);
     }
 }
