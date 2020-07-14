@@ -4,10 +4,8 @@ import android.util.Log;
 
 import com.example.group20restaurantapp.R;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormatSymbols;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +27,7 @@ public class Inspection implements Serializable {
     private int numNonCritical;
     private String hazardRating;
     List <Violation> violLump = new ArrayList<>();
+    private int diffInDay;
 
     public Inspection(){}
 
@@ -72,7 +71,7 @@ public class Inspection implements Serializable {
 
         return fullFormattedDate;
     }
-
+    //https://www.baeldung.com/java-date-difference
     public String intelligentInspectDate() {
         String intelligentDate = "";
         try {
@@ -85,7 +84,8 @@ public class Inspection implements Serializable {
             Date inspectionD = sdf.parse(rawInspectionDate);
             long diffInMS = Math.abs(currentDate.getTime() - inspectionD.getTime());
             long diffInDay = TimeUnit.DAYS.convert(diffInMS, TimeUnit.MILLISECONDS);
-
+            this.diffInDay = (int) diffInDay;
+            //https://stackoverflow.com/questions/36370895/getyear-getmonth-getday-are-deprecated-in-calendar-what-to-use-then
             String[] indexToMonth = new DateFormatSymbols().getMonths();
             Calendar inspectionCalendar = Calendar.getInstance();
             inspectionCalendar.setTime(inspectionD);
@@ -150,6 +150,8 @@ public class Inspection implements Serializable {
         return violLump;
     }
 
+    public int getDiffInDay() { return this.diffInDay; }
+
     public void setViolLump(List<Violation> violLump) {
         this.violLump = violLump;
     }
@@ -165,5 +167,22 @@ public class Inspection implements Serializable {
                 ", hazardRating=" + hazardRating +
                 ", violLump= " + Arrays.toString(getViolLump().toArray()) +
                 '}';
+    }
+    public int getHazardIcon() {
+
+        if (hazardRating.equals("Low")) {
+
+            return R.drawable.green;
+
+        } else if (hazardRating.equals("Moderate")) {
+
+            return R.drawable.yellow;
+
+        } else {
+
+            return R.drawable.red;
+
+        }
+
     }
 }
