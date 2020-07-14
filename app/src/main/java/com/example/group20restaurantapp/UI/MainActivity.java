@@ -50,13 +50,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         readRestaurantData();
+        getUpdatedData();
 
         // Following functions taken from Dr. Fraser's video linked below
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
-
         wireLaunchMapButton();
+    }
+
+    private void getUpdatedData() {
+
     }
 
     private void wireLaunchMapButton() {
