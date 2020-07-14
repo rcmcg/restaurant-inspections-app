@@ -20,7 +20,6 @@ public class Restaurant {
         private String facType;
         private int iconImgId;
         List<Inspection> inspectionList = new ArrayList<>();
-
         //Constructor
         public Restaurant(String name, String address, double latitude, double longitude, String trackingNumber, String city, String facType, int icon) {
             this.name = name;
@@ -145,6 +144,19 @@ public class Restaurant {
                     ", icon=" + iconImgId +
                     '}';
         }
-    }
+        public String getLastHazardLevel() {
+            if (inspectionList.isEmpty()) return "None";
+            return inspectionList.get(0).getHazardRating();
+        }
+        private int countCriticalViolation() {
+            int count = 0;
+            for (Inspection inspection : inspectionList) {
+                if (inspection.getDiffInDay() <= 365) {
+                    count = count + inspection.getNumCritical();
+                }
+            }
+            return count;
+        }
+}
 
 

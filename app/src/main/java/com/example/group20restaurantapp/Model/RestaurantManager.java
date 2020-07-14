@@ -1,7 +1,5 @@
 package com.example.group20restaurantapp.Model;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,7 +14,11 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     // Iterable and a singleton class of restaurants object
     private List<Restaurant> restaurantList = new ArrayList<>();
-
+    private static RestaurantManager  instance;
+    private String searchTerm = "";
+    private String hazardLevelFilter = "All";
+    private String comparator = "All";
+    private boolean favouriteOnly = false;
     public void add(Restaurant restaurant){
         restaurantList.add(restaurant);
     }
@@ -30,7 +32,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
 
     // Singleton class and adding restaurants from CSV
-    private static RestaurantManager  instance;
+
     private RestaurantManager(){
         // Prevent from instantiating
     }
@@ -74,5 +76,48 @@ public class RestaurantManager implements Iterable<Restaurant>{
         for (Restaurant restaurant : restaurantList){
             Collections.sort(restaurant.inspectionList, compareByDate.reversed()); //Sort arraylist in reverse order
         }
+    }
+    public Restaurant findRestaurantByLatLng(double latitude, double longitude) {
+        for (Restaurant restaurant: restaurantList) {
+            if (restaurant.getLatitude() == latitude && restaurant.getLongitude() == longitude) {
+                return restaurant;
+            }
+        }
+        return null;
+    }
+    public List<Restaurant> getRestaurants() {
+        searchTerm = searchTerm.trim();
+        if (searchTerm.isEmpty() &&
+                hazardLevelFilter.equalsIgnoreCase("All") &&
+                comparator.equalsIgnoreCase("All") &&
+                !favouriteOnly) {
+
+            return restaurantList; // O(1) when search term is empty.
+        }
+
+        List<Restaurant> filteredRestaurants = new ArrayList<>();
+        for (Restaurant restaurant : restaurantList) {
+            if (qualifies(restaurant)) {
+                filteredRestaurants.add(restaurant);
+            }
+        }
+        return filteredRestaurants;
+    }
+    private boolean qualifies(Restaurant restaurant) {
+        String restaurantName = restaurant.getName();
+        restaurantName = restaurantName.toLowerCase();
+        String hazardLevel = restaurant.getLastHazardLevel();
+
+        if (restaurantName.toLowerCase().contains(searchTerm.toLowerCase()) &&
+                ((hazardLevelFilter.equalsIgnoreCase("All")) ||
+                        (hazardLevel.equalsIgnoreCase(hazardLevelFilter))) ) {
+
+            return true;
+
+        } else {
+
+            return false;
+        }
+
     }
 }
