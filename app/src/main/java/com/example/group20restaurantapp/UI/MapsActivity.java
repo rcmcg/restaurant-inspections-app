@@ -80,9 +80,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         setUpClusterer();
 
-        // Add a marker in Surrey and move the camera
+        // Move the camera to surrey
+        // TODO: The camera should pan to user's location on startup
         LatLng surrey = new LatLng(49.104431, -122.801094);
-        // mMap.addMarker(new MarkerOptions().position(surrey).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
 
         //Set Custom InfoWindow Adapter
