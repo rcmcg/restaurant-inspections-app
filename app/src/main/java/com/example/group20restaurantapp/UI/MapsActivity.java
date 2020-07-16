@@ -24,7 +24,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -163,17 +162,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             restaurantNameText.setText(temp);
 
+            TextView addressText = itemView.findViewById(R.id.info_item_address);
+            addressText.setText(restaurant.getAddress());
 
-            Inspection RecentInspection = restaurant.getInspectionList().get(0);
+            Inspection RecentInspection = null;
+            TextView lastInspectionText = itemView.findViewById(R.id.info_item_lastInspection);
+            ImageView hazard = itemView.findViewById(R.id.info_item_hazardImage);
 
-            if (RecentInspection != null) {
-                TextView numNonCriticalText = itemView.findViewById(R.id.info_item_numNonCritical);
-                numNonCriticalText.setText(Integer.toString(RecentInspection.getNumNonCritical()));
-
-                TextView numCriticalText = itemView.findViewById(R.id.info_item_numCritical);
-                numCriticalText.setText(Integer.toString(RecentInspection.getNumCritical()));
-
-                TextView lastInspectionText = itemView.findViewById(R.id.info_item_lastInspection);
+            if (restaurant.getInspectionSize() > 0){
+                RecentInspection = restaurant.getInspectionList().get(0);
                 //lastInspectionText.setText(RecentInspection.getInspectionDate());
                 lastInspectionText.setText(
                         getString(
@@ -181,7 +178,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 RecentInspection.intelligentInspectDate())
                 );
 
-                ImageView hazard = itemView.findViewById(R.id.info_item_hazardImage);
                 String level = RecentInspection.getHazardRating();
                 if (level.equals("Low")) {
                     hazard.setImageResource(R.drawable.yellow_triangle);
@@ -190,6 +186,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else {
                     hazard.setImageResource(R.drawable.red_octogon);
                 }
+            }
+            else{
+                //lastInspectionText.setText("");
+                hazard.setImageResource(R.drawable.no_inspection_qmark);
             }
 
             return itemView;
