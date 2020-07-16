@@ -128,6 +128,7 @@ public class Restaurant {
             }
         }
 
+
         public int getInspectionSize() {
         return inspectionList.size();
     }

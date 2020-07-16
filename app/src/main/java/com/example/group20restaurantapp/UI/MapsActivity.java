@@ -151,12 +151,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             // Fill the view
             ImageView logo = itemView.findViewById(R.id.info_item_restaurantLogo);
-            //need change
-            logo.setImageResource(R.drawable.a_and_w);
+
+            logo.setImageResource(restaurant.getIconImgId());
 
             TextView restaurantNameText = itemView.findViewById(R.id.info_item_restaurantName);
-            //need change
-            String temp = "Pattullo A&W";
+
+            String temp = restaurant.getName();
 
             if (temp.length() > 25) {
                 temp = temp.substring(0, 25) + "...";
@@ -164,22 +164,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             restaurantNameText.setText(temp);
 
 
-            Inspection mostRecentInspection = null;
-                    //restaurant.getInspectionList().get(0);
-            //need change
-            if (mostRecentInspection == null) {
+            Inspection RecentInspection = restaurant.getInspectionList().get(0);
+
+            if (RecentInspection != null) {
                 TextView numNonCriticalText = itemView.findViewById(R.id.info_item_numNonCritical);
-                numNonCriticalText.setText(Integer.toString(2));
+                numNonCriticalText.setText(Integer.toString(RecentInspection.getNumNonCritical()));
 
                 TextView numCriticalText = itemView.findViewById(R.id.info_item_numCritical);
-                numCriticalText.setText(Integer.toString(1));
+                numCriticalText.setText(Integer.toString(RecentInspection.getNumCritical()));
 
                 TextView lastInspectionText = itemView.findViewById(R.id.info_item_lastInspection);
-                lastInspectionText.setText("September");
+                //lastInspectionText.setText(RecentInspection.getInspectionDate());
+                lastInspectionText.setText(
+                        getString(
+                                R.string.restaurant_activity_inspection_item_date,
+                                RecentInspection.intelligentInspectDate())
+                );
 
                 ImageView hazard = itemView.findViewById(R.id.info_item_hazardImage);
-                hazard.setImageResource(R.drawable.red_octogon);
-
+                String level = RecentInspection.getHazardRating();
+                if (level.equals("Low")) {
+                    hazard.setImageResource(R.drawable.yellow_triangle);
+                } else if (level.equals("Moderate")){
+                    hazard.setImageResource(R.drawable.orange_diamond);
+                } else {
+                    hazard.setImageResource(R.drawable.red_octogon);
+                }
             }
 
             return itemView;

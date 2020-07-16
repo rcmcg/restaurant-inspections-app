@@ -13,8 +13,8 @@
             android:layout_width="wrap_content"
             android:layout_height="18dp"
             android:layout_above="@+id/info_item_numCritical"
-            android:layout_marginStart="9dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginBottom="0dp"
             android:layout_toEndOf="@+id/info_textView10"
             android:text="N/A" />
 
@@ -41,11 +41,11 @@
 
         <TextView
             android:id="@+id/info_textView9"
-            android:layout_width="115dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/info_item_restaurantLogo"
             android:layout_marginStart="0dp"
-            android:layout_marginEnd="0dp"
+            android:layout_marginEnd="25dp"
             android:layout_marginBottom="0dp"
             android:layout_toStartOf="@+id/info_item_numNonCritical"
             android:layout_toEndOf="@+id/info_item_restaurantLogo"
@@ -53,11 +53,11 @@
 
         <TextView
             android:id="@+id/info_textView10"
-            android:layout_width="111dp"
-            android:layout_height="18dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_above="@+id/info_textView9"
             android:layout_marginStart="2dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="-2dp"
             android:layout_toEndOf="@+id/info_item_restaurantLogo"
             android:text="NumNonCritical" />
 
@@ -75,10 +75,10 @@
             android:id="@+id/info_item_numCritical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/info_textView9"
             android:layout_alignBottom="@+id/info_textView9"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="77dp"
             android:layout_marginBottom="0dp"
-            android:layout_toEndOf="@+id/info_textView9"
             android:text="N/A" />
 
         <TextView
@@ -87,8 +87,8 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/info_item_numCritical"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="6dp"
-            android:layout_marginBottom="2dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
             android:text="N/A" />
     </RelativeLayout>
 </RelativeLayout>
