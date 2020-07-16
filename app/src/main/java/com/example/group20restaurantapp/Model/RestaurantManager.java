@@ -19,9 +19,11 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private String hazardLevelFilter = "All";
     private String comparator = "All";
     private boolean favouriteOnly = false;
+
     public void add(Restaurant restaurant){
         restaurantList.add(restaurant);
     }
+
     public void delete(Restaurant restaurant){
         restaurantList.remove(restaurant);
     }
