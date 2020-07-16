@@ -52,7 +52,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
 
         wireLaunchListButton();
-
     }
 
     private void wireLaunchListButton() {
@@ -79,16 +78,44 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Surrey and move the camera
+        setUpClusterer();
+
+        // Move the camera to surrey
+        // TODO: The camera should pan to user's location on startup
         LatLng surrey = new LatLng(49.104431, -122.801094);
-        mMap.addMarker(new MarkerOptions().position(surrey).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
+
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
         mMap.setInfoWindowAdapter(adapter);
+
         // Receive intent from Restaurant Activity
         Intent i_receive = getIntent();
         String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
+    }
+
+    private void setUpClusterer() {
+        // Initialize new clusterManager
+        mClusterManager = new ClusterManager<PegItem>(this, mMap);
+
+        mMap.setOnCameraIdleListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+
+        populateMapWithMarkers();
+    }
+
+    private void populateMapWithMarkers() {
+        // Get Singleton RestaurantManager
+        RestaurantManager manager = RestaurantManager.getInstance();
+
+        for (Restaurant restaurant : manager) {
+            PegItem pegItem = new PegItem(
+                    restaurant.getLatitude(),
+                    restaurant.getLongitude()
+            );
+
+            mClusterManager.addItem(pegItem);
+        }
     }
 
     public static Intent makeIntent(Context context) {

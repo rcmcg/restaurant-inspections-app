@@ -53,13 +53,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // TODO: These functions should be member functions of Restaurant?
         readRestaurantData();
         getRestaurantsDataURL(); //TODO: figure out how to store the updated data from server in restaurants CSV
 
-        // Following functions taken from Dr. Fraser's video linked below
+        // Following 2 functions taken from Dr. Fraser's video linked below
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
+
         wireLaunchMapButton();
     }
 
