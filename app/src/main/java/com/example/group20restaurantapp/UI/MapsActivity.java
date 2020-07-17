@@ -2,15 +2,19 @@ package com.example.group20restaurantapp.UI;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
 import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.PegItem;
@@ -26,7 +30,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterManager;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity
+        implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener
+{
+
 
     private GoogleMap mMap;
 
@@ -41,6 +48,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private RestaurantManager manager = RestaurantManager.getInstance();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
+    private Boolean updateData = false;
+    private Boolean newData = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +60,58 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Suppose there is new data
+        // newData = manager.checkForNewData();
+        newData = true;
+
+        // Add one more outer if statement checking if it's been >= 20 hours since
+        // data has been updated
+
+        /*
+        if (timeSinceLastServerCheck >= 20 hours) {
+
+        }
+         */
+
+        if (newData) {
+            if (!manager.hasUserBeenAskedToUpdateThisSession()) {
+                showAskUserToUpdateDialog();
+                manager.setUserBeenAskedToUpdateThisSession(true);
+            }
+
+            if (updateData) {
+                // Launch Please-Wait dialog and download new data
+                // If data download is cancelled, do nothing
+                // If it is allowed to complete,
+                    // Update installed data
+                    // Update SharedPref storing last update
+            }
+        }
+
+        // Read installed data
+
+
         wireLaunchListButton();
+    }
+
+    public void showAskUserToUpdateDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new AskUserToUpdateDialogFragment();
+        dialog.show(getSupportFragmentManager(), "AskUserToUpdateFragment");
+    }
+
+    public void onAskUserToUpdateDialogPositiveClick(DialogFragment dialog) {
+        // User touched the dialog's positive button
+        Toast.makeText(MapsActivity.this,
+                "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
+        updateData = true;
+    }
+
+    public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
+        Toast.makeText(MapsActivity.this,
+                "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
+        updateData = false;
     }
 
     private void wireLaunchListButton() {
@@ -120,11 +181,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
     }
+
     public static Intent makeLaunchIntent(Context c, String message) {
         Intent i1 = new Intent(c, MapsActivity.class);
         i1.putExtra(EXTRA_MESSAGE, message);
         return i1;
     }
+
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
         private Activity context;
@@ -191,7 +254,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //lastInspectionText.setText("");
                 hazard.setImageResource(R.drawable.no_inspection_qmark);
             }
-
             return itemView;
         }
     }

@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             String line = "";
-            br.readLine();
+            br.readLine(); //Header line
             int initialSize = RestaurantManager.getInstance().getSize();
             boolean repeatEntry = false;
 
@@ -235,9 +235,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     count++;
                 }
-                if (repeatEntry){
+                if (repeatEntry)
                     continue;
-                }
 
                 String [] restaurantData = new String[7];
                 if (tokens.length > 7){ //Some restaurant names have ',' (commas) in them causing tokens[1] and tokens[2] to be a split version of the restaurant name
