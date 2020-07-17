@@ -49,6 +49,7 @@ public class MapsActivity extends AppCompatActivity
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
     private Boolean updateData = false;
+    private Boolean newData = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +60,36 @@ public class MapsActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        if (!manager.hasUserBeenAskedToUpdateThisSession()) {
-            showAskUserToUpdateDialog();
-            manager.setUserBeenAskedToUpdateThisSession(true);
+        // Suppose there is new data
+        // newData = manager.checkForNewData();
+        newData = true;
+
+        // Add one more outer if statement checking if it's been >= 20 hours since
+        // data has been updated
+
+        /*
+        if (timeSinceLastServerCheck >= 20 hours) {
+
         }
+         */
+
+        if (newData) {
+            if (!manager.hasUserBeenAskedToUpdateThisSession()) {
+                showAskUserToUpdateDialog();
+                manager.setUserBeenAskedToUpdateThisSession(true);
+            }
+
+            if (updateData) {
+                // Launch Please-Wait dialog and download new data
+                // If data download is cancelled, do nothing
+                // If it is allowed to complete,
+                    // Update installed data
+                    // Update SharedPref storing last update
+            }
+        }
+
+        // Read installed data
+
 
         wireLaunchListButton();
     }
