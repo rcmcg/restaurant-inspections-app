@@ -31,7 +31,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterManager;
 
 public class MapsActivity extends AppCompatActivity
-        implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener
+        implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
+        PleaseWaitDialogFragment.PleaseWaitDialogListener
 {
 
 
@@ -60,39 +61,42 @@ public class MapsActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // Suppose there is new data
+        // Suppose there is new data on the City of Surrey server
         // newData = manager.checkForNewData();
         newData = true;
 
         // Add one more outer if statement checking if it's been >= 20 hours since
-        // data has been updated
-
-        /*
-        if (timeSinceLastServerCheck >= 20 hours) {
-
-        }
-         */
+        // in-app data has been updated
 
         if (newData) {
             if (!manager.hasUserBeenAskedToUpdateThisSession()) {
                 showAskUserToUpdateDialog();
                 manager.setUserBeenAskedToUpdateThisSession(true);
             }
-
-            if (updateData) {
-                // Launch Please-Wait dialog and download new data
-                // If data download is cancelled, do nothing
-                // If it is allowed to complete,
-                    // Update installed data
-                    // Update SharedPref storing last update
-            }
         }
 
         // Read installed data
 
-
         wireLaunchListButton();
     }
+
+    public void showPleaseWaitDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new PleaseWaitDialogFragment();
+        dialog.show(getSupportFragmentManager(), "PleaseWaitFragment");
+    }
+
+
+    @Override
+    public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
+        // User pressed dialog's negative button, ie, wants to cancel the download
+        Toast.makeText(MapsActivity.this,
+                "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
+
+        // Update global variable for onAskUserToUpdateDialogPositiveClick
+        // isDownloadCancelled = true;
+    }
+
 
     public void showAskUserToUpdateDialog() {
         // Create an instance of the dialog fragment and show it
@@ -104,14 +108,25 @@ public class MapsActivity extends AppCompatActivity
         // User touched the dialog's positive button
         Toast.makeText(MapsActivity.this,
                 "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
-        updateData = true;
+        updateData = true; // this won't work
+
+        // Launch please-wait dialog and start the download
+        showPleaseWaitDialog();
+
+        // Start download
+        // while ( downloading && !isDownloadCancelled )
+
+        // if (!isDownloadCancelled)
+            // finish the please wait dialog
+            // Update relevant data
     }
 
     public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
         // User touched the dialog's negative button
         Toast.makeText(MapsActivity.this,
                 "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
-        updateData = false;
+        // do nothing
+        // updateData = false;
     }
 
     private void wireLaunchListButton() {
@@ -187,6 +202,7 @@ public class MapsActivity extends AppCompatActivity
         i1.putExtra(EXTRA_MESSAGE, message);
         return i1;
     }
+
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
