@@ -48,7 +48,6 @@ public class MapsActivity extends AppCompatActivity
     private RestaurantManager manager = RestaurantManager.getInstance();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
-
     private Boolean updateData = false;
 
     @Override
@@ -60,11 +59,10 @@ public class MapsActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // Get RestaurantManager singleton
-
-
-        // Test AlertDialog
-        showAskUserToUpdateDialog();
+        if (!manager.hasUserBeenAskedToUpdateThisSession()) {
+            showAskUserToUpdateDialog();
+            manager.setUserBeenAskedToUpdateThisSession(true);
+        }
 
         wireLaunchListButton();
     }
@@ -156,11 +154,13 @@ public class MapsActivity extends AppCompatActivity
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
     }
+
     public static Intent makeLaunchIntent(Context c, String message) {
         Intent i1 = new Intent(c, MapsActivity.class);
         i1.putExtra(EXTRA_MESSAGE, message);
         return i1;
     }
+
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
         private Activity context;
@@ -227,7 +227,6 @@ public class MapsActivity extends AppCompatActivity
                 //lastInspectionText.setText("");
                 hazard.setImageResource(R.drawable.no_inspection_qmark);
             }
-
             return itemView;
         }
     }
