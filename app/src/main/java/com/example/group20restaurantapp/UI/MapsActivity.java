@@ -2,15 +2,19 @@ package com.example.group20restaurantapp.UI;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
 import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.PegItem;
@@ -26,7 +30,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterManager;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity
+        implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener
+{
+
 
     private GoogleMap mMap;
 
@@ -41,6 +48,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private RestaurantManager manager = RestaurantManager.getInstance();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
+
+    private Boolean updateData = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +60,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Get RestaurantManager singleton
+
+
+        // Test AlertDialog
+        showAskUserToUpdateDialog();
+
         wireLaunchListButton();
+    }
+
+    public void showAskUserToUpdateDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new AskUserToUpdateDialogFragment();
+        dialog.show(getSupportFragmentManager(), "AskUserToUpdateFragment");
+    }
+
+    public void onAskUserToUpdateDialogPositiveClick(DialogFragment dialog) {
+        // User touched the dialog's positive button
+        Toast.makeText(MapsActivity.this,
+                "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
+        updateData = true;
+    }
+
+    public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
+        Toast.makeText(MapsActivity.this,
+                "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
+        updateData = false;
     }
 
     private void wireLaunchListButton() {
