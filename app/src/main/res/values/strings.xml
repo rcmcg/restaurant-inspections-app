@@ -17,7 +17,7 @@
     <string name="restaurant_activity_restaurant_name">%1$s</string>
     <string name="restaurant_activity_restaurant_address">Address: %1$s</string>
     <string name="restaurant_activity_restaurant_coords">Coordinates: %1$s</string>
-    <string name="restaurant_activity_inspection_item_date">Inspection date: %1$s</string>
+    <string name="restaurant_activity_inspection_item_date">Last Inspection: %1$s</string>
     <string name="restaurant_activity_inspection_item_crit_viols">Critical violations: %1$s</string>
     <string name="restaurant_activity_inspection_item_non_crit_viols">Non-critical violations: %1$s</string>
 
