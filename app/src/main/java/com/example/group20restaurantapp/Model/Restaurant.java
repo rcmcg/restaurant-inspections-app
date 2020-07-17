@@ -96,6 +96,10 @@ public class Restaurant {
         }
 
         public List<Inspection> getInspectionList() {
+
+            if(this==null){
+             return inspectionList = new ArrayList<>();
+            }
             return inspectionList;
         }
 

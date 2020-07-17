@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -18,23 +19,27 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
+
+import java.io.Serializable;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
 
-    private static final String TAG = "MapActivity";
+    private GoogleMap mMap;
+    public static final String TAG = "Restaurant";
     private static final float DEFAULT_ZOOM = 18f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    public static final String RESTAURANT_ACTIVITY_RESTAURANT_TAG = "restaurant";
     private static final String EXTRA_MESSAGE = "Extra";
     private Boolean mLocationPermissionsGranted = false;
     private Marker mMarker;
@@ -79,6 +84,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         setUpClusterer();
 
+        registerClickCallback();
+
         // Move the camera to surrey
         // TODO: The camera should pan to user's location on startup
         LatLng surrey = new LatLng(49.104431, -122.801094);
@@ -91,6 +98,69 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Receive intent from Restaurant Activity
         Intent i_receive = getIntent();
         String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
+    }
+
+    private void registerClickCallback() {
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                // Find the restaurant to work with.
+                LatLng latLngF = marker.getPosition();
+                double lat = latLngF.latitude;
+                double lng = latLngF.longitude;
+                Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng);
+                int tempIndex = manager.findIndex(restaurant);
+                Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
+                intent.putExtra("Index",tempIndex);
+                intent.putExtra("open",true);
+                //Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
+                //intent.putExtra(" ", String.valueOf(restaurant));
+                MapsActivity.this.startActivityForResult(intent, 451);
+            }
+        });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                moveCamera(marker.getPosition(), DEFAULT_ZOOM);
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                // Clear everything
+                mClusterManager.clearItems();
+
+                // Clear the currently open marker
+                mMap.clear();
+
+                // Reinitialize clusterManager
+                setUpClusterer();
+
+                // Focus map on the position that was clicked on map
+                moveCamera(latLng, 15f);
+            }
+        });
+
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<PegItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<PegItem> cluster) {
+                moveCamera(cluster.getPosition(), -10f);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Move the camera according to Latitude and longitude
+     * DEFAULT_ZOOM = 15
+     */
+    private void moveCamera(LatLng latLng, float zoom) {
+        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
+        mMap.animateCamera(location);
     }
 
     private void setUpClusterer() {
@@ -188,11 +258,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
             else{
-                //lastInspectionText.setText("");
+                lastInspectionText.setText("");
                 hazard.setImageResource(R.drawable.no_inspection_qmark);
             }
 
             return itemView;
         }
     }
+
+
 }
