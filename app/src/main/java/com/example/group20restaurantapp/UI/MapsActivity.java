@@ -61,11 +61,11 @@ public class MapsActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // Suppose there is new data on the City of Surrey server
+        // TODO: Check if there is new data on the server
         // newData = manager.checkForNewData();
         newData = true;
 
-        // Add one more outer if statement checking if it's been >= 20 hours since
+        // TODO: Add one more outer if statement checking if it's been >= 20 hours since
         // in-app data has been updated
 
         if (newData) {
@@ -114,11 +114,12 @@ public class MapsActivity extends AppCompatActivity
         showPleaseWaitDialog();
 
         // Start download
-        // while ( downloading && !isDownloadCancelled )
 
         // if (!isDownloadCancelled)
             // finish the please wait dialog
             // Update relevant data
+        // else
+            // do not update any data
     }
 
     public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
