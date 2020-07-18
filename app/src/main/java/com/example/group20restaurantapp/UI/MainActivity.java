@@ -17,11 +17,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 
 import com.example.group20restaurantapp.Model.Inspection;
@@ -43,6 +47,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
+    private static final String WEB_SERVER_CSV = "updatedRestaurants.csv";
     private RestaurantManager manager = RestaurantManager.getInstance();
 
     // Yellow, orange, red, with 20% transparency
@@ -53,18 +58,48 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // TODO: These functions should be member functions of Restaurant?
+        getUpdatedRestaurantData(); //TODO: Call this after user allows update (after 20 hrs)
         readRestaurantData();
-        getRestaurantsDataURL(); //TODO: figure out how to store the updated data from server in restaurants CSV
 
-        // Following functions taken from Dr. Fraser's video linked below
+
+        // Following 2 functions take from Dr. Fraser's video linked below
         // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
         wireLaunchMapButton();
     }
 
-    private void getRestaurantsDataURL() {
+    private void getUpdatedRestaurantData() {
+        String restaurantDataURL = "";
+        restaurantDataURL = getRestaurantsDataURL(); //Retrieve url used to request csv
+        String newData = requestData(restaurantDataURL); //Request updated restaurant data csv
+        //Log.d("MyActivity!", newData); //Dump updated restaurants CSV into logcat
+
+        //Write new csv from web server to internal storage
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(WEB_SERVER_CSV, MODE_PRIVATE);
+            fos.write(newData.getBytes());
+            Toast.makeText(this, "Saved to " + getFilesDir() + "/" + WEB_SERVER_CSV, Toast.LENGTH_LONG).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally{
+            //Execute even if catch
+            if(fos != null){
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private String getRestaurantsDataURL() {
         //TODO: Don't do in main thread
+        //TODO: Record 'last modified'
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -74,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 .url("https://data.surrey.ca/api/3/action/package_show?id=restaurants")
                 .method("GET", null)
                 .build();
+        String restaurantDataURL = "";
         try {
             Response response = client.newCall(request).execute();
             String getJSON = response.body().string();
@@ -82,34 +118,36 @@ public class MainActivity extends AppCompatActivity {
 
             JSONArray resArr = resultObj.getJSONArray("resources");
             JSONObject restaurantsData = resArr.getJSONObject(0);
-            String restaurantsDataURL = restaurantsData.getString("url");
-            getUpdatedRestaurantsData(restaurantsDataURL);
+            restaurantDataURL = restaurantsData.getString("url");
 
         } catch (IOException | JSONException e) {
             Log.e("MYACTIVITY!", "ERROR!!!!");
             e.printStackTrace();
         }
+            return restaurantDataURL;
     }
 
-    private void getUpdatedRestaurantsData(String restaurantsDataURL) {
+    private String requestData(String restaurantDataURL) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         Request request = new Request.Builder()
-                .url(restaurantsDataURL)
+                .url(restaurantDataURL)
                 .method("GET", null)
                 .build();
+        String csv = "";
         try {
             Response response = client.newCall(request).execute();
-            String getCSV = response.body().string();
+            csv = response.body().string();
             //Log.d("MyActivity", getCSV); //Dump updated restaurants CSV into logcat
 
         } catch (IOException e) {
             Log.e("MYACTIVITY!", "ERROR!!!!");
             e.printStackTrace();
         }
+        return csv;
     }
 
     private void wireLaunchMapButton() {
@@ -168,6 +206,72 @@ public class MainActivity extends AppCompatActivity {
             InitInspectionLists();
             manager.sortInspListsByDate();
         }
+        readNewRestaurantData();
+    }
+
+    private void readNewRestaurantData() {
+
+        FileInputStream fis = null;
+
+        try {
+            fis = openFileInput(WEB_SERVER_CSV);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            String line = "";
+            br.readLine(); //Header line
+            int initialSize = RestaurantManager.getInstance().getSize();
+            boolean repeatEntry = false;
+
+            while ((line = br.readLine()) != null){
+               //line = line.replace("\"", "");
+                String[] tokens = line.split(",");
+
+                //Web server contains restaurants from 'retaurants_itr1.csv' as well -> check for these repeats
+                int count = 0;
+                while (count < initialSize){
+                    if (tokens[0].equals(RestaurantManager.getInstance().getIndex(count).getTrackingNumber())){
+                        repeatEntry = true;
+                        break;
+                    }
+                    count++;
+                }
+                if (repeatEntry)
+                    continue;
+
+                String [] restaurantData = new String[7];
+                if (tokens.length > 7){ //Some restaurant names have ',' (commas) in them causing tokens[1] and tokens[2] to be a split version of the restaurant name
+                    restaurantData[0] = tokens[0];
+                    restaurantData[1] = tokens[1] + tokens[2];
+                    System.arraycopy(tokens, 3, restaurantData, 2, 5);
+                }
+                else{
+                    restaurantData = tokens.clone();
+                }
+
+                Restaurant newRestaurant = new Restaurant();
+                newRestaurant.setTrackingNumber(restaurantData[0]);
+                newRestaurant.setName(restaurantData[1]);
+                newRestaurant.setAddress(restaurantData[2]);
+                newRestaurant.setCity(restaurantData[3]);
+                newRestaurant.setFacType(restaurantData[4]);
+                newRestaurant.setLatitude(Double.parseDouble(restaurantData[5]));
+                newRestaurant.setLongitude(Double.parseDouble(restaurantData[6]));
+                newRestaurant.setImgId();
+
+                manager.add(newRestaurant);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fis != null){
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
     }
 
     private void populateListView() {
