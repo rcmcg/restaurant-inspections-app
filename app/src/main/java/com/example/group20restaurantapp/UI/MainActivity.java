@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         getUpdatedData(); //TODO: Call this after user allows update (after 20 hrs)
         readRestaurantData();
         InitInspectionLists();
+        //Log.d("HELOOOO", "" + RestaurantManager.getInstance().getIndex(1300).getTrackingNumber() + "+");
         manager.sortRestaurantsByName();
         manager.sortInspListsByDate();
 
@@ -82,8 +83,6 @@ public class MainActivity extends AppCompatActivity {
         inspectionDataURL = getURL("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
         String newRestaurantData = requestData(restaurantDataURL); //Request updated restaurant data csv
         String newInspectionData = requestData(inspectionDataURL); //Request updated restaurant data csv
-
-        //Log.d("MyActivity!", newData); //Dump updated restaurants CSV into logcat
 
         //Write new csv from web server to internal storage
         writeToFile(newRestaurantData, WEB_SERVER_RESTAURANTS_CSV);
@@ -226,26 +225,10 @@ public class MainActivity extends AppCompatActivity {
             BufferedReader br = new BufferedReader(isr);
             String line = "";
             br.readLine(); //Header line
-            int initialSize = RestaurantManager.getInstance().getSize();
-            boolean repeatEntry = false;
 
             while ((line = br.readLine()) != null){
-               //line = line.replace("\"", "");
+               line = line.replace("\"", "");
                 String[] tokens = line.split(",");
-
-                //Web server contains restaurants from 'retaurants_itr1.csv' as well -> check for these repeats
-                int count = 0;
-                while (count < initialSize){
-                    if (tokens[0].equals(RestaurantManager.getInstance().getIndex(count).getTrackingNumber())){
-                        repeatEntry = true;
-                        break;
-                    }
-                    count++;
-                }
-                if (repeatEntry){
-                    repeatEntry = false;
-                    continue;
-                }
 
                 String [] restaurantData = new String[7];
                 if (tokens.length > 7){ //Some restaurant names have ',' (commas) in them causing tokens[1] and tokens[2] to be a split version of the restaurant name
@@ -258,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Restaurant newRestaurant = new Restaurant();
-                newRestaurant.setTrackingNumber(restaurantData[0]);
+                newRestaurant.setTrackingNumber(restaurantData[0].replace(" ", ""));
                 newRestaurant.setName(restaurantData[1]);
                 newRestaurant.setAddress(restaurantData[2]);
                 newRestaurant.setCity(restaurantData[3]);
@@ -328,9 +311,7 @@ public class MainActivity extends AppCompatActivity {
             if (currentRestaurant.getInspectionList().size() != 0) {
                 // Inspection list in Restaurant is sorted on startup so the first index is the most recent
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                if (lastInspection.getHazardRating() == null){
-                    String name = "";
-                }
+
                 if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
                     itemView.setBackgroundColor(itemViewBackgroundColours[0]);
@@ -517,6 +498,9 @@ public class MainActivity extends AppCompatActivity {
                         continue;
                     }
                     trackingNum = lineSplit[0];
+                    if (trackingNum.equals("SYOG-5M5942")){
+                        String test = "";
+                    }
                 }
                 //Initializing inspection object variables
                 Inspection inspection = new Inspection();
@@ -536,7 +520,7 @@ public class MainActivity extends AppCompatActivity {
                         continue;
                     }
 
-                    if (Integer.parseInt(test[0]) == 502){
+                    if (Integer.parseInt(test[0]) == 502 || Integer.parseInt(test[0]) == 305){
                         violSplit = new String[test.length - 1];
 
                         violSplit[0] = test[0];
