@@ -37,11 +37,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
-import java.io.Serializable;
-import java.util.List;
-
-public class MapsActivity extends AppCompatActivity implements
-        OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
+public class MapsActivity extends AppCompatActivity
+        implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
         PleaseWaitDialogFragment.PleaseWaitDialogListener
 {
 
@@ -192,7 +189,7 @@ public class MapsActivity extends AppCompatActivity implements
                 int tempIndex = manager.findIndex(restaurant);
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 intent.putExtra("Index", tempIndex);
-                // intent.putExtra("open", true);
+                intent.putExtra("open", true);
                 //Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 //intent.putExtra(" ", String.valueOf(restaurant));
                 MapsActivity.this.startActivityForResult(intent, 451);
