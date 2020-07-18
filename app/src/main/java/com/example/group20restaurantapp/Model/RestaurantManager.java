@@ -34,10 +34,18 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public Restaurant getIndex(int n){
         return restaurantList.get(n);
     }
-
     // Singleton class and adding restaurants from CSV
 
-    private RestaurantManager(){
+    public int findIndex(Restaurant restaurant){
+        for(int i = 0 ; i < restaurantList.size() ; i++){
+            if(restaurant == restaurantList.get(i)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public RestaurantManager(){
         // Prevent from instantiating
     }
 
@@ -130,4 +138,5 @@ public class RestaurantManager implements Iterable<Restaurant>{
             return false;
         }
     }
+
 }

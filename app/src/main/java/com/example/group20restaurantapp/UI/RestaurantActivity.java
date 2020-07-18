@@ -23,6 +23,7 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantActivity extends AppCompatActivity {
@@ -32,6 +33,8 @@ public class RestaurantActivity extends AppCompatActivity {
     public static final String RESTAURANT_LONGITUDE_INTENT_TAG = "Restaurant longitude";
     private RestaurantManager manager;
     List<Inspection> inspections;
+    // int MapIndex;
+    // boolean openMap = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,6 @@ public class RestaurantActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         int restaurantIndex = getIntent().getIntExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG,-1);
-        Log.d("RestaurantActivity", "onCreate: restaurantIndex = " + restaurantIndex);
 
         // Get singleton
         manager = RestaurantManager.getInstance();
@@ -51,7 +53,7 @@ public class RestaurantActivity extends AppCompatActivity {
         if (restaurantIndex == -1) {
             Log.e("RestaurantActivity", "onCreate: Activity opened with no restaurant");
         } else {
-             restaurant = manager.getIndex(restaurantIndex);
+            restaurant = manager.getIndex(restaurantIndex);
         }
 
         assert restaurant != null;
@@ -64,6 +66,7 @@ public class RestaurantActivity extends AppCompatActivity {
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
         setupDefaultIntent();
+
     }
 
     // Source
@@ -173,7 +176,6 @@ public class RestaurantActivity extends AppCompatActivity {
             return itemView;
         }
 
-
     }
     private void registerClickCallback(final Restaurant restaurant) {
         ListView list = findViewById(R.id.restaurant_view);
@@ -198,3 +200,4 @@ public class RestaurantActivity extends AppCompatActivity {
         return new Intent(c, RestaurantActivity.class);
     }
 }
+

@@ -19,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.group20restaurantapp.Model.Inspection;
+import com.example.group20restaurantapp.Model.Restaurant;
+import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.Model.Violation;
 import com.example.group20restaurantapp.R;
 
@@ -29,7 +31,6 @@ public class InspectionActivity extends AppCompatActivity {
 
     private static List<Violation> violationList;
     private static final String ACTION_BAR_TITLE = "Inspection";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -197,4 +198,5 @@ public class InspectionActivity extends AppCompatActivity {
     public static Intent makeIntent(Context context) {
         return new Intent(context, InspectionActivity.class);
     }
+
 }
