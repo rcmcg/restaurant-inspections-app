@@ -4,6 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
@@ -12,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.PegItem;
@@ -24,18 +28,20 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 
     private GoogleMap mMap;
-    public static final String TAG = "Restaurant";
     private static final float DEFAULT_ZOOM = 18f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -46,6 +52,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private RestaurantManager manager = RestaurantManager.getInstance();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,8 +118,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng);
                 int tempIndex = manager.findIndex(restaurant);
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
-                intent.putExtra("Index",tempIndex);
-                intent.putExtra("open",true);
+                intent.putExtra("Index", tempIndex);
+                intent.putExtra("open", true);
                 //Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 //intent.putExtra(" ", String.valueOf(restaurant));
                 MapsActivity.this.startActivityForResult(intent, 451);
@@ -176,13 +183,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void populateMapWithMarkers() {
         // Get Singleton RestaurantManager
         RestaurantManager manager = RestaurantManager.getInstance();
-
-        for (Restaurant restaurant : manager) {
+        List<Restaurant> restaurants = manager.getRestaurants();
+        for (Restaurant restaurant : restaurants) {
+            String tempName = restaurant.getName();
+            System.out.println("name"+ tempName);
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
-                    restaurant.getLongitude()
+                    restaurant.getLongitude(),tempName,getHazardIcon(restaurant)
             );
-
             mClusterManager.addItem(pegItem);
         }
     }
@@ -190,16 +198,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
     }
+
     public static Intent makeLaunchIntent(Context c, String message) {
         Intent i1 = new Intent(c, MapsActivity.class);
         i1.putExtra(EXTRA_MESSAGE, message);
         return i1;
     }
+
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
         private Activity context;
 
-        public CustomInfoAdapter(Activity context){
+        public CustomInfoAdapter(Activity context) {
             this.context = context;
         }
 
@@ -239,7 +249,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             TextView lastInspectionText = itemView.findViewById(R.id.info_item_lastInspection);
             ImageView hazard = itemView.findViewById(R.id.info_item_hazardImage);
 
-            if (restaurant.getInspectionSize() > 0){
+            if (restaurant.getInspectionSize() > 0) {
                 RecentInspection = restaurant.getInspectionList().get(0);
                 //lastInspectionText.setText(RecentInspection.getInspectionDate());
                 lastInspectionText.setText(
@@ -251,13 +261,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 String level = RecentInspection.getHazardRating();
                 if (level.equals("Low")) {
                     hazard.setImageResource(R.drawable.yellow_triangle);
-                } else if (level.equals("Moderate")){
+                } else if (level.equals("Moderate")) {
                     hazard.setImageResource(R.drawable.orange_diamond);
                 } else {
                     hazard.setImageResource(R.drawable.red_octogon);
                 }
-            }
-            else{
+            } else {
                 lastInspectionText.setText("");
                 hazard.setImageResource(R.drawable.no_inspection_qmark);
             }
@@ -265,6 +274,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return itemView;
         }
     }
+
+    private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
+        Inspection RecentInspection = restaurant.getInspection(0);
+        BitmapDescriptor hazardIcon = bitmapDescriptorFromVector(this,R.drawable.peg_green);
+        if (RecentInspection != null) {
+            String hazardLevel = RecentInspection.getHazardRating();
+
+            if (hazardLevel.equals("Low")) {
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_green);
+            } else if (hazardLevel.equals("Moderate")) {
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_yellow);
+            } else {
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_red);
+            }
+        }
+        return hazardIcon;
+    }
+
+
+    // For peg icon
+    // Learned from:https://stackoverflow.com/questions/42365658/custom-marker-in-google-maps-in-android-with-vector-asset-icon
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
 
 
 }

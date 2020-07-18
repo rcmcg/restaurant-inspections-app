@@ -98,10 +98,18 @@ public class Restaurant {
         public List<Inspection> getInspectionList() {
 
             if(this==null){
-             return inspectionList = new ArrayList<>();
+             return inspectionList = null;
             }
             return inspectionList;
         }
+
+    public Inspection getInspection(int inspection) {
+        if (inspectionList.size() <= inspection || inspection < 0){
+            return null;
+        }
+
+        return inspectionList.get(inspection);
+    }
 
         public void setInspectionList(List<Inspection> inspectionList) {
             this.inspectionList = inspectionList;
