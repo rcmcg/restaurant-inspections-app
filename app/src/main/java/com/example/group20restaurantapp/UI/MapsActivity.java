@@ -39,9 +39,15 @@ import java.io.Serializable;
 import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity
+        implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
+        PleaseWaitDialogFragment.PleaseWaitDialogListener
+{
 
 
     private GoogleMap mMap;
+
+    private static final String TAG = "MapActivity";
     private static final float DEFAULT_ZOOM = 18f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -52,6 +58,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private RestaurantManager manager = RestaurantManager.getInstance();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
+    private Boolean updateData = false;
+    private Boolean newData = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +70,73 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // TODO: Check if there is new data on the server
+        // newData = manager.checkForNewData();
+        newData = true;
+
+        // TODO: Add one more outer if statement checking if it's been >= 20 hours since
+        // in-app data has been updated
+
+        if (newData) {
+            if (!manager.hasUserBeenAskedToUpdateThisSession()) {
+                showAskUserToUpdateDialog();
+                manager.setUserBeenAskedToUpdateThisSession(true);
+            }
+        }
+
+        // Read installed data
+
         wireLaunchListButton();
+    }
+
+    public void showPleaseWaitDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new PleaseWaitDialogFragment();
+        dialog.show(getSupportFragmentManager(), "PleaseWaitFragment");
+    }
+
+
+    @Override
+    public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
+        // User pressed dialog's negative button, ie, wants to cancel the download
+        Toast.makeText(MapsActivity.this,
+                "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
+
+        // Update global variable for onAskUserToUpdateDialogPositiveClick
+        // isDownloadCancelled = true;
+    }
+
+
+    public void showAskUserToUpdateDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new AskUserToUpdateDialogFragment();
+        dialog.show(getSupportFragmentManager(), "AskUserToUpdateFragment");
+    }
+
+    public void onAskUserToUpdateDialogPositiveClick(DialogFragment dialog) {
+        // User touched the dialog's positive button
+        Toast.makeText(MapsActivity.this,
+                "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
+        updateData = true; // this won't work
+
+        // Launch please-wait dialog and start the download
+        showPleaseWaitDialog();
+
+        // Start download
+
+        // if (!isDownloadCancelled)
+            // finish the please wait dialog
+            // Update relevant data
+        // else
+            // do not update any data
+    }
+
+    public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
+        Toast.makeText(MapsActivity.this,
+                "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
+        // do nothing
+        // updateData = false;
     }
 
     private void wireLaunchListButton() {
@@ -183,13 +257,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void populateMapWithMarkers() {
         // Get Singleton RestaurantManager
         RestaurantManager manager = RestaurantManager.getInstance();
-        List<Restaurant> restaurants = manager.getRestaurants();
-        for (Restaurant restaurant : restaurants) {
-            String tempName = restaurant.getName();
-            System.out.println("name"+ tempName);
+
+        for (Restaurant restaurant : manager) {
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
-                    restaurant.getLongitude(),tempName,getHazardIcon(restaurant)
+                    restaurant.getLongitude(),
+                    tempName,
+                    getHazardIcon(restaurant)
             );
             mClusterManager.addItem(pegItem);
         }
@@ -270,7 +344,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 lastInspectionText.setText("");
                 hazard.setImageResource(R.drawable.no_inspection_qmark);
             }
-
             return itemView;
         }
     }
