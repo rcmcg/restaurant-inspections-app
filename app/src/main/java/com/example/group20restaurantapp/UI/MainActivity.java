@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 String[] tokens = line.split(",");
 
                 //Web server contains restaurants from 'retaurants_itr1.csv' as well -> check for these repeats
-                int count = 0;
+                /*int count = 0;
                 while (count < initialSize){
                     if (tokens[0].equals(RestaurantManager.getInstance().getIndex(count).getTrackingNumber())){
                         repeatEntry = true;
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                     count++;
                 }
                 if (repeatEntry)
-                    continue;
+                    continue;*/
 
                 String [] restaurantData = new String[7];
                 if (tokens.length > 7){ //Some restaurant names have ',' (commas) in them causing tokens[1] and tokens[2] to be a split version of the restaurant name
