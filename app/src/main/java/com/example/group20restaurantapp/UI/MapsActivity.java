@@ -10,7 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -20,8 +20,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
@@ -33,7 +31,6 @@ import com.example.group20restaurantapp.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -42,10 +39,8 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -75,8 +70,8 @@ public class MapsActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // TODO: Change function name
-        getlocationpermission2();
+
+        getLocationPermissionFromUser();
         Log.d("MapsActivity", "Working on oncreate");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -150,15 +145,8 @@ public class MapsActivity extends AppCompatActivity
         // updateData = false;
     }
 
-    private void initMap() {
-        Log.d("MapsActivity", "Working INIT MAP");
-
-        SupportMapFragment mapfragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapfragment.getMapAsync(MapsActivity.this);
-    }
-
-    private void getDevicelocation() {
-        Log.d("Mapsactivity", "Code has executed till getdevicelocation function");
+    private void getDeviceLocation() {
+        Log.d("MapsActivity", "Code has executed till getdevicelocation function");
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
             if (mLocationPermissionsGranted) {
@@ -167,47 +155,34 @@ public class MapsActivity extends AppCompatActivity
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            Log.d("Mapsactivity", "Found Location");
+                            Log.d("MapsActivity", "Found Location");
                             Location currentLocation = (Location) task.getResult();
-                            moveCAmera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
                         } else {
-                            Log.d("Mapsactivity", "Current location cannot be found");
-                            Toast.makeText(MapsActivity.this, "Unable to get Location", Toast.LENGTH_SHORT).show();
-
+                            Log.d("MapsActivity", "Current location cannot be found");
+                            Toast.makeText(MapsActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
                         }
-
                     }
                 });
             }
-
         } catch (SecurityException e) {
-            Log.e(TAG, "Get Device Location" + e.getMessage());
+            Log.e(TAG, "getDeviceLocation: " + e.getMessage());
         }
     }
 
-    private void moveCAmera(LatLng latLng, float zoom) {
-        Log.d("Mapsactivity", "new latitude" + latLng.latitude + "new longitude" + latLng.longitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-    }
-
-    private void getlocationpermission2() {
+    private void getLocationPermissionFromUser() {
         Log.d("MapsActivity", "Working till get location permission");
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION};
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionsGranted = true;
-                initMap();
             } else {
                 ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
-
-
             }
         } else {
             ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
-
         }
-
     }
 
     @Override
@@ -224,8 +199,6 @@ public class MapsActivity extends AppCompatActivity
                         }
                     }
                     mLocationPermissionsGranted = true;
-                    // initialize the map
-                    // initMap();
                 }
             }
         }
@@ -255,9 +228,13 @@ public class MapsActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if (mLocationPermissionsGranted) {
-            getDevicelocation();
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+            getDeviceLocation();
+            if (
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
+                // TODO: Remove this return statement? What is it for?
                 return;
             }
             mMap.setMyLocationEnabled(true);
@@ -467,7 +444,6 @@ public class MapsActivity extends AppCompatActivity
         }
         return hazardIcon;
     }
-
 
     // For peg icon
     // Learned from:https://stackoverflow.com/questions/42365658/custom-marker-in-google-maps-in-android-with-vector-asset-icon
