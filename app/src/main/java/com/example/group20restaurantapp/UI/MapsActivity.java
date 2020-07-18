@@ -188,10 +188,9 @@ public class MapsActivity extends AppCompatActivity
                 Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng);
                 int tempIndex = manager.findIndex(restaurant);
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
-                intent.putExtra("Index", tempIndex);
-                intent.putExtra("open", true);
-                //Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
-                //intent.putExtra(" ", String.valueOf(restaurant));
+                intent.putExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG, tempIndex);
+
+                // what is 451 for?
                 MapsActivity.this.startActivityForResult(intent, 451);
             }
         });
@@ -208,6 +207,9 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
+                // I don't think anything should happen unless you press a marker
+                // No need to re-initialize every map marker as far as I can tell
+
                 // Clear everything
                 // mClusterManager.clearItems();
 
@@ -218,14 +220,14 @@ public class MapsActivity extends AppCompatActivity
                 // setUpClusterer();
 
                 // Focus map on the position that was clicked on map
-                moveCamera(latLng, 15f);
+                // moveCamera(latLng, 15f);
             }
         });
 
         mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<PegItem>() {
             @Override
             public boolean onClusterClick(Cluster<PegItem> cluster) {
-                moveCamera(cluster.getPosition(), -10f);
+                moveCamera(cluster.getPosition(), 15);
                 return true;
             }
         });
@@ -255,11 +257,10 @@ public class MapsActivity extends AppCompatActivity
         RestaurantManager manager = RestaurantManager.getInstance();
 
         for (Restaurant restaurant : manager) {
-            String tempName = "why";
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
                     restaurant.getLongitude(),
-                    tempName,
+                    restaurant.getName(),
                     getHazardIcon(restaurant)
             );
             mClusterManager.addItem(pegItem);
@@ -270,6 +271,7 @@ public class MapsActivity extends AppCompatActivity
         return new Intent(context, MapsActivity.class);
     }
 
+    // is this function used anywhere?
     public static Intent makeLaunchIntent(Context c, String message) {
         Intent i1 = new Intent(c, MapsActivity.class);
         i1.putExtra(EXTRA_MESSAGE, message);

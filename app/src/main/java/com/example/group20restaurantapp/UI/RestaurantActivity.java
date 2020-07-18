@@ -30,8 +30,8 @@ public class RestaurantActivity extends AppCompatActivity {
     public static final String RESTAURANT_ACTIVITY_INSPECTION_TAG = "inspection";
     private RestaurantManager manager;
     List<Inspection> inspections;
-    int MapIndex;
-    boolean openMap = false;
+    // int MapIndex;
+    // boolean openMap = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,37 +46,14 @@ public class RestaurantActivity extends AppCompatActivity {
         // Get singleton
         manager = RestaurantManager.getInstance();
 
-        if(openMap == false) {
-            Restaurant restaurant = null;
-            if (restaurantIndex == -1) {
-            } else {
-                restaurant = manager.getIndex(restaurantIndex);
-            }
-
-            if (restaurant != null) {
-                inspections = restaurant.getInspectionList();
-
-                setRestaurantText(restaurant);
-                setAddressText(restaurant);
-                setCoordsText(restaurant);
-
-                populateInspectionList(restaurant);
-                registerClickCallback(restaurant);
-            }
-    }
-        Intent intent = getIntent();
-        openMap = intent.getBooleanExtra("open",false);
-        if(openMap==true) {
-            setDetailInMap();
-        }
-        setupDefaultIntent();
-    }
-
-    private void setDetailInMap(){
         Restaurant restaurant = null;
-        Intent intent = getIntent();
-        MapIndex = intent.getIntExtra("Index",-1);
-        restaurant = manager.getIndex(MapIndex);
+        if (restaurantIndex == -1) {
+            Log.e("RestaurantActivity", "onCreate: Activity opened with no restaurant");
+        } else {
+            restaurant = manager.getIndex(restaurantIndex);
+        }
+
+        assert restaurant != null;
         inspections = restaurant.getInspectionList();
 
         setRestaurantText(restaurant);
@@ -85,6 +62,8 @@ public class RestaurantActivity extends AppCompatActivity {
 
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
+        setupDefaultIntent();
+
     }
 
     // Source
@@ -182,7 +161,6 @@ public class RestaurantActivity extends AppCompatActivity {
 
             return itemView;
         }
-
 
     }
     private void registerClickCallback(final Restaurant restaurant) {
