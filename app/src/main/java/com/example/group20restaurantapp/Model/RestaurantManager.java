@@ -20,6 +20,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private String comparator = "All";
     private boolean favouriteOnly = false;
 
+    private boolean userBeenAskedToUpdateThisSession = false;
+
     public void add(Restaurant restaurant){
         restaurantList.add(restaurant);
     }
@@ -47,7 +49,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return instance;
     }
 
-
     @Override
     public Iterator<Restaurant> iterator() {
         return restaurantList.iterator();
@@ -55,6 +56,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     public int getSize() {
         return restaurantList.size();
+    }
+
+    public boolean hasUserBeenAskedToUpdateThisSession() {
+        return userBeenAskedToUpdateThisSession;
+    }
+
+    public void setUserBeenAskedToUpdateThisSession(boolean userBeenAskedToUpdateThisSession) {
+        this.userBeenAskedToUpdateThisSession = userBeenAskedToUpdateThisSession;
     }
 
     public void sortRestaurantsByName() {
@@ -79,6 +88,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
             Collections.sort(restaurant.inspectionList, compareByDate.reversed()); //Sort arraylist in reverse order
         }
     }
+
     public Restaurant findRestaurantByLatLng(double latitude, double longitude) {
         for (Restaurant restaurant: restaurantList) {
             if (restaurant.getLatitude() == latitude && restaurant.getLongitude() == longitude) {
@@ -87,6 +97,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return null;
     }
+
     public List<Restaurant> getRestaurants() {
         searchTerm = searchTerm.trim();
         if (searchTerm.isEmpty() &&
@@ -105,6 +116,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return filteredRestaurants;
     }
+
     private boolean qualifies(Restaurant restaurant) {
         String restaurantName = restaurant.getName();
         restaurantName = restaurantName.toLowerCase();
@@ -113,13 +125,9 @@ public class RestaurantManager implements Iterable<Restaurant>{
         if (restaurantName.toLowerCase().contains(searchTerm.toLowerCase()) &&
                 ((hazardLevelFilter.equalsIgnoreCase("All")) ||
                         (hazardLevel.equalsIgnoreCase(hazardLevelFilter))) ) {
-
             return true;
-
         } else {
-
             return false;
         }
-
     }
 }

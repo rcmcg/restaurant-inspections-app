@@ -31,6 +31,11 @@
     <string name="inspection_activity_non_critical_violations">Non-critical violations: %1$s</string>
     <string name="inspection_activity_hazard_rating">Hazard rating: %1$s</string>
     <string name="title_activity_maps">Map</string>
+    <string name="ask_user_to_update_message">There is new data to download. Would you like to download it?</string>
+    <string name="ask_user_to_update_accept">Yes</string>
+    <string name="ask_user_to_update_decline">No</string>
+    <string name="please_wait_dialog_message">Please wait while the data is being downloaded. Press cancel if you would like to cancel the download.</string>
+    <string name="please_wait_dialog_cancel">Cancel</string>
 
 
 </resources>

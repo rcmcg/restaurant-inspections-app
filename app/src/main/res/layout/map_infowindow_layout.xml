@@ -48,8 +48,8 @@
 
         <TextView
             android:id="@+id/info_item_lastInspection"
-            android:layout_width="119dp"
-            android:layout_height="35dp"
+            android:layout_width="107dp"
+            android:layout_height="36dp"
             android:text="No inspection data available."
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
