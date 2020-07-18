@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 
 import com.example.group20restaurantapp.Model.Inspection;
@@ -47,7 +46,9 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
-    private static final String WEB_SERVER_CSV = "updatedRestaurants.csv";
+    private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
+    private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
+
     private RestaurantManager manager = RestaurantManager.getInstance();
 
     // Yellow, orange, red, with 20% transparency
@@ -59,8 +60,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // TODO: These functions should be member functions of Restaurant?
-        getUpdatedRestaurantData(); //TODO: Call this after user allows update (after 20 hrs)
+        getUpdatedData(); //TODO: Call this after user allows update (after 20 hrs)
         readRestaurantData();
+        InitInspectionLists();
+        for (Restaurant restaurant : RestaurantManager.getInstance().getRestaurants()){
+            Log.d("HELOOOO", "Name: " + restaurant.getName() + " Tracking Number: " + restaurant.getTrackingNumber() + " Number of Inspections " + restaurant.getInspectionSize());
+        }
+        manager.sortRestaurantsByName();
+        manager.sortInspListsByDate();
 
 
         // Following 2 functions take from Dr. Fraser's video linked below
@@ -70,71 +77,57 @@ public class MainActivity extends AppCompatActivity {
         wireLaunchMapButton();
     }
 
-    private void getUpdatedRestaurantData() {
+    private void getUpdatedData() {
         String restaurantDataURL = "";
-        restaurantDataURL = getRestaurantsDataURL(); //Retrieve url used to request csv
-        String newData = requestData(restaurantDataURL); //Request updated restaurant data csv
-        //Log.d("MyActivity!", newData); //Dump updated restaurants CSV into logcat
+        String inspectionDataURL = "";
+
+        restaurantDataURL = getURL("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
+        inspectionDataURL = getURL("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
+        String newRestaurantData = requestData(restaurantDataURL); //Request updated restaurant data csv
+        String newInspectionData = requestData(inspectionDataURL); //Request updated restaurant data csv
 
         //Write new csv from web server to internal storage
-        FileOutputStream fos = null;
-        try {
-            fos = openFileOutput(WEB_SERVER_CSV, MODE_PRIVATE);
-            fos.write(newData.getBytes());
-            Toast.makeText(this, "Saved to " + getFilesDir() + "/" + WEB_SERVER_CSV, Toast.LENGTH_LONG).show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally{
-            //Execute even if catch
-            if(fos != null){
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        writeToFile(newRestaurantData, WEB_SERVER_RESTAURANTS_CSV);
+        writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV);
     }
 
-    private String getRestaurantsDataURL() {
-        //TODO: Don't do in main thread
-        //TODO: Record 'last modified'
+    private String getURL(String url) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         Request request = new Request.Builder()
-                .url("https://data.surrey.ca/api/3/action/package_show?id=restaurants")
+                .url(url)
                 .method("GET", null)
                 .build();
-        String restaurantDataURL = "";
+        String dataURL = "";
         try {
             Response response = client.newCall(request).execute();
             String getJSON = response.body().string();
-            JSONObject restaurantObj = new JSONObject(getJSON);
-            JSONObject resultObj = restaurantObj.getJSONObject("result");
+            JSONObject jsonObj = new JSONObject(getJSON);
+            JSONObject resultObj = jsonObj.getJSONObject("result");
 
             JSONArray resArr = resultObj.getJSONArray("resources");
-            JSONObject restaurantsData = resArr.getJSONObject(0);
-            restaurantDataURL = restaurantsData.getString("url");
+            JSONObject data = resArr.getJSONObject(0);
+            dataURL = data.getString("url");
+            String lastModifiedDate = data.getString("last_modified");
 
         } catch (IOException | JSONException e) {
             Log.e("MYACTIVITY!", "ERROR!!!!");
             e.printStackTrace();
         }
-            return restaurantDataURL;
+        return dataURL;
     }
 
-    private String requestData(String restaurantDataURL) {
+    private String requestData(String DataURL) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         Request request = new Request.Builder()
-                .url(restaurantDataURL)
+                .url(DataURL)
                 .method("GET", null)
                 .build();
         String csv = "";
@@ -148,6 +141,27 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return csv;
+    }
+
+    private void writeToFile(String newData, String fileName) {
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(fileName, MODE_PRIVATE);
+            fos.write(newData.getBytes());
+            Toast.makeText(this, "Saved to " + getFilesDir() + "/" + WEB_SERVER_RESTAURANTS_CSV, Toast.LENGTH_LONG).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally{
+            //Execute even if catch
+            if(fos != null){
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void wireLaunchMapButton() {
@@ -200,43 +214,23 @@ public class MainActivity extends AppCompatActivity {
                 Log.wtf("MyActivity", "Error reading data file on line" + line, e);
                 e.printStackTrace();
             }
-
-            manager.sortRestaurantsByName();
-
-            InitInspectionLists();
-            manager.sortInspListsByDate();
         }
         readNewRestaurantData();
     }
 
     private void readNewRestaurantData() {
-
         FileInputStream fis = null;
 
         try {
-            fis = openFileInput(WEB_SERVER_CSV);
+            fis = openFileInput(WEB_SERVER_RESTAURANTS_CSV);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             String line = "";
             br.readLine(); //Header line
-            int initialSize = RestaurantManager.getInstance().getSize();
-            boolean repeatEntry = false;
 
             while ((line = br.readLine()) != null){
-               //line = line.replace("\"", "");
+               line = line.replace("\"", "");
                 String[] tokens = line.split(",");
-
-                //Web server contains restaurants from 'retaurants_itr1.csv' as well -> check for these repeats
-                int count = 0;
-                while (count < initialSize){
-                    if (tokens[0].equals(RestaurantManager.getInstance().getIndex(count).getTrackingNumber())){
-                        repeatEntry = true;
-                        break;
-                    }
-                    count++;
-                }
-                if (repeatEntry)
-                    continue;
 
                 String [] restaurantData = new String[7];
                 if (tokens.length > 7){ //Some restaurant names have ',' (commas) in them causing tokens[1] and tokens[2] to be a split version of the restaurant name
@@ -249,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Restaurant newRestaurant = new Restaurant();
-                newRestaurant.setTrackingNumber(restaurantData[0]);
+                newRestaurant.setTrackingNumber(restaurantData[0].replace(" ", ""));
                 newRestaurant.setName(restaurantData[1]);
                 newRestaurant.setAddress(restaurantData[2]);
                 newRestaurant.setCity(restaurantData[3]);
@@ -319,6 +313,7 @@ public class MainActivity extends AppCompatActivity {
             if (currentRestaurant.getInspectionList().size() != 0) {
                 // Inspection list in Restaurant is sorted on startup so the first index is the most recent
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+                Log.d("HELOOO", lastInspection.getTrackingNumber());
                 if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
                     itemView.setBackgroundColor(itemViewBackgroundColours[0]);
@@ -462,11 +457,6 @@ public class MainActivity extends AppCompatActivity {
                                 violSplit[2],
                                 briefDesc,
                                 repeat);
-                        // Log.d("MyActivity", "----violation.violNum: " + violObj.getViolNumber());
-                        // Log.d("MyActivity", "----violation.crit: " + violObj.getCritical());
-                        // Log.d("MyActivity", "----violation.violDetails: " + violObj.getViolDetails());
-                        // Log.d("MyActivity", "----violation.briefViolDetails: " + violObj.getBriefDetails());
-                        // Log.d("MyActivity", "----violation.repeat: " + violObj.getRepeat());
                         inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
                     }
                 }
@@ -474,6 +464,117 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (IOException e){
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
+            e.printStackTrace();
+        }
+        initNewInspectionLists(violNumbers, violBriefDescriptions);
+    }
+
+    private void initNewInspectionLists(List<Integer> violNumbers, List<String> violBriefDescriptions) {
+        FileInputStream fis = null;
+        try {
+            fis = openFileInput(WEB_SERVER_INSPECTIONS_CSV);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            String line = "";
+            br.readLine(); //Header line
+            //String prevTrackingNum = "";
+            boolean unknownRestaurant = false;
+            int i;
+
+            while ((line = br.readLine()) != null) { //Iterate through lines (reports) in CSV
+                line = line.replace("\"", "");
+
+                String[] lineSplit = line.split(",", 6);
+
+                //Find restaurant matching report tracking number being read
+                    i = 0;
+                while (!lineSplit[0].replace(" ", "").equals(RestaurantManager.getInstance().getIndex(i).getTrackingNumber())) {
+                    i++;
+                    if (i == RestaurantManager.getInstance().getSize()-1) {
+                        unknownRestaurant = true;
+                        break;
+                    }
+                }
+                    //String name = RestaurantManager.getInstance().getIndex(i).getName();
+                    //Log.d("HELO :)", name);
+                if (unknownRestaurant) {
+                    unknownRestaurant = false;
+                    continue;
+                }
+
+                //prevTrackingNum = lineSplit[0];
+                //Initializing inspection object variables
+                Inspection inspection = new Inspection();
+                inspection.setTrackingNumber(lineSplit[0].replace(" ", ""));
+                inspection.setInspectionDate(lineSplit[1]);
+                inspection.setInspType(lineSplit[2]);
+                inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
+                inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
+                if (lineSplit[5].equals(",Low") || lineSplit[5].equals(",")){
+                    inspection.setHazardRating("Low");
+                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    continue;
+                }
+                if (lineSplit[5].equals(",Moderate")){
+                    inspection.setHazardRating("Moderate");
+                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    continue;
+                }
+                if (lineSplit[5].equals(",High")){
+                    inspection.setHazardRating("High");
+                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    continue;
+                }
+                String[] violationsArr = lineSplit[5].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
+
+                for (int violCount = 0; violCount < violationsArr.length; violCount++) { // For each token, split it up farther into number, crit, details, repeat
+                    String[] violSplit = violationsArr[violCount].split(",", 3);
+                    Log.d("HELLLOOOO", "" + lineSplit[0] + " " + violSplit[0]);
+
+                    int violNumber = Integer.parseInt(violSplit[0]);
+
+                    boolean crit = false;
+                    if (violSplit[1].equals("Critical")) {
+                        crit = true;
+                    }
+
+                    boolean repeat = true;
+                    if (violSplit[2].contains("Not Repeat")){
+                        violSplit[2] = violSplit[2].replace("Not Repeat", "");
+                        repeat = false;
+                    }
+                    else{
+                        violSplit[2] = violSplit[2].replace("Repeat", "");
+                    }
+
+                    if (violSplit[2].contains("Moderate")){
+                        violSplit[2] = violSplit[2].replace("Moderate", "");
+                        inspection.setHazardRating("Moderate");
+                    }
+                    else if (violSplit[2].contains("High")){
+                        violSplit[2] = violSplit[2].replace("High", "");
+                        inspection.setHazardRating("High");
+                    }
+                    else{
+                        violSplit[2] = violSplit[2].replace("Low", "");
+                        inspection.setHazardRating("Low");
+                    }
+
+                    String briefDesc = "";
+                    if (violNumbers.indexOf(violNumber) == -1){
+                        briefDesc = "Construction plans ignoring Regulations";
+                    }
+                    else{
+                        int briefDescIndex = violNumbers.indexOf(violNumber);
+                        briefDesc = violBriefDescriptions.get(briefDescIndex);
+                    }
+
+                    Violation violObj = new Violation(violNumber, crit, violSplit[2], briefDesc, repeat);
+                    inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
+                }
+                RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+            }
+        } catch (IOException e){
             e.printStackTrace();
         }
     }
