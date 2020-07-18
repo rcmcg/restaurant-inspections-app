@@ -13,9 +13,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.PegItem;
@@ -38,9 +40,8 @@ import com.google.maps.android.clustering.ClusterManager;
 import java.io.Serializable;
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
-public class MapsActivity extends AppCompatActivity
-        implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
+public class MapsActivity extends AppCompatActivity implements
+        OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
         PleaseWaitDialogFragment.PleaseWaitDialogListener
 {
 
@@ -95,7 +96,6 @@ public class MapsActivity extends AppCompatActivity
         dialog.show(getSupportFragmentManager(), "PleaseWaitFragment");
     }
 
-
     @Override
     public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
         // User pressed dialog's negative button, ie, wants to cancel the download
@@ -105,7 +105,6 @@ public class MapsActivity extends AppCompatActivity
         // Update global variable for onAskUserToUpdateDialogPositiveClick
         // isDownloadCancelled = true;
     }
-
 
     public void showAskUserToUpdateDialog() {
         // Create an instance of the dialog fragment and show it
@@ -193,7 +192,7 @@ public class MapsActivity extends AppCompatActivity
                 int tempIndex = manager.findIndex(restaurant);
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 intent.putExtra("Index", tempIndex);
-                intent.putExtra("open", true);
+                // intent.putExtra("open", true);
                 //Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 //intent.putExtra(" ", String.valueOf(restaurant));
                 MapsActivity.this.startActivityForResult(intent, 451);
@@ -213,13 +212,13 @@ public class MapsActivity extends AppCompatActivity
             @Override
             public void onMapClick(LatLng latLng) {
                 // Clear everything
-                mClusterManager.clearItems();
+                // mClusterManager.clearItems();
 
                 // Clear the currently open marker
-                mMap.clear();
+                // mMap.clear();
 
                 // Reinitialize clusterManager
-                setUpClusterer();
+                // setUpClusterer();
 
                 // Focus map on the position that was clicked on map
                 moveCamera(latLng, 15f);
@@ -259,6 +258,7 @@ public class MapsActivity extends AppCompatActivity
         RestaurantManager manager = RestaurantManager.getInstance();
 
         for (Restaurant restaurant : manager) {
+            String tempName = "why";
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
                     restaurant.getLongitude(),
