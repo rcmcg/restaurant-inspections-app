@@ -60,36 +60,17 @@ public class MapsActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // TODO: Add if statement to check if it's been >= 20 hours since app last updated
+        // TODO: Add function to check if the server has new data for us to download
         // Suppose there is new data
-        // newData = manager.checkForNewData();
         newData = true;
-
-        // Add one more outer if statement checking if it's been >= 20 hours since
-        // data has been updated
-
-        /*
-        if (timeSinceLastServerCheck >= 20 hours) {
-
-        }
-         */
 
         if (newData) {
             if (!manager.hasUserBeenAskedToUpdateThisSession()) {
                 showAskUserToUpdateDialog();
                 manager.setUserBeenAskedToUpdateThisSession(true);
             }
-
-            if (updateData) {
-                // Launch Please-Wait dialog and download new data
-                // If data download is cancelled, do nothing
-                // If it is allowed to complete,
-                    // Update installed data
-                    // Update SharedPref storing last update
-            }
         }
-
-        // Read installed data
-
 
         wireLaunchListButton();
     }
@@ -138,20 +119,33 @@ public class MapsActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+
         setUpClusterer();
 
-        // Move the camera to surrey
-        // TODO: The camera should pan to user's location on startup
-        LatLng surrey = new LatLng(49.104431, -122.801094);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
+        double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
+
+        Log.d(TAG, "onMapReady: chosenRestaurantLatLon = [" + chosenRestaurantLatLon[0]
+                + "," + chosenRestaurantLatLon[1] + "]");
+
+        if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
+            Log.d(TAG, "onMapReady: Setting map to user's location");
+            // Move the camera to surrey
+            // TODO: The camera should pan to user's location on startup
+            LatLng surrey = new LatLng(49.104431, -122.801094);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surrey, 10));
+        } else {
+            Log.d(TAG, "onMapReady: Setting map to chosen restaurant coords");
+            LatLng chosenRestaurantCoords = new LatLng(
+                    chosenRestaurantLatLon[0],
+                    chosenRestaurantLatLon[1]
+            );
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, 20));
+        }
 
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
         mMap.setInfoWindowAdapter(adapter);
-
-        // Receive intent from Restaurant Activity
-        Intent i_receive = getIntent();
-        String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
     }
 
     private void setUpClusterer() {
@@ -178,10 +172,20 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
+    private double[] getChosenRestaurantLocation() {
+        // Return as [lat,long]
+        double restaurantLatitude = getIntent()
+                .getDoubleExtra(RestaurantActivity.RESTAURANT_LATITUDE_INTENT_TAG,-1);
+        double restaurantLongitude = getIntent()
+                .getDoubleExtra(RestaurantActivity.RESTAURANT_LONGITUDE_INTENT_TAG,-1);
+        return new double[]{restaurantLatitude, restaurantLongitude};
+    }
+
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
     }
 
+    // TODO: Remove this function?
     public static Intent makeLaunchIntent(Context c, String message) {
         Intent i1 = new Intent(c, MapsActivity.class);
         i1.putExtra(EXTRA_MESSAGE, message);
