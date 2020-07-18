@@ -2,13 +2,15 @@ package com.example.group20restaurantapp.UI;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -20,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.group20restaurantapp.Model.Inspection;
@@ -28,18 +31,22 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 public class MapsActivity extends AppCompatActivity
@@ -54,13 +61,13 @@ public class MapsActivity extends AppCompatActivity
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    public static final String RESTAURANT_ACTIVITY_RESTAURANT_TAG = "restaurant";
     private static final String EXTRA_MESSAGE = "Extra";
     private Boolean mLocationPermissionsGranted = false;
     private Marker mMarker;
     private RestaurantManager manager = RestaurantManager.getInstance();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
-
     private Boolean updateData = false;
     private Boolean newData = false;
 
@@ -101,7 +108,6 @@ public class MapsActivity extends AppCompatActivity
         dialog.show(getSupportFragmentManager(), "PleaseWaitFragment");
     }
 
-
     @Override
     public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
         // User pressed dialog's negative button, ie, wants to cancel the download
@@ -111,7 +117,6 @@ public class MapsActivity extends AppCompatActivity
         // Update global variable for onAskUserToUpdateDialogPositiveClick
         // isDownloadCancelled = true;
     }
-
 
     public void showAskUserToUpdateDialog() {
         // Create an instance of the dialog fragment and show it
@@ -260,6 +265,8 @@ public class MapsActivity extends AppCompatActivity
 
         setUpClusterer();
 
+        registerClickCallback();
+
         // Move the camera to surrey
         // TODO: The camera should pan to user's location on startup
         LatLng surrey = new LatLng(49.104431, -122.801094);
@@ -272,6 +279,71 @@ public class MapsActivity extends AppCompatActivity
         // Receive intent from Restaurant Activity
         Intent i_receive = getIntent();
         String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
+    }
+
+    private void registerClickCallback() {
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                // Find the restaurant to work with.
+                LatLng latLngF = marker.getPosition();
+                double lat = latLngF.latitude;
+                double lng = latLngF.longitude;
+                Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng);
+                int tempIndex = manager.findIndex(restaurant);
+                Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
+                intent.putExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG, tempIndex);
+
+                // what is 451 for?
+                MapsActivity.this.startActivityForResult(intent, 451);
+            }
+        });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                moveCamera(marker.getPosition(), DEFAULT_ZOOM);
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                // I don't think anything should happen unless you press a marker
+                // No need to re-initialize every map marker as far as I can tell
+
+                // Clear everything
+                // mClusterManager.clearItems();
+
+                // Clear the currently open marker
+                // mMap.clear();
+
+                // Reinitialize clusterManager
+                // setUpClusterer();
+
+                // Focus map on the position that was clicked on map
+                // moveCamera(latLng, 15f);
+            }
+        });
+
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<PegItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<PegItem> cluster) {
+                moveCamera(cluster.getPosition(), 15);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Move the camera according to Latitude and longitude
+     * DEFAULT_ZOOM = 15
+     */
+    private void moveCamera(LatLng latLng, float zoom) {
+        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
+        mMap.animateCamera(location);
     }
 
     private void setUpClusterer() {
@@ -291,9 +363,10 @@ public class MapsActivity extends AppCompatActivity
         for (Restaurant restaurant : manager) {
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
-                    restaurant.getLongitude()
+                    restaurant.getLongitude(),
+                    restaurant.getName(),
+                    getHazardIcon(restaurant)
             );
-
             mClusterManager.addItem(pegItem);
         }
     }
@@ -302,6 +375,7 @@ public class MapsActivity extends AppCompatActivity
         return new Intent(context, MapsActivity.class);
     }
 
+    // is this function used anywhere?
     public static Intent makeLaunchIntent(Context c, String message) {
         Intent i1 = new Intent(c, MapsActivity.class);
         i1.putExtra(EXTRA_MESSAGE, message);
@@ -312,7 +386,7 @@ public class MapsActivity extends AppCompatActivity
 
         private Activity context;
 
-        public CustomInfoAdapter(Activity context){
+        public CustomInfoAdapter(Activity context) {
             this.context = context;
         }
 
@@ -352,7 +426,7 @@ public class MapsActivity extends AppCompatActivity
             TextView lastInspectionText = itemView.findViewById(R.id.info_item_lastInspection);
             ImageView hazard = itemView.findViewById(R.id.info_item_hazardImage);
 
-            if (restaurant.getInspectionSize() > 0){
+            if (restaurant.getInspectionSize() > 0) {
                 RecentInspection = restaurant.getInspectionList().get(0);
                 //lastInspectionText.setText(RecentInspection.getInspectionDate());
                 lastInspectionText.setText(
@@ -364,17 +438,49 @@ public class MapsActivity extends AppCompatActivity
                 String level = RecentInspection.getHazardRating();
                 if (level.equals("Low")) {
                     hazard.setImageResource(R.drawable.yellow_triangle);
-                } else if (level.equals("Moderate")){
+                } else if (level.equals("Moderate")) {
                     hazard.setImageResource(R.drawable.orange_diamond);
                 } else {
                     hazard.setImageResource(R.drawable.red_octogon);
                 }
-            }
-            else{
-                //lastInspectionText.setText("");
+            } else {
+                lastInspectionText.setText("");
                 hazard.setImageResource(R.drawable.no_inspection_qmark);
             }
             return itemView;
         }
     }
+
+    private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
+        Inspection RecentInspection = restaurant.getInspection(0);
+        BitmapDescriptor hazardIcon = bitmapDescriptorFromVector(this,R.drawable.peg_green);
+        if (RecentInspection != null) {
+            String hazardLevel = RecentInspection.getHazardRating();
+
+            if (hazardLevel.equals("Low")) {
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_green);
+            } else if (hazardLevel.equals("Moderate")) {
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_yellow);
+            } else {
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_red);
+            }
+        }
+        return hazardIcon;
+    }
+
+
+    // For peg icon
+    // Learned from:https://stackoverflow.com/questions/42365658/custom-marker-in-google-maps-in-android-with-vector-asset-icon
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+
+
 }
