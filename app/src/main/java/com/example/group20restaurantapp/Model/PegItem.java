@@ -15,7 +15,7 @@ public class PegItem implements ClusterItem {
         this.mHazard = mHazard;
     }
 
-    public PegItem(double lat, double lng) {
+    public PegItem(double lat, double lng, BitmapDescriptor hazardIcon) {
         mPosition = new LatLng(lat, lng);
     }
 
