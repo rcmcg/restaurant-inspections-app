@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         getUpdatedData(); //TODO: Call this after user allows update (after 20 hrs)
         readRestaurantData();
         InitInspectionLists();
+        manager.sortRestaurantsByName();
+        manager.sortInspListsByDate();
 
 
         // Following 2 functions take from Dr. Fraser's video linked below
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
             JSONArray resArr = resultObj.getJSONArray("resources");
             JSONObject data = resArr.getJSONObject(0);
             dataURL = data.getString("url");
+            String lastModifiedDate = data.getString("last_modified");
 
         } catch (IOException | JSONException e) {
             Log.e("MYACTIVITY!", "ERROR!!!!");
@@ -210,10 +213,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.wtf("MyActivity", "Error reading data file on line" + line, e);
                 e.printStackTrace();
             }
-
-            manager.sortRestaurantsByName();
-
-            manager.sortInspListsByDate();
         }
         readNewRestaurantData();
     }
@@ -227,18 +226,14 @@ public class MainActivity extends AppCompatActivity {
             BufferedReader br = new BufferedReader(isr);
             String line = "";
             br.readLine(); //Header line
-            //int initialSize = RestaurantManager.getInstance().getSize();
-            //boolean repeatEntry = false;
+            int initialSize = RestaurantManager.getInstance().getSize();
+            boolean repeatEntry = false;
 
             while ((line = br.readLine()) != null){
                //line = line.replace("\"", "");
                 String[] tokens = line.split(",");
-                if (tokens[0].equals("A018235    ")){
-                    String hi = "This is it!";
-                }
 
                 //Web server contains restaurants from 'retaurants_itr1.csv' as well -> check for these repeats
-                /*
                 int count = 0;
                 while (count < initialSize){
                     if (tokens[0].equals(RestaurantManager.getInstance().getIndex(count).getTrackingNumber())){
@@ -250,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                 if (repeatEntry){
                     repeatEntry = false;
                     continue;
-                }*/
+                }
 
                 String [] restaurantData = new String[7];
                 if (tokens.length > 7){ //Some restaurant names have ',' (commas) in them causing tokens[1] and tokens[2] to be a split version of the restaurant name
@@ -333,6 +328,9 @@ public class MainActivity extends AppCompatActivity {
             if (currentRestaurant.getInspectionList().size() != 0) {
                 // Inspection list in Restaurant is sorted on startup so the first index is the most recent
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+                if (lastInspection.getHazardRating() == null){
+                    String name = "";
+                }
                 if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
                     itemView.setBackgroundColor(itemViewBackgroundColours[0]);
@@ -490,69 +488,91 @@ public class MainActivity extends AppCompatActivity {
 
     private void initNewInspectionLists(List<Integer> violNumbers, List<String> violBriefDescriptions) {
         FileInputStream fis = null;
-
         try {
             fis = openFileInput(WEB_SERVER_INSPECTIONS_CSV);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             String line = "";
             br.readLine(); //Header line
+            String trackingNum = "";
+            boolean unknownRestaurant = false;
+            int i = 0;
 
-            while ( (line = br.readLine()) != null){ //Iterate through lines (reports) in CSV
-                //Log.d("MyActivity", "Line: " + line);
-                int i = 0;
+            while ((line = br.readLine()) != null) { //Iterate through lines (reports) in CSV
                 line = line.replace("\"", "");
 
                 String[] lineSplit = line.split(",", 6);
+
                 //Find restaurant matching report tracking number being read
-                while (!lineSplit[0].equals(RestaurantManager.getInstance().getIndex(i).getTrackingNumber())){
-                    i++;
-                    if(i == 1437){
-                        String name = "";
+                if (!trackingNum.equals(lineSplit[0])) {
+                    i = 0;
+                    while (!lineSplit[0].equals(RestaurantManager.getInstance().getIndex(i).getTrackingNumber())) {
+                        i++;
+                        if (i == RestaurantManager.getInstance().getSize()) {
+                            unknownRestaurant = true;
+                            break;
+                        }
                     }
+                    if (unknownRestaurant) {
+                        continue;
+                    }
+                    trackingNum = lineSplit[0];
                 }
                 //Initializing inspection object variables
                 Inspection inspection = new Inspection();
-
                 inspection.setTrackingNumber(lineSplit[0]);
                 inspection.setInspectionDate(lineSplit[1]);
                 inspection.setInspType(lineSplit[2]);
                 inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
                 inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
-
                 String[] violationsArr = lineSplit[5].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
-                inspection.setHazardRating(violationsArr[violationsArr.length-1]);
-                violationsArr[violationsArr.length-1] = "";
+                String[] violSplit;
 
-                if (violationsArr.length != 1){
-                    for (String violation : violationsArr){ // For each token, split it up farther into number, crit, details, repeat
-                        if (violation.equals("")){
-                            continue;
-                        }
-                        String[] violSplit = violation.split(",");
+                for (int violCount = 0; violCount < violationsArr.length; violCount++) { // For each token, split it up farther into number, crit, details, repeat
+                    String[] test = violationsArr[violCount].split(",");
 
-                        boolean crit = false;
-                        if (violSplit[1].equals("Critical")) {
-                            crit = true;
-                        }
-
-                        boolean repeat = false;
-                        if (violSplit[3].equals("Repeat")) {
-                            repeat = true;
-                        }
-
-                        int violNumber = Integer.parseInt(violSplit[0]);
-
-                        int briefDescIndex = violNumbers.indexOf(violNumber);
-                        String briefDesc = violBriefDescriptions.get(briefDescIndex);
-
-                        Violation violObj = new Violation(violNumber,
-                                crit,
-                                violSplit[2],
-                                briefDesc,
-                                repeat);
-                        inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
+                    if (test.length == 2) {
+                        inspection.setHazardRating(test[1]);
+                        continue;
                     }
+
+                    if (Integer.parseInt(test[0]) == 502){
+                        violSplit = new String[test.length - 1];
+
+                        violSplit[0] = test[0];
+                        violSplit[1] = test[1];
+                        violSplit[2] = test[2] + test[3];
+                        int length = 1;
+                        if (test.length == 6){
+                            length = 2;
+                        }
+                        System.arraycopy(test, 4, violSplit, 3, length);
+                    }
+                    else{
+                        violSplit = test.clone();
+                    }
+
+                    if (violSplit.length == 5) {
+                        inspection.setHazardRating(violSplit[4]);
+                    }
+
+                    boolean crit = false;
+                    if (violSplit[1].equals("Critical")) {
+                        crit = true;
+                    }
+
+                    boolean repeat = false;
+                    if (violSplit[3].equals("Repeat")) {
+                        repeat = true;
+                    }
+
+                    int violNumber = Integer.parseInt(violSplit[0]);
+
+                    int briefDescIndex = violNumbers.indexOf(violNumber);
+                    String briefDesc = violBriefDescriptions.get(briefDescIndex);
+
+                    Violation violObj = new Violation(violNumber, crit, violSplit[2], briefDesc, repeat);
+                    inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
                 }
                 RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
             }
