@@ -199,9 +199,16 @@ public class MapsActivity extends AppCompatActivity
                         }
                     }
                     mLocationPermissionsGranted = true;
+                    refreshMap();
                 }
             }
         }
+    }
+
+    private void refreshMap() {
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     private void wireLaunchListButton() {
