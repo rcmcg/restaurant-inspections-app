@@ -60,14 +60,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // TODO: These functions should be member functions of Restaurant?
-        getUpdatedData(); //TODO: Call this after user allows update (after 20 hrs)
-        readRestaurantData();
-        InitInspectionLists();
-        for (Restaurant restaurant : RestaurantManager.getInstance().getRestaurants()){
-            Log.d("HELOOOO", "Name: " + restaurant.getName() + " Tracking Number: " + restaurant.getTrackingNumber() + " Number of Inspections " + restaurant.getInspectionSize());
-        }
-        manager.sortRestaurantsByName();
-        manager.sortInspListsByDate();
+        //getUpdatedData(); //TODO: Call this after user allows update (after 20 hrs)
+        //readRestaurantData();
+        //InitInspectionLists();
+
+        //manager.sortRestaurantsByName();
+        //manager.sortInspListsByDate();
 
 
         // Following 2 functions take from Dr. Fraser's video linked below
@@ -83,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
         restaurantDataURL = getURL("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
         inspectionDataURL = getURL("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
-        String newRestaurantData = requestData(restaurantDataURL); //Request updated restaurant data csv
-        String newInspectionData = requestData(inspectionDataURL); //Request updated restaurant data csv
+        String newRestaurantData = getCSV(restaurantDataURL); //Request updated restaurant data csv
+        String newInspectionData = getCSV(inspectionDataURL); //Request updated restaurant data csv
 
         //Write new csv from web server to internal storage
         writeToFile(newRestaurantData, WEB_SERVER_RESTAURANTS_CSV);
@@ -120,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         return dataURL;
     }
 
-    private String requestData(String DataURL) {
+    private String getCSV(String DataURL) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -477,30 +475,34 @@ public class MainActivity extends AppCompatActivity {
             BufferedReader br = new BufferedReader(isr);
             String line = "";
             br.readLine(); //Header line
-            //String prevTrackingNum = "";
+            String prevTrackingNum = "";
             boolean unknownRestaurant = false;
-            int i;
+            int i = 0;
 
             while ((line = br.readLine()) != null) { //Iterate through lines (reports) in CSV
                 line = line.replace("\"", "");
 
                 String[] lineSplit = line.split(",", 6);
+                lineSplit[0] = lineSplit[0].replace(" ", "");
 
-                //Find restaurant matching report tracking number being read
+                //Find restaurant with matching report tracking number being read
+                if (!prevTrackingNum.equals(lineSplit[0])){
                     i = 0;
-                while (!lineSplit[0].replace(" ", "").equals(RestaurantManager.getInstance().getIndex(i).getTrackingNumber())) {
-                    i++;
-                    if (i == RestaurantManager.getInstance().getSize()-1) {
-                        unknownRestaurant = true;
-                        break;
+                    while (!lineSplit[0].equals(RestaurantManager.getInstance().getIndex(i).getTrackingNumber())) {
+                        i++;
+                        if (i == RestaurantManager.getInstance().getSize()-1) {
+                            unknownRestaurant = true;
+                            break;
+                        }
+                    }
+                    prevTrackingNum = lineSplit[0];
+                    if (unknownRestaurant) {
+                        unknownRestaurant = false;
+                        continue;
                     }
                 }
                     //String name = RestaurantManager.getInstance().getIndex(i).getName();
                     //Log.d("HELO :)", name);
-                if (unknownRestaurant) {
-                    unknownRestaurant = false;
-                    continue;
-                }
 
                 //prevTrackingNum = lineSplit[0];
                 //Initializing inspection object variables
@@ -510,6 +512,7 @@ public class MainActivity extends AppCompatActivity {
                 inspection.setInspType(lineSplit[2]);
                 inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
                 inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
+
                 if (lineSplit[5].equals(",Low") || lineSplit[5].equals(",")){
                     inspection.setHazardRating("Low");
                     RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
