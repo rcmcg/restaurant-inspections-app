@@ -39,10 +39,14 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
+import java.util.List;
 
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
@@ -58,7 +62,6 @@ public class MapsActivity extends AppCompatActivity
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    public static final String RESTAURANT_ACTIVITY_RESTAURANT_TAG = "restaurant";
     private static final String EXTRA_MESSAGE = "Extra";
     private Boolean mLocationPermissionsGranted = false;
     private Marker mMarker;
@@ -356,35 +359,47 @@ public class MapsActivity extends AppCompatActivity
 
         mMap.setOnCameraIdleListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);
-
+        mClusterManager.setRenderer(new MarkerClusterRenderer(getApplicationContext(), mMap, mClusterManager));
         populateMapWithMarkers();
     }
 
     private void populateMapWithMarkers() {
         // Get Singleton RestaurantManager
-        RestaurantManager manager = RestaurantManager.getInstance();
-
-        for (Restaurant restaurant : manager) {
+        for (Restaurant restaurant : manager.getRestaurants()) {
+            String temp = restaurant.getName();
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
                     restaurant.getLongitude(),
-                    restaurant.getName(),
+                    temp,
                     getHazardIcon(restaurant)
             );
             mClusterManager.addItem(pegItem);
         }
     }
 
+    private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
+        Inspection RecentInspection = restaurant.getInspection(0);
+        BitmapDescriptor hazardIcon;
+        if (RecentInspection != null) {
+            String hazardLevel = RecentInspection.getHazardRating();
+            if (hazardLevel.equals("Low")) {
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_yellow);
+            } else if (hazardLevel.equals("Moderate")) {
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_orangle);
+            } else {
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_red);
+            }
+        }
+        else{
+            hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_green);
+        }
+        return hazardIcon;
+    }
+
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
     }
 
-    // is this function used anywhere?
-    public static Intent makeLaunchIntent(Context c, String message) {
-        Intent i1 = new Intent(c, MapsActivity.class);
-        i1.putExtra(EXTRA_MESSAGE, message);
-        return i1;
-    }
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
@@ -455,23 +470,6 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
-    private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
-        Inspection RecentInspection = restaurant.getInspection(0);
-        BitmapDescriptor hazardIcon = bitmapDescriptorFromVector(this,R.drawable.peg_green);
-        if (RecentInspection != null) {
-            String hazardLevel = RecentInspection.getHazardRating();
-
-            if (hazardLevel.equals("Low")) {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_green);
-            } else if (hazardLevel.equals("Moderate")) {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_yellow);
-            } else {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_red);
-            }
-        }
-        return hazardIcon;
-    }
-
     // For peg icon
     // Learned from:https://stackoverflow.com/questions/42365658/custom-marker-in-google-maps-in-android-with-vector-asset-icon
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
@@ -484,6 +482,23 @@ public class MapsActivity extends AppCompatActivity
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
+    private class MarkerClusterRenderer extends DefaultClusterRenderer<PegItem> {
 
+        public MarkerClusterRenderer(Context context, GoogleMap map,
+                                     ClusterManager<PegItem> clusterManager) {
+            super(context, map, mClusterManager);
+        }
 
+        @Override
+        protected void onBeforeClusterItemRendered(PegItem item, MarkerOptions markerOptions) {
+            // use this to make your change to the marker option
+            // for the marker before it gets render on the map
+            markerOptions.icon(item.getHazard());
+            markerOptions.title(item.getTitle());
+            super.onBeforeClusterItemRendered(item, markerOptions);
+        }
+    }
 }
+
+
+

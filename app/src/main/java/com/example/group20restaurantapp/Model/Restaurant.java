@@ -158,7 +158,7 @@ public class Restaurant {
                     '}';
         }
         public String getLastHazardLevel() {
-            if (inspectionList.isEmpty()) return "None";
+            if (inspectionList.isEmpty()) return null;
             return inspectionList.get(0).getHazardRating();
         }
         private int countCriticalViolation() {
