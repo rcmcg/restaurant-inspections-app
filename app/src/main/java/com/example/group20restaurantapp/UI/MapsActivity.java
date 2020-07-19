@@ -35,8 +35,15 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.ClusterRenderer;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
@@ -58,8 +65,14 @@ public class MapsActivity extends AppCompatActivity
     private RestaurantManager manager = RestaurantManager.getInstance();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
+    // private ClusterRenderer<PegItem> mRenderer;
+
+    // private List<Marker> mMarkerArray = new ArrayList<Marker>();
+
     private Boolean updateData = false;
     private Boolean newData = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,18 +191,82 @@ public class MapsActivity extends AppCompatActivity
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surrey, 10));
         } else {
             Log.d(TAG, "onMapReady: Setting map to chosen restaurant coords");
+            Log.d(TAG, "onMapReady: chosen restaurant lat: " + chosenRestaurantLatLon[0] + " chosen restaurant lon: " + chosenRestaurantLatLon[1]);
+
             LatLng chosenRestaurantCoords = new LatLng(
                     chosenRestaurantLatLon[0],
                     chosenRestaurantLatLon[1]
             );
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, 20));
+
+            // Open window of correct marker
+            /*
+            Marker chosenRestaurantMarker = null;
+            for (Marker marker : mMarkerArray) {
+                if (marker.getPosition().latitude == chosenRestaurantCoords.latitude && marker.getPosition().longitude == chosenRestaurantCoords.longitude) {
+                    chosenRestaurantMarker = marker;
+                    Log.d(TAG, "onMapReady: found chosenRestaurantMarker: " + chosenRestaurantMarker.getPosition().toString());
+                    break;
+                }
+            }
+
+             */
+
+            // Add a new marker
+            // mClusterManager.cluster();
+            // Log.d(TAG, "onMapReady: mClusterManager.getMarkerCollection().getMarkers().size(): " + mClusterManager.getMarkerCollection().getMarkers().size());
+            // mClusterManager.getMarkerCollection().getMarkers().size();
+
+            /*
+            java.util.Collection<Marker> markerCollection = mClusterManager.getMarkerCollection().;
+            ArrayList<Marker> userList = new ArrayList<>(markerCollection);
+            Log.d(TAG, "onMapReady: userList.size() " + userList.size());
+            for (Marker marker : userList) {
+                if (marker.getPosition().latitude == chosenRestaurantCoords.latitude && marker.getPosition().longitude == chosenRestaurantCoords.longitude) {
+                    marker.showInfoWindow();
+                }
+            }
+
+             */
+
+            /*
+            Log.d(TAG, "onMapReady: mClusterManager.getMarkerCollection().getMarkers().size(): " + mClusterManager.getMarkerCollection().getMarkers().size());
+            for (Marker marker : mClusterManager.getMarkerCollection().getMarkers()) {
+                Log.d(TAG, "onMapReady: marker.getPosition: " + marker.getPosition().toString());
+                if (marker.getPosition().latitude == chosenRestaurantCoords.latitude && marker.getPosition().longitude == chosenRestaurantCoords.longitude) {
+                    Log.d(TAG, "onMapReady: Correct marker found: marker.getPosition: " + marker.getPosition().toString());
+                    break;
+                }
+            }
+             */
+            /*
+            Marker currMarker;
+            // Log.d(TAG, "onMapReady: mMarkerArray.size(): " + mMarkerArray.size());
+            for (int i = 0; i < mMarkerArray.size(); i++) {
+                currMarker = mMarkerArray.get(i);
+                // Log.d(TAG, "onMapReady: marker[i]: currMarker [lat,lon]: [" + currMarker.getPosition().latitude + "," + currMarker.getPosition().longitude + "]");
+                // Log.d(TAG, "onMapReady: marker[i]: chosenRestaurantCoords [lat,lon]: [" + chosenRestaurantCoords.latitude + "," + chosenRestaurantCoords.longitude + "]");
+                if ((currMarker.getPosition().latitude == chosenRestaurantCoords.latitude) && (currMarker.getPosition().longitude == chosenRestaurantCoords.longitude)) {
+                    Log.d(TAG, "onMapReady: Found restaurant: currMarker position: " + currMarker.getPosition().toString());
+
+                    for( Marker m : mClusterManager.getMarkerCollection().getMarkers()) {
+                        if (m.getPosition().latitude == currMarker.getPosition().latitude && m.getPosition().longitude == currMarker.getPosition().longitude) {
+                            Log.d(TAG, "onMapReady: inside mClusterManager iteration, showing window");
+                            m.showInfoWindow();
+                        }
+                    }
+                    break;
+                }
+            }
+             */
         }
+
         registerClickCallback();
 
         // Move the camera to surrey
         // TODO: The camera should pan to user's location on startup
-        LatLng surrey = new LatLng(49.104431, -122.801094);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
+        // LatLng surrey = new LatLng(49.104431, -122.801094);
+        // mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
 
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
@@ -250,7 +327,7 @@ public class MapsActivity extends AppCompatActivity
         mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<PegItem>() {
             @Override
             public boolean onClusterClick(Cluster<PegItem> cluster) {
-                moveCamera(cluster.getPosition(), 15);
+                moveCamera(cluster.getPosition(), 20);
                 return true;
             }
         });
@@ -269,6 +346,9 @@ public class MapsActivity extends AppCompatActivity
         // Initialize new clusterManager
         mClusterManager = new ClusterManager<PegItem>(this, mMap);
 
+        // mRenderer = new DefaultClusterRenderer<>(this, mMap, mClusterManager);
+        // mClusterManager.setRenderer(mRenderer);
+
         mMap.setOnCameraIdleListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);
 
@@ -280,6 +360,7 @@ public class MapsActivity extends AppCompatActivity
         RestaurantManager manager = RestaurantManager.getInstance();
 
         for (Restaurant restaurant : manager) {
+            // Add PegItem to ClusterManager
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
                     restaurant.getLongitude(),
@@ -287,7 +368,22 @@ public class MapsActivity extends AppCompatActivity
                     getHazardIcon(restaurant)
             );
             mClusterManager.addItem(pegItem);
+
+            // Add PegItem to array
+            // mMarkerArray.add(pegItem);
+
+            // Add Marker to mMarkerArray
+            // LatLng location = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
+            // Marker marker = mMap.addMarker(new MarkerOptions().position(location));
+            // mMarkerArray.add(marker);
         }
+
+        // Set MapMarkers to invisible in mMarkerArray
+        /*
+        for (int i = 0; i < mMarkerArray.size(); i++) {
+            mMarkerArray.get(i).setVisible(false);
+        }
+         */
     }
 
     private double[] getChosenRestaurantLocation() {
@@ -408,7 +504,4 @@ public class MapsActivity extends AppCompatActivity
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
-
-
-
 }
