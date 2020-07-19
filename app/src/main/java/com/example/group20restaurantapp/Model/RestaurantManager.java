@@ -46,6 +46,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private boolean favouriteOnly = false;
     private List<Integer> violNumbers = new ArrayList<>();
     private List<String> violBriefDescriptions = new ArrayList<>();
+    private String restaurantsLastModified = "";
+    private String inspectionsLastModified = "";
 
     private boolean userBeenAskedToUpdateThisSession = false;
 
@@ -162,14 +164,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
                         (hazardLevel.equalsIgnoreCase(hazardLevelFilter)));
     }
 
-    public String getURL(String url) {
+    public String getURL(String requestURL) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         Request request = new Request.Builder()
-                .url(url)
+                .url(requestURL)
                 .method("GET", null)
                 .build();
         String dataURL = "";
@@ -182,6 +184,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
             JSONArray resArr = resultObj.getJSONArray("resources");
             JSONObject data = resArr.getJSONObject(0);
             dataURL = data.getString("url");
+            if (restaurantsLastModified.equals("")){
+                restaurantsLastModified = data.getString("last_modified");
+            }
+            else{
+                inspectionsLastModified = data.getString("last_modified");
+            }
             String lastModifiedDate = data.getString("last_modified");
 
         } catch (IOException | JSONException e) {
