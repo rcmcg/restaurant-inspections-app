@@ -9,6 +9,8 @@ import android.location.Location;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -39,6 +41,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.clustering.Cluster;
@@ -46,10 +49,14 @@ import com.google.maps.android.clustering.ClusterManager;
 
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
-        PleaseWaitDialogFragment.PleaseWaitDialogListener
-{
+        PleaseWaitDialogFragment.PleaseWaitDialogListener {
 
     private GoogleMap mMap;
+    private LocationListener locationListener;
+    private LocationManager locationManager;
+    private final long MIN_TIME = 1000;
+    private final long MIN_DIST = 1;
+
 
     private static final String TAG = "MapActivity";
     private static final float DEFAULT_ZOOM = 18f;
@@ -65,6 +72,7 @@ public class MapsActivity extends AppCompatActivity
     private ClusterManager<PegItem> mClusterManager;
     private Boolean updateData = false;
     private Boolean newData = false;
+    LatLng locationchangedlatlong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +85,10 @@ public class MapsActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        //Permission for fine and coarse location
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PackageManager.PERMISSION_GRANTED);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PackageManager.PERMISSION_GRANTED);
+        //
 
         // TODO: Check if there is new data on the server
         // newData = manager.checkForNewData();
@@ -131,10 +143,10 @@ public class MapsActivity extends AppCompatActivity
         // Start download
 
         // if (!isDownloadCancelled)
-            // finish the please wait dialog
-            // Update relevant data
+        // finish the please wait dialog
+        // Update relevant data
         // else
-            // do not update any data
+        // do not update any data
     }
 
     public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
@@ -150,7 +162,7 @@ public class MapsActivity extends AppCompatActivity
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
             if (mLocationPermissionsGranted) {
-                 Task<Location> location = mFusedLocationProviderClient.getLastLocation();
+                Task<Location> location = mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
@@ -238,14 +250,59 @@ public class MapsActivity extends AppCompatActivity
             getDeviceLocation();
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
+                            != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED
+            ) {
                 // TODO: Remove this return statement? What is it for?
                 return;
             }
             mMap.setMyLocationEnabled(true);
         }
+        //I started from here
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+             try {
+                 locationchangedlatlong = new LatLng(location.getLatitude(), location.getLongitude());
+                 mMap.addMarker(new MarkerOptions().position(locationchangedlatlong).title("This is here"));
+
+                 mMap.moveCamera(CameraUpdateFactory.newLatLng(locationchangedlatlong));
+
+             }catch(SecurityException e){
+                 e.printStackTrace();
+             }
+                //Getting the dot to change the place
+
+                //Here it finishes
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+        locationManager=(LocationManager) getSystemService(LOCATION_SERVICE);
+        try {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,MIN_TIME,MIN_DIST,locationListener);
+        }catch (SecurityException e){
+            e.printStackTrace();
+        }
+
+
+
+
+ //Not me
 
         setUpClusterer();
 
