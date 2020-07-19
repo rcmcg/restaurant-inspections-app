@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,32 +16,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 
 import com.example.group20restaurantapp.Model.Inspection;
-import com.example.group20restaurantapp.Model.Violation;
 import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
@@ -59,17 +40,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TODO: These functions should be member functions of Restaurant?
-        //getUpdatedData(); //TODO: Call this after user allows update (after 20 hrs)
-        //readRestaurantData();
-        //InitInspectionLists();
-
-        //manager.sortRestaurantsByName();
-        //manager.sortInspListsByDate();
-
-
-        // Following 2 functions take from Dr. Fraser's video linked below
-        // https://www.youtube.com/watch?v=WRANgDgM2Zg
         populateListView();
         registerClickCallback();
         wireLaunchMapButton();
@@ -132,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
             if (currentRestaurant.getInspectionList().size() != 0) {
                 // Inspection list in Restaurant is sorted on startup so the first index is the most recent
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                Log.d("HELOOO", lastInspection.getTrackingNumber());
                 if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
                     itemView.setBackgroundColor(itemViewBackgroundColours[0]);

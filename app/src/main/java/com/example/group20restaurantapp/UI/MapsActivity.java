@@ -365,9 +365,7 @@ public class MapsActivity extends AppCompatActivity
 
     private void populateMapWithMarkers() {
         // Get Singleton RestaurantManager
-        RestaurantManager manager = RestaurantManager.getInstance();
-        List<Restaurant> restaurants = manager.getRestaurants();
-        for (Restaurant restaurant : restaurants) {
+        for (Restaurant restaurant : manager.getRestaurants()) {
             String temp = restaurant.getName();
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
@@ -375,8 +373,6 @@ public class MapsActivity extends AppCompatActivity
                     temp,
                     getHazardIcon(restaurant)
             );
-
-
             mClusterManager.addItem(pegItem);
         }
     }
