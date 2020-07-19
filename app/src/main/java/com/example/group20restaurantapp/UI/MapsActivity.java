@@ -56,6 +56,8 @@ public class MapsActivity extends AppCompatActivity
     private GoogleMap mMap;
 
     private static final String TAG = "MapActivity";
+    private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
+    private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
     private static final float DEFAULT_ZOOM = 18f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -80,6 +82,24 @@ public class MapsActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        String restaurantDataURL = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
+        String inspectionDataURL = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
+        String newRestaurantData = manager.getCSV(restaurantDataURL); //Request updated restaurant data csv
+        String newInspectionData = manager.getCSV(inspectionDataURL); //Request updated restaurant data csv
+
+        //Write new csv from web server to internal storage
+        manager.writeToFile(newRestaurantData, WEB_SERVER_RESTAURANTS_CSV, this);
+        manager.writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV, this);
+
+        manager.readRestaurantData(this);
+        manager.readNewRestaurantData(this);
+
+        manager.initInspectionLists(this);
+        manager.initNewInspectionLists(this);
+
+        manager.sortInspListsByDate();
+        manager.sortRestaurantsByName();
 
         // TODO: Check if there is new data on the server
         // newData = manager.checkForNewData();
