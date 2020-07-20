@@ -67,6 +67,7 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class MapsActivity extends AppCompatActivity
@@ -96,6 +97,7 @@ public class MapsActivity extends AppCompatActivity
     private String restaurantDataURL;
     private String inspectionDataURL;
     private Date currentDate;
+    private Marker singleRestaurantMarker;
 
     private DialogFragment pleaseWaitDialog;
 
@@ -442,16 +444,34 @@ public class MapsActivity extends AppCompatActivity
             Restaurant restaurant = manager.findRestaurantByLatLng(chosenRestaurantLatLon[0], chosenRestaurantLatLon[1]);
             if (restaurant.getLongitude() ==  chosenRestaurantLatLon[1] &&
                 restaurant.getLatitude() ==  chosenRestaurantLatLon[0]) {
-                Marker marker = mMap.addMarker(new MarkerOptions()
+                singleRestaurantMarker = mMap.addMarker(new MarkerOptions()
                         .position(chosenRestaurantCoords)
                         .icon(getHazardIcon(restaurant)));
-                marker.showInfoWindow();
+                singleRestaurantMarker.showInfoWindow();
             }
+            // singleRestaurantMarker.remove();
+
+            // Wait a few seconds
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+                        @Override
+                        public void onCameraMove() {
+                            if (singleRestaurantMarker != null) {
+                                Log.d(TAG, "onCameraMove: singleRestaurantMarker.remove()");
+                                singleRestaurantMarker.remove();
+                                singleRestaurantMarker = null;
+                            }
+                        }
+                    });
+                }
+            }, 1000);
         }
 
         // Receive intent from Restaurant Activity
-        //Intent i_receive = getIntent();
-        //String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
+        // Intent i_receive = getIntent();
+        // String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
     }
 
     private void registerClickCallback() {
@@ -519,6 +539,8 @@ public class MapsActivity extends AppCompatActivity
     private void populateMapWithMarkers() {
         // Get Singleton RestaurantManager
         RestaurantManager manager = RestaurantManager.getInstance();
+
+        Log.d(TAG, "populateMapWithMarkers: Populating map with markers");
 
         for (Restaurant restaurant : manager) {
             PegItem pegItem = new PegItem(
@@ -661,5 +683,43 @@ public class MapsActivity extends AppCompatActivity
             markerOptions.title(item.getTitle());
             super.onBeforeClusterItemRendered(item, markerOptions);
         }
+
+        /*
+        @Override
+        protected void onClusterItemRendered(PegItem clusterItem, Marker marker) {
+            if (singleRestaurantMarker != null) {
+                Log.d(TAG, "onClusterItemRendered: removing singleRestaurantMarker");
+                singleRestaurantMarker.remove();
+                singleRestaurantMarker = null;
+            }
+            super.onClusterItemRendered(clusterItem, marker);
+        }
+
+         */
+
+        /*
+        @Override
+        protected void onClusterRendered(Cluster<PegItem> cluster, Marker marker) {
+            if (singleRestaurantMarker != null) {
+                Log.d(TAG, "onClusterRendered: removing singleRestaurantMarker");
+                singleRestaurantMarker.remove();
+                singleRestaurantMarker = null;
+            }
+            super.onClusterRendered(cluster, marker);
+        }
+         */
+
+        /*
+        @Override
+        public void onClustersChanged(Set<? extends Cluster<PegItem>> clusters) {
+            if (singleRestaurantMarker != null) {
+                Log.d(TAG, "onClustersChanged: removing singleRestaurantMarker");
+                singleRestaurantMarker.remove();
+                singleRestaurantMarker = null;
+            }
+            super.onClustersChanged(clusters);
+        }
+
+         */
     }
 }
