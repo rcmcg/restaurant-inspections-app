@@ -293,8 +293,8 @@ public class MapsActivity extends AppCompatActivity
             mClusterManager.clearItems();
             mClusterManager.cluster();
             setUpClusterer();
-             //mClusterManager.cluster();
-            refreshMap();
+            mClusterManager.cluster();
+            // refreshMap();
         }
     }
 
@@ -358,7 +358,12 @@ public class MapsActivity extends AppCompatActivity
                         }
                     }
                     mLocationPermissionsGranted = true;
-                    refreshMap();
+
+                    // Restart activity with new permission
+                    finish();
+                    Intent refreshIntent = makeIntent(this);
+                    startActivity(refreshIntent);
+                    manager.setUserBeenAskedToUpdateThisSession(false);
                 }
             }
         }
@@ -397,8 +402,10 @@ public class MapsActivity extends AppCompatActivity
             //getDeviceLocation();
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED
+                    != PackageManager.PERMISSION_GRANTED
+                    &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
             ) {
                 // TODO: Remove this return statement? What is it for?
                 return;
@@ -406,6 +413,7 @@ public class MapsActivity extends AppCompatActivity
             mMap.setMyLocationEnabled(true);
         }
         mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
 
@@ -419,6 +427,10 @@ public class MapsActivity extends AppCompatActivity
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
         mMap.setInfoWindowAdapter(adapter);
+
+        // move camera to Surrey first for testing
+        LatLng surrey = new LatLng(49.104431, -122.801094);
+        moveCamera(surrey, 10);
 
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
