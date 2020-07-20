@@ -79,7 +79,7 @@ public class MapsActivity extends AppCompatActivity
     private static final String TAG = "MapActivity";
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
-    private static final float DEFAULT_ZOOM = 18f;
+    private static final float DEFAULT_ZOOM = 10f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
