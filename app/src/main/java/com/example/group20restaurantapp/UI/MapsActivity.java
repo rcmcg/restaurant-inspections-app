@@ -362,7 +362,9 @@ public class MapsActivity extends AppCompatActivity
                     // Restart activity with new permission
                     finish();
                     Intent refreshIntent = makeIntent(this);
+                    overridePendingTransition(0, 0);
                     startActivity(refreshIntent);
+                    overridePendingTransition(0, 0);
                     manager.setUserBeenAskedToUpdateThisSession(false);
                 }
             }
@@ -496,6 +498,8 @@ public class MapsActivity extends AppCompatActivity
                 return true;
             }
         });
+
+
     }
 
     /**
@@ -662,6 +666,11 @@ public class MapsActivity extends AppCompatActivity
             markerOptions.icon(item.getHazard());
             markerOptions.title(item.getTitle());
             super.onBeforeClusterItemRendered(item, markerOptions);
+        }
+
+        @Override
+        protected boolean shouldRenderAsCluster(Cluster<PegItem> cluster) {
+            return (cluster.getSize() >= 10);
         }
     }
 }
