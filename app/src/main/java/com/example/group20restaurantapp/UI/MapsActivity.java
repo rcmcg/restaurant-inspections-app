@@ -539,6 +539,8 @@ public class MapsActivity extends AppCompatActivity
         // Get Singleton RestaurantManager
         RestaurantManager manager = RestaurantManager.getInstance();
 
+        Log.d(TAG, "populateMapWithMarkers: Populating map with markers");
+
         for (Restaurant restaurant : manager) {
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
