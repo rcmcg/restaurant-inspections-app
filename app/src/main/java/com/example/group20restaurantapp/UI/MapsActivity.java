@@ -102,46 +102,10 @@ public class MapsActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        /*
-        String[] restaurantDataURLDate = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
-        String[] inspectionDataURLDate = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
-
-        Log.d(TAG, "onCreate: restaurantData last updated: " + restaurantDataURLDate[1]);
-        Log.d(TAG, "onCreate: restaurantData last updated: " + inspectionDataURLDate[1]);
-
-        // Get the current date
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        Date currentDate = new Date();
-
-        // Get difference in days between restaurantDataLastUpdated and currentDate
-        String rawRestaurantLastUpdated = restaurantDataURLDate[1];
-        try {
-            Date restaurantLastUpdatedDate = sdf.parse(rawRestaurantLastUpdated);
-            long diffInMS = currentDate.getTime() - restaurantLastUpdatedDate.getTime();
-            long diffInDay = TimeUnit.DAYS.convert(diffInMS, TimeUnit.MILLISECONDS);
-            long diffInHour = TimeUnit.HOURS.convert(diffInMS, TimeUnit.MILLISECONDS);
-            Log.d(TAG, "onCreate: diffInDay between today and last restaurant update: " + diffInDay);
-            Log.d(TAG, "onCreate: diffInHour between today and last restaurant update: " + diffInHour);
-
-            Log.d(TAG, "onCreate: currentDate.toString(): " + currentDate.toString());
-            Log.d(TAG, "onCreate: currentDate.getTime(): " + currentDate.getTime());
-
-            saveAppLastUpdated(currentDate.getTime());
-
-            long appLastUpdatedInMs = getAppLastUpdated(this);
-
-            Log.d(TAG, "onCreate: Time in hours since app last updated: " + TimeUnit.HOURS.convert(appLastUpdatedInMs - currentDate.getTime(), TimeUnit.MILLISECONDS));
-            Log.d(TAG, "onCreate: New data on server?: if (appLastUpdatedInMs < restaurantLastUpdatedDate.getTime(): " + (appLastUpdatedInMs < restaurantLastUpdatedDate.getTime()));
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-         */
-
         currentDate = new Date();
         long appLastUpdated = getAppLastUpdated(this);
 
-        // regardless of whether or not the user wants to update, we need to read data (I think)
+        // read data on startup
         if (manager.getSize() == 0) {
             if (appLastUpdated == -1) {
                 Log.d(TAG, "onCreate: Filling with default restaurants");
@@ -152,9 +116,7 @@ public class MapsActivity extends AppCompatActivity
             }
         }
 
-
-        // long timeSinceLastAppUpdateInHours = timeSinceLastAppUpdateInHours(currentDate);
-
+        Log.d(TAG, "onCreate: Time since last update in hours: " +  timeSinceLastAppUpdateInHours(currentDate));
         if (appLastUpdated == -1 || timeSinceLastAppUpdateInHours(currentDate) >= 20) {
             // App has never been updated or it's been over 20 hours since the last update
             Log.d(TAG, "onCreate: App has never been updated or it's been over 20 hours since the last update");
@@ -197,22 +159,6 @@ public class MapsActivity extends AppCompatActivity
                 }
             }
         }
-
-        // String newRestaurantData = manager.getCSV(restaurantDataURLDate[0]); //Request updated restaurant data csv
-        // String newInspectionData = manager.getCSV(inspectionDataURLDate[0]); //Request updated restaurant data csv
-
-        // Write new csv from web server to internal storage
-        // manager.writeToFile(newRestaurantData, WEB_SERVER_RESTAURANTS_CSV, this);
-        // manager.writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV, this);
-
-        // manager.readRestaurantData(this);
-        // manager.readNewRestaurantData(this);
-
-        // manager.initInspectionLists(this);
-        // manager.initNewInspectionLists(this);
-
-        // manager.sortInspListsByDate();
-        // manager.sortRestaurantsByName();
 
         wireLaunchListButton();
     }
@@ -305,15 +251,6 @@ public class MapsActivity extends AppCompatActivity
                 initiateDownload();
             }
         }, 2000);   // 2 seconds
-
-
-        // String newInspectionData = manager.getCSV(inspectionDataURLDate[0]); //Request updated restaurant data csv
-
-        // if (!isDownloadCancelled)
-            // finish the please wait dialog
-            // Update relevant data
-        // else
-            // do not update any data
     }
 
     private void initiateDownload() {
@@ -336,13 +273,16 @@ public class MapsActivity extends AppCompatActivity
         if (!manager.isDownloadCancelled()) {
             // Safe to write new data
             manager.writeToFile(newRestaurantData, WEB_SERVER_RESTAURANTS_CSV, this);
+            Log.d(TAG, "initiateDownload: finished writing newRestaurantData");
             manager.writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV, this);
+            Log.d(TAG, "initiateDownload: finished writing newInspectionData");
 
             refillRestaurantManager();
             saveAppLastUpdated(currentDate.getTime());
 
             // Update the map
             mClusterManager.clearItems();
+            mClusterManager.cluster();
             setUpClusterer();
             // mClusterManager.cluster();
             refreshMap();
@@ -463,8 +403,8 @@ public class MapsActivity extends AppCompatActivity
 
         // Move the camera to surrey
         // TODO: The camera should pan to user's location on startup
-        // LatLng surrey = new LatLng(49.104431, -122.801094);
-        // mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
+        LatLng surrey = new LatLng(49.104431, -122.801094);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
 
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
@@ -536,6 +476,7 @@ public class MapsActivity extends AppCompatActivity
      * DEFAULT_ZOOM = 15
      */
     private void moveCamera(LatLng latLng, float zoom) {
+        Log.d(TAG, "moveCamera: moving camera to: " + latLng);
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
         mMap.animateCamera(location);
     }
