@@ -450,23 +450,24 @@ public class MapsActivity extends AppCompatActivity
                 singleRestaurantMarker.showInfoWindow();
             }
             // singleRestaurantMarker.remove();
-        }
 
-        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            @Override
-            public void onCameraMove() {
-                // A Marker object is added whenever user launches Map from RestaurantActivity
-                // This map uses ClusterItems in a ClusterManager so these markers need to be deleted
-                // mMap.clear(); // doesn't work, map only shows clusters half the time
-                /*
-                // doesn't work, clears before the marker can be seen by the user
-                if (singleRestaurantMarker != null) {
-                    Log.d(TAG, "onCameraMove: Clearing singleRestaurantMarker");
-                    singleRestaurantMarker.remove();
+            // Wait a few seconds
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+                        @Override
+                        public void onCameraMove() {
+                            if (singleRestaurantMarker != null) {
+                                Log.d(TAG, "onCameraMove: singleRestaurantMarker.remove()");
+                                singleRestaurantMarker.remove();
+                                singleRestaurantMarker = null;
+                            }
+                        }
+                    });
                 }
-                 */
-            }
-        });
+            }, 1000);
+        }
 
         // Receive intent from Restaurant Activity
         // Intent i_receive = getIntent();
