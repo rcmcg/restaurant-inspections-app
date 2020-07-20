@@ -447,20 +447,6 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                // I don't think anything should happen unless you press a marker
-                // No need to re-initialize every map marker as far as I can tell
-
-                // Clear everything
-                // mClusterManager.clearItems();
-
-                // Clear the currently open marker
-                // mMap.clear();
-
-                // Reinitialize clusterManager
-                // setUpClusterer();
-
-                // Focus map on the position that was clicked on map
-                // moveCamera(latLng, 15f);
             }
         });
 
@@ -506,6 +492,7 @@ public class MapsActivity extends AppCompatActivity
             );
             mClusterManager.addItem(pegItem);
         }
+        mClusterManager.cluster();
     }
 
     private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
@@ -599,23 +586,6 @@ public class MapsActivity extends AppCompatActivity
             }
             return itemView;
         }
-    }
-
-    private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
-        Inspection RecentInspection = restaurant.getInspection(0);
-        BitmapDescriptor hazardIcon = bitmapDescriptorFromVector(this,R.drawable.peg_green);
-        if (RecentInspection != null) {
-            String hazardLevel = RecentInspection.getHazardRating();
-
-            if (hazardLevel.equals("Low")) {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_green);
-            } else if (hazardLevel.equals("Moderate")) {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_yellow);
-            } else {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_red);
-            }
-        }
-        return hazardIcon;
     }
 
     // For peg icon
