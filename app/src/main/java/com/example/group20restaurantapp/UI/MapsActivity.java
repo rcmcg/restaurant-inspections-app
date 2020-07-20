@@ -172,6 +172,7 @@ public class MapsActivity extends AppCompatActivity
         wireLaunchListButton();
     }
 
+    // TODO: Move to RestaurantManager.java?
     private void refillRestaurantManager() {
         // Call this function when the RestaurantManager needs to be updated with new data
         manager = RestaurantManager.getInstance();
@@ -179,6 +180,7 @@ public class MapsActivity extends AppCompatActivity
         fillRestaurantManager(true);
     }
 
+    // TODO: Move to RestaurantManager.java?
     private void fillRestaurantManager(boolean hasAppBeenUpdated) {
         manager = RestaurantManager.getInstance();
         if (!hasAppBeenUpdated) {
@@ -371,11 +373,13 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
+    /*
     private void refreshMap() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+     */
 
     private void wireLaunchListButton() {
         Button btn = findViewById(R.id.btnLaunchList);
@@ -430,7 +434,7 @@ public class MapsActivity extends AppCompatActivity
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
         mMap.setInfoWindowAdapter(adapter);
 
-        // move camera to Surrey first for testing
+        // move camera to Surrey first
         LatLng surrey = new LatLng(49.104431, -122.801094);
         moveCamera(surrey, 10);
 
@@ -670,7 +674,7 @@ public class MapsActivity extends AppCompatActivity
 
         @Override
         protected boolean shouldRenderAsCluster(Cluster<PegItem> cluster) {
-            return (cluster.getSize() >= 10);
+            return (cluster.getSize() >= 8);
         }
     }
 }
