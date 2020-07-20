@@ -155,6 +155,10 @@ public class Restaurant {
                 iconImgId=R.drawable.bengal_grill;
             }else if(name.matches("Browns Socialhouse(.*)")) {
                 iconImgId=R.drawable.brown;
+            }else if(name.matches("Burger King(.*)")) {
+                iconImgId=R.drawable.burger_king;
+            }else if(name.matches("Church's Chicken(.*)")) {
+                iconImgId=R.drawable.ccc;
             }else {
                 // Generic image if restaurant not found
                 iconImgId =  R.drawable.restaurant_icon_clipart;
