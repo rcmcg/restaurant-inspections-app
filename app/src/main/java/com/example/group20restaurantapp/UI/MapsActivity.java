@@ -45,8 +45,17 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.Algorithm;
+import com.google.maps.android.clustering.view.ClusterRenderer;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.util.List;
@@ -81,16 +90,14 @@ public class MapsActivity extends AppCompatActivity
     private RestaurantManager manager = RestaurantManager.getInstance();
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
+
     private Boolean updateData = false;
     private Boolean newData = false;
-
     private String restaurantDataURL;
     private String inspectionDataURL;
-
     private Date currentDate;
 
     private DialogFragment pleaseWaitDialog;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -399,7 +406,15 @@ public class MapsActivity extends AppCompatActivity
             mMap.setMyLocationEnabled(true);
         }
 
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+
         setUpClusterer();
+
+        double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
+
+        Log.d(TAG, "onMapReady: chosenRestaurantLatLon = [" + chosenRestaurantLatLon[0]
+                + "," + chosenRestaurantLatLon[1] + "]");
+        LatLng chosenRestaurantCoords = null;
 
         registerClickCallback();
 
@@ -411,6 +426,102 @@ public class MapsActivity extends AppCompatActivity
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
         mMap.setInfoWindowAdapter(adapter);
+
+        if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
+            Log.d(TAG, "onMapReady: Setting map to user's location");
+            // Move the camera to surrey
+            // TODO: The camera should pan to user's location on startup
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surrey, 10));
+        } else {
+            Log.d(TAG, "onMapReady: Setting map to chosen restaurant coords");
+            Log.d(TAG, "onMapReady: chosen restaurant lat: " + chosenRestaurantLatLon[0] + " chosen restaurant lon: " + chosenRestaurantLatLon[1]);
+
+            chosenRestaurantCoords = new LatLng(
+                    chosenRestaurantLatLon[0],
+                    chosenRestaurantLatLon[1]
+            );
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, 20));
+
+            /*for (Marker marker : visibleMarkers){
+                /*if (marker.getPosition().latitude == chosenRestaurantLatLon[0]
+                && marker.getPosition().longitude == chosenRestaurantLatLon[1]){
+                    marker.showInfoWindow();
+                }
+            }*/
+
+            /*Restaurant chosenRestaurant = new Restaurant();
+            for (Restaurant restaurant : manager.getRestaurants()){
+                if (restaurant.getLatitude() == chosenRestaurantLatLon[0]
+                && restaurant.getLongitude() == chosenRestaurantLatLon[1]){
+                    chosenRestaurant = restaurant;
+                }
+            }*/
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .position(chosenRestaurantCoords));
+            marker.showInfoWindow();
+
+
+            // Open window of correct marker
+            /*
+            Marker chosenRestaurantMarker = null;
+            for (Marker marker : mMarkerArray) {
+                if (marker.getPosition().latitude == chosenRestaurantCoords.latitude && marker.getPosition().longitude == chosenRestaurantCoords.longitude) {
+                    chosenRestaurantMarker = marker;
+                    Log.d(TAG, "onMapReady: found chosenRestaurantMarker: " + chosenRestaurantMarker.getPosition().toString());
+                    break;
+                }
+            }
+
+             */
+
+            // Add a new marker
+            // mClusterManager.cluster();
+            // Log.d(TAG, "onMapReady: mClusterManager.getMarkerCollection().getMarkers().size(): " + mClusterManager.getMarkerCollection().getMarkers().size());
+            // mClusterManager.getMarkerCollection().getMarkers().size();
+
+            /*
+            java.util.Collection<Marker> markerCollection = mClusterManager.getMarkerCollection().;
+            ArrayList<Marker> userList = new ArrayList<>(markerCollection);
+            Log.d(TAG, "onMapReady: userList.size() " + userList.size());
+            for (Marker marker : userList) {
+                if (marker.getPosition().latitude == chosenRestaurantCoords.latitude && marker.getPosition().longitude == chosenRestaurantCoords.longitude) {
+                    marker.showInfoWindow();
+                }
+            }
+
+             */
+
+            /*
+            Log.d(TAG, "onMapReady: mClusterManager.getMarkerCollection().getMarkers().size(): " + mClusterManager.getMarkerCollection().getMarkers().size());
+            for (Marker marker : mClusterManager.getMarkerCollection().getMarkers()) {
+                Log.d(TAG, "onMapReady: marker.getPosition: " + marker.getPosition().toString());
+                if (marker.getPosition().latitude == chosenRestaurantCoords.latitude && marker.getPosition().longitude == chosenRestaurantCoords.longitude) {
+                    Log.d(TAG, "onMapReady: Correct marker found: marker.getPosition: " + marker.getPosition().toString());
+                    break;
+                }
+            }
+             */
+            /*
+            Marker currMarker;
+            // Log.d(TAG, "onMapReady: mMarkerArray.size(): " + mMarkerArray.size());
+            for (int i = 0; i < mMarkerArray.size(); i++) {
+                currMarker = mMarkerArray.get(i);
+                // Log.d(TAG, "onMapReady: marker[i]: currMarker [lat,lon]: [" + currMarker.getPosition().latitude + "," + currMarker.getPosition().longitude + "]");
+                // Log.d(TAG, "onMapReady: marker[i]: chosenRestaurantCoords [lat,lon]: [" + chosenRestaurantCoords.latitude + "," + chosenRestaurantCoords.longitude + "]");
+                if ((currMarker.getPosition().latitude == chosenRestaurantCoords.latitude) && (currMarker.getPosition().longitude == chosenRestaurantCoords.longitude)) {
+                    Log.d(TAG, "onMapReady: Found restaurant: currMarker position: " + currMarker.getPosition().toString());
+
+                    for( Marker m : mClusterManager.getMarkerCollection().getMarkers()) {
+                        if (m.getPosition().latitude == currMarker.getPosition().latitude && m.getPosition().longitude == currMarker.getPosition().longitude) {
+                            Log.d(TAG, "onMapReady: inside mClusterManager iteration, showing window");
+                            m.showInfoWindow();
+                        }
+                    }
+                    break;
+                }
+            }
+             */
+        }
 
         // Receive intent from Restaurant Activity
         Intent i_receive = getIntent();
@@ -512,6 +623,15 @@ public class MapsActivity extends AppCompatActivity
             hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_green);
         }
         return hazardIcon;
+    }
+
+    private double[] getChosenRestaurantLocation() {
+        // Return as [lat,long]
+        double restaurantLatitude = getIntent()
+                .getDoubleExtra(RestaurantActivity.RESTAURANT_LATITUDE_INTENT_TAG,-1);
+        double restaurantLongitude = getIntent()
+                .getDoubleExtra(RestaurantActivity.RESTAURANT_LONGITUDE_INTENT_TAG,-1);
+        return new double[]{restaurantLatitude, restaurantLongitude};
     }
 
     public static Intent makeIntent(Context context) {

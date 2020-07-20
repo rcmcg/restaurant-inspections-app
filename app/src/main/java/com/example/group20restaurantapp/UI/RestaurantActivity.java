@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.Restaurant;
@@ -28,6 +29,8 @@ import java.util.List;
 public class RestaurantActivity extends AppCompatActivity {
 
     public static final String RESTAURANT_ACTIVITY_INSPECTION_TAG = "inspection";
+    public static final String RESTAURANT_LATITUDE_INTENT_TAG = "Restaurant latitude";
+    public static final String RESTAURANT_LONGITUDE_INTENT_TAG = "Restaurant longitude";
     private RestaurantManager manager;
     List<Inspection> inspections;
     // int MapIndex;
@@ -92,12 +95,23 @@ public class RestaurantActivity extends AppCompatActivity {
         );
     }
 
-    private void setCoordsText(Restaurant restaurant) {
+    private void setCoordsText(final Restaurant restaurant) {
         TextView txtViewCoords = findViewById(R.id.coords_resActivity);
         String coordsString = "" + restaurant.getLatitude() + "," + restaurant.getLongitude();
         txtViewCoords.setText(
                 getString(R.string.restaurant_activity_restaurant_coords,coordsString)
         );
+
+        txtViewCoords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get intent from MapsActivity
+                Intent intent = MapsActivity.makeIntent(RestaurantActivity.this);
+                intent.putExtra(RESTAURANT_LATITUDE_INTENT_TAG, restaurant.getLatitude());
+                intent.putExtra(RESTAURANT_LONGITUDE_INTENT_TAG, restaurant.getLongitude());
+                startActivity(intent);
+            }
+        });
     }
 
     private void populateInspectionList(Restaurant restaurant) {
