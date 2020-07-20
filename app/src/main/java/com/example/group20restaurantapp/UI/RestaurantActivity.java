@@ -94,21 +94,20 @@ public class RestaurantActivity extends AppCompatActivity {
         );
     }
 
-    private void setCoordsText(Restaurant restaurant) {
+    private void setCoordsText(final Restaurant restaurant) {
         TextView txtViewCoords = findViewById(R.id.coords_resActivity);
         String coordsString = "" + restaurant.getLatitude() + "," + restaurant.getLongitude();
         txtViewCoords.setText(
                 getString(R.string.restaurant_activity_restaurant_coords,coordsString)
         );
-        final Restaurant temp = restaurant;
 
         txtViewCoords.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Get intent from MapsActivity
                 Intent intent = MapsActivity.makeIntent(RestaurantActivity.this);
-                intent.putExtra(RESTAURANT_LATITUDE_INTENT_TAG, temp.getLatitude());
-                intent.putExtra(RESTAURANT_LONGITUDE_INTENT_TAG, temp.getLongitude());
+                intent.putExtra(RESTAURANT_LATITUDE_INTENT_TAG, restaurant.getLatitude());
+                intent.putExtra(RESTAURANT_LONGITUDE_INTENT_TAG, restaurant.getLongitude());
                 startActivity(intent);
             }
         });

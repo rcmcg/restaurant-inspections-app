@@ -394,7 +394,7 @@ public class MapsActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if (mLocationPermissionsGranted) {
-            getDeviceLocation();
+            //getDeviceLocation();
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -419,9 +419,8 @@ public class MapsActivity extends AppCompatActivity
         registerClickCallback();
 
         // Move the camera to surrey
-        // TODO: The camera should pan to user's location on startup
-        LatLng surrey = new LatLng(49.104431, -122.801094);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
+        //LatLng surrey = new LatLng(49.104431, -122.801094);
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
 
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
@@ -429,9 +428,7 @@ public class MapsActivity extends AppCompatActivity
 
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
-            // Move the camera to surrey
-            // TODO: The camera should pan to user's location on startup
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surrey, 10));
+            getDeviceLocation();
         } else {
             Log.d(TAG, "onMapReady: Setting map to chosen restaurant coords");
             Log.d(TAG, "onMapReady: chosen restaurant lat: " + chosenRestaurantLatLon[0] + " chosen restaurant lon: " + chosenRestaurantLatLon[1]);
@@ -440,16 +437,21 @@ public class MapsActivity extends AppCompatActivity
                     chosenRestaurantLatLon[0],
                     chosenRestaurantLatLon[1]
             );
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, 20));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, DEFAULT_ZOOM));
 
-            Marker marker = mMap.addMarker(new MarkerOptions()
-                    .position(chosenRestaurantCoords));
-            marker.showInfoWindow();
+            Restaurant restaurant = manager.findRestaurantByLatLng(chosenRestaurantLatLon[0], chosenRestaurantLatLon[1]);
+            if (restaurant.getLongitude() ==  chosenRestaurantLatLon[1] &&
+                restaurant.getLatitude() ==  chosenRestaurantLatLon[0]) {
+                Marker marker = mMap.addMarker(new MarkerOptions()
+                        .position(chosenRestaurantCoords)
+                        .icon(getHazardIcon(restaurant)));
+                marker.showInfoWindow();
+            }
         }
 
         // Receive intent from Restaurant Activity
-        Intent i_receive = getIntent();
-        String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
+        //Intent i_receive = getIntent();
+        //String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
     }
 
     private void registerClickCallback() {
