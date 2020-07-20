@@ -1,6 +1,7 @@
 package com.example.group20restaurantapp.Model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
@@ -50,6 +51,21 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private String inspectionsLastModified = "";
 
     private boolean userBeenAskedToUpdateThisSession = false;
+    private boolean isDownloadCancelled = false;
+
+    OkHttpClient client = new OkHttpClient().newBuilder().build();
+
+    public boolean isDownloadCancelled() {
+        return isDownloadCancelled;
+    }
+
+    public void setDownloadCancelled(boolean downloadCancelled) {
+        isDownloadCancelled = downloadCancelled;
+    }
+
+    public void cancelDownloads() {
+        client.dispatcher().cancelAll();
+    }
 
     public void add(Restaurant restaurant){
         restaurantList.add(restaurant);
@@ -164,17 +180,18 @@ public class RestaurantManager implements Iterable<Restaurant>{
                         (hazardLevel.equalsIgnoreCase(hazardLevelFilter)));
     }
 
-    public String getURL(String requestURL) {
+    public String[] getURL(String requestURL) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
+        // OkHttpClient client = new OkHttpClient().newBuilder()
+           //      .build();
         Request request = new Request.Builder()
                 .url(requestURL)
                 .method("GET", null)
                 .build();
         String dataURL = "";
+        String lastModifiedDate = "";
         try {
             Response response = client.newCall(request).execute();
             String getJSON = response.body().string();
@@ -190,21 +207,21 @@ public class RestaurantManager implements Iterable<Restaurant>{
             else{
                 inspectionsLastModified = data.getString("last_modified");
             }
-            String lastModifiedDate = data.getString("last_modified");
+            lastModifiedDate = data.getString("last_modified");
 
         } catch (IOException | JSONException e) {
             Log.e("MYACTIVITY!", "ERROR!!!!");
             e.printStackTrace();
         }
-        return dataURL;
+        return new String[]{dataURL, lastModifiedDate};
     }
 
     public String getCSV(String DataURL) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
+        // OkHttpClient client = new OkHttpClient().newBuilder()
+                // .build();
         Request request = new Request.Builder()
                 .url(DataURL)
                 .method("GET", null)

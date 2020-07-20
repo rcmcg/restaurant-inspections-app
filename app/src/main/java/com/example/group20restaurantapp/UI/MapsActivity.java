@@ -4,12 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 
 import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.PegItem;
@@ -48,6 +51,15 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.util.List;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
         PleaseWaitDialogFragment.PleaseWaitDialogListener
@@ -62,6 +74,7 @@ public class MapsActivity extends AppCompatActivity
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    public static final String RESTAURANT_ACTIVITY_RESTAURANT_TAG = "restaurant";
     private static final String EXTRA_MESSAGE = "Extra";
     private Boolean mLocationPermissionsGranted = false;
     private Marker mMarker;
@@ -70,6 +83,14 @@ public class MapsActivity extends AppCompatActivity
     private ClusterManager<PegItem> mClusterManager;
     private Boolean updateData = false;
     private Boolean newData = false;
+
+    private String restaurantDataURL;
+    private String inspectionDataURL;
+
+    private Date currentDate;
+
+    private DialogFragment pleaseWaitDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,47 +104,123 @@ public class MapsActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        String restaurantDataURL = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
-        String inspectionDataURL = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
-        String newRestaurantData = manager.getCSV(restaurantDataURL); //Request updated restaurant data csv
-        String newInspectionData = manager.getCSV(inspectionDataURL); //Request updated restaurant data csv
+        currentDate = new Date();
+        long appLastUpdated = getAppLastUpdated(this);
 
-        //Write new csv from web server to internal storage
-        manager.writeToFile(newRestaurantData, WEB_SERVER_RESTAURANTS_CSV, this);
-        manager.writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV, this);
-
-        manager.readRestaurantData(this);
-        manager.readNewRestaurantData(this);
-
-        manager.initInspectionLists(this);
-        manager.initNewInspectionLists(this);
-
-        manager.sortInspListsByDate();
-        manager.sortRestaurantsByName();
-
-        // TODO: Check if there is new data on the server
-        // newData = manager.checkForNewData();
-        newData = true;
-
-        // TODO: Add one more outer if statement checking if it's been >= 20 hours since
-        // in-app data has been updated
-
-        if (newData) {
-            if (!manager.hasUserBeenAskedToUpdateThisSession()) {
-                showAskUserToUpdateDialog();
-                manager.setUserBeenAskedToUpdateThisSession(true);
+        // read data on startup
+        if (manager.getSize() == 0) {
+            if (appLastUpdated == -1) {
+                Log.d(TAG, "onCreate: Filling with default restaurants");
+                fillRestaurantManager(false);
+            } else {
+                Log.d(TAG, "onCreate: Filling with updated restaurants");
+                fillRestaurantManager(true);
             }
         }
 
-        // Read installed data
+        Log.d(TAG, "onCreate: Time since last update in hours: " +  timeSinceLastAppUpdateInHours(currentDate));
+        if (appLastUpdated == -1 || timeSinceLastAppUpdateInHours(currentDate) >= 20) {
+            // App has never been updated or it's been over 20 hours since the last update
+            Log.d(TAG, "onCreate: App has never been updated or it's been over 20 hours since the last update");
+
+            // Check server for new data
+            String[] restaurantDataURLDate = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
+            String[] inspectionDataURLDate = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
+
+            // Update global URL variables
+            restaurantDataURL = restaurantDataURLDate[0];
+            inspectionDataURL = inspectionDataURLDate[0];
+
+            // Get restaurant and inspection data last updated as Date
+            Date restaurantLastUpdatedDate = null;
+            Date inspectionLastUpdatedDate = null;
+            try {
+                restaurantLastUpdatedDate = getDateFromString(restaurantDataURLDate[1]);
+                inspectionLastUpdatedDate = getDateFromString(inspectionDataURLDate[1]);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            boolean restaurantDataOutOfDate = false, inspectionDataOutOfDate = false;
+            assert restaurantLastUpdatedDate != null;
+            if (restaurantLastUpdatedDate.getTime() > appLastUpdated) {
+                restaurantDataOutOfDate = true;
+            }
+
+            assert inspectionLastUpdatedDate != null;
+            if (inspectionLastUpdatedDate.getTime() > appLastUpdated) {
+                inspectionDataOutOfDate = true;
+            }
+
+            if (appLastUpdated == -1 || restaurantDataOutOfDate || inspectionDataOutOfDate) {
+                // App has never been updated or appData is out of date
+                if (!manager.hasUserBeenAskedToUpdateThisSession()) {
+                    Log.d(TAG, "onCreate: Asking user if they want to update");
+                    showAskUserToUpdateDialog();
+                    manager.setUserBeenAskedToUpdateThisSession(true);
+                }
+            }
+        }
 
         wireLaunchListButton();
     }
 
+    private void refillRestaurantManager() {
+        // Call this function when the RestaurantManager needs to be updated with new data
+        manager = RestaurantManager.getInstance();
+        manager.getRestaurants().clear();
+        fillRestaurantManager(true);
+    }
+
+    private void fillRestaurantManager(boolean hasAppBeenUpdated) {
+        manager = RestaurantManager.getInstance();
+        if (!hasAppBeenUpdated) {
+            manager.readRestaurantData(this);
+            manager.initInspectionLists(this);
+        } else {
+            manager.readNewRestaurantData(this);
+            manager.initNewInspectionLists(this);
+        }
+        manager.sortInspListsByDate();
+        manager.sortRestaurantsByName();
+    }
+
+    private Date getDateFromString(String rawString) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        return sdf.parse(rawString);
+    }
+
+    private long timeSinceLastAppUpdateInHours(Date currentDate) {
+        long appLastUpdatedInMs = getAppLastUpdated(this);
+        long diffInMs = currentDate.getTime() - appLastUpdatedInMs;
+        long diffInHours = TimeUnit.HOURS.convert(diffInMs, TimeUnit.MILLISECONDS);
+        return diffInHours;
+    }
+
+    private void saveAppLastUpdated(long currentDateInMs) {
+        SharedPreferences prefs = this.getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong("appLastUpdated", currentDateInMs);
+        editor.apply();
+    }
+
+    static public long getAppLastUpdated(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        return prefs.getLong("appLastUpdated", -1);
+    }
+
     public void showPleaseWaitDialog() {
         // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new PleaseWaitDialogFragment();
-        dialog.show(getSupportFragmentManager(), "PleaseWaitFragment");
+        pleaseWaitDialog = new PleaseWaitDialogFragment();
+        pleaseWaitDialog.show(getSupportFragmentManager(), "PleaseWaitFragment");
+    }
+
+    private void finishPleaseWaitDialog() {
+        // Log.d(TAG, "finishPleaseWaitDialog: entered");
+        if (pleaseWaitDialog != null) {
+            // Log.d(TAG, "finishPleaseWaitDialog: pleaseWaitDialog != null");
+            pleaseWaitDialog.dismiss();
+        }
     }
 
     @Override
@@ -132,8 +229,8 @@ public class MapsActivity extends AppCompatActivity
         Toast.makeText(MapsActivity.this,
                 "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
 
-        // Update global variable for onAskUserToUpdateDialogPositiveClick
-        // isDownloadCancelled = true;
+        manager.setDownloadCancelled(true);
+        manager.cancelDownloads();
     }
 
     public void showAskUserToUpdateDialog() {
@@ -146,26 +243,58 @@ public class MapsActivity extends AppCompatActivity
         // User touched the dialog's positive button
         Toast.makeText(MapsActivity.this,
                 "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
-        updateData = true; // this won't work
-
         // Launch please-wait dialog and start the download
         showPleaseWaitDialog();
 
-        // Start download
+        // Wait a few seconds
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                initiateDownload();
+            }
+        }, 2000);   // 2 seconds
+    }
 
-        // if (!isDownloadCancelled)
-            // finish the please wait dialog
-            // Update relevant data
-        // else
-            // do not update any data
+    private void initiateDownload() {
+        String newRestaurantData = "", newInspectionData = "";
+        if(!manager.isDownloadCancelled()) {
+            newRestaurantData = manager.getCSV(restaurantDataURL); //Request updated restaurant data csv
+        }
+
+        if (!manager.isDownloadCancelled()) {
+            newInspectionData = manager.getCSV(inspectionDataURL); //Request updated inspection data csv
+        }
+
+        // Log.d(TAG, "onAskUserToUpdateDialogPositiveClick: newRestaurantData: " + newRestaurantData);
+        // Log.d(TAG, "onAskUserToUpdateDialogPositiveClick: newInspectionData: " + newInspectionData);
+        Log.d(TAG, "onAskUserToUpdateDialogPositiveClick: finished getting new data or user cancelled");
+
+        // Finish please-wait dialog if it isn't already finished
+        finishPleaseWaitDialog();
+
+        if (!manager.isDownloadCancelled()) {
+            // Safe to write new data
+            manager.writeToFile(newRestaurantData, WEB_SERVER_RESTAURANTS_CSV, this);
+            Log.d(TAG, "initiateDownload: finished writing newRestaurantData");
+            manager.writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV, this);
+            Log.d(TAG, "initiateDownload: finished writing newInspectionData");
+
+            refillRestaurantManager();
+            saveAppLastUpdated(currentDate.getTime());
+
+            // Update the map
+            mClusterManager.clearItems();
+            mClusterManager.cluster();
+            setUpClusterer();
+            // mClusterManager.cluster();
+            refreshMap();
+        }
     }
 
     public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
         // User touched the dialog's negative button
         Toast.makeText(MapsActivity.this,
                 "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
-        // do nothing
-        // updateData = false;
     }
 
     private void getDeviceLocation() {
@@ -318,20 +447,6 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                // I don't think anything should happen unless you press a marker
-                // No need to re-initialize every map marker as far as I can tell
-
-                // Clear everything
-                // mClusterManager.clearItems();
-
-                // Clear the currently open marker
-                // mMap.clear();
-
-                // Reinitialize clusterManager
-                // setUpClusterer();
-
-                // Focus map on the position that was clicked on map
-                // moveCamera(latLng, 15f);
             }
         });
 
@@ -349,6 +464,7 @@ public class MapsActivity extends AppCompatActivity
      * DEFAULT_ZOOM = 15
      */
     private void moveCamera(LatLng latLng, float zoom) {
+        Log.d(TAG, "moveCamera: moving camera to: " + latLng);
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
         mMap.animateCamera(location);
     }
@@ -365,16 +481,18 @@ public class MapsActivity extends AppCompatActivity
 
     private void populateMapWithMarkers() {
         // Get Singleton RestaurantManager
-        for (Restaurant restaurant : manager.getRestaurants()) {
-            String temp = restaurant.getName();
+        RestaurantManager manager = RestaurantManager.getInstance();
+
+        for (Restaurant restaurant : manager) {
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
                     restaurant.getLongitude(),
-                    temp,
+                    restaurant.getName(),
                     getHazardIcon(restaurant)
             );
             mClusterManager.addItem(pegItem);
         }
+        mClusterManager.cluster();
     }
 
     private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
@@ -499,6 +617,3 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 }
-
-
-
