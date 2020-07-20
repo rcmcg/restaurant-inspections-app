@@ -442,85 +442,9 @@ public class MapsActivity extends AppCompatActivity
             );
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, 20));
 
-            /*for (Marker marker : visibleMarkers){
-                /*if (marker.getPosition().latitude == chosenRestaurantLatLon[0]
-                && marker.getPosition().longitude == chosenRestaurantLatLon[1]){
-                    marker.showInfoWindow();
-                }
-            }*/
-
-            /*Restaurant chosenRestaurant = new Restaurant();
-            for (Restaurant restaurant : manager.getRestaurants()){
-                if (restaurant.getLatitude() == chosenRestaurantLatLon[0]
-                && restaurant.getLongitude() == chosenRestaurantLatLon[1]){
-                    chosenRestaurant = restaurant;
-                }
-            }*/
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(chosenRestaurantCoords));
             marker.showInfoWindow();
-
-
-            // Open window of correct marker
-            /*
-            Marker chosenRestaurantMarker = null;
-            for (Marker marker : mMarkerArray) {
-                if (marker.getPosition().latitude == chosenRestaurantCoords.latitude && marker.getPosition().longitude == chosenRestaurantCoords.longitude) {
-                    chosenRestaurantMarker = marker;
-                    Log.d(TAG, "onMapReady: found chosenRestaurantMarker: " + chosenRestaurantMarker.getPosition().toString());
-                    break;
-                }
-            }
-
-             */
-
-            // Add a new marker
-            // mClusterManager.cluster();
-            // Log.d(TAG, "onMapReady: mClusterManager.getMarkerCollection().getMarkers().size(): " + mClusterManager.getMarkerCollection().getMarkers().size());
-            // mClusterManager.getMarkerCollection().getMarkers().size();
-
-            /*
-            java.util.Collection<Marker> markerCollection = mClusterManager.getMarkerCollection().;
-            ArrayList<Marker> userList = new ArrayList<>(markerCollection);
-            Log.d(TAG, "onMapReady: userList.size() " + userList.size());
-            for (Marker marker : userList) {
-                if (marker.getPosition().latitude == chosenRestaurantCoords.latitude && marker.getPosition().longitude == chosenRestaurantCoords.longitude) {
-                    marker.showInfoWindow();
-                }
-            }
-
-             */
-
-            /*
-            Log.d(TAG, "onMapReady: mClusterManager.getMarkerCollection().getMarkers().size(): " + mClusterManager.getMarkerCollection().getMarkers().size());
-            for (Marker marker : mClusterManager.getMarkerCollection().getMarkers()) {
-                Log.d(TAG, "onMapReady: marker.getPosition: " + marker.getPosition().toString());
-                if (marker.getPosition().latitude == chosenRestaurantCoords.latitude && marker.getPosition().longitude == chosenRestaurantCoords.longitude) {
-                    Log.d(TAG, "onMapReady: Correct marker found: marker.getPosition: " + marker.getPosition().toString());
-                    break;
-                }
-            }
-             */
-            /*
-            Marker currMarker;
-            // Log.d(TAG, "onMapReady: mMarkerArray.size(): " + mMarkerArray.size());
-            for (int i = 0; i < mMarkerArray.size(); i++) {
-                currMarker = mMarkerArray.get(i);
-                // Log.d(TAG, "onMapReady: marker[i]: currMarker [lat,lon]: [" + currMarker.getPosition().latitude + "," + currMarker.getPosition().longitude + "]");
-                // Log.d(TAG, "onMapReady: marker[i]: chosenRestaurantCoords [lat,lon]: [" + chosenRestaurantCoords.latitude + "," + chosenRestaurantCoords.longitude + "]");
-                if ((currMarker.getPosition().latitude == chosenRestaurantCoords.latitude) && (currMarker.getPosition().longitude == chosenRestaurantCoords.longitude)) {
-                    Log.d(TAG, "onMapReady: Found restaurant: currMarker position: " + currMarker.getPosition().toString());
-
-                    for( Marker m : mClusterManager.getMarkerCollection().getMarkers()) {
-                        if (m.getPosition().latitude == currMarker.getPosition().latitude && m.getPosition().longitude == currMarker.getPosition().longitude) {
-                            Log.d(TAG, "onMapReady: inside mClusterManager iteration, showing window");
-                            m.showInfoWindow();
-                        }
-                    }
-                    break;
-                }
-            }
-             */
         }
 
         // Receive intent from Restaurant Activity

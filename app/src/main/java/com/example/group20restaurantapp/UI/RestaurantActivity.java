@@ -16,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.Restaurant;
@@ -95,20 +94,21 @@ public class RestaurantActivity extends AppCompatActivity {
         );
     }
 
-    private void setCoordsText(final Restaurant restaurant) {
+    private void setCoordsText(Restaurant restaurant) {
         TextView txtViewCoords = findViewById(R.id.coords_resActivity);
         String coordsString = "" + restaurant.getLatitude() + "," + restaurant.getLongitude();
         txtViewCoords.setText(
                 getString(R.string.restaurant_activity_restaurant_coords,coordsString)
         );
+        final Restaurant temp = restaurant;
 
         txtViewCoords.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Get intent from MapsActivity
                 Intent intent = MapsActivity.makeIntent(RestaurantActivity.this);
-                intent.putExtra(RESTAURANT_LATITUDE_INTENT_TAG, restaurant.getLatitude());
-                intent.putExtra(RESTAURANT_LONGITUDE_INTENT_TAG, restaurant.getLongitude());
+                intent.putExtra(RESTAURANT_LATITUDE_INTENT_TAG, temp.getLatitude());
+                intent.putExtra(RESTAURANT_LONGITUDE_INTENT_TAG, temp.getLongitude());
                 startActivity(intent);
             }
         });
