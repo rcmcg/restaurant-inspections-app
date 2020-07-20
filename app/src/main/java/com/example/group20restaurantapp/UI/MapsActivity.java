@@ -38,10 +38,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.Algorithm;
 import com.google.maps.android.clustering.view.ClusterRenderer;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -182,6 +184,18 @@ public class MapsActivity extends AppCompatActivity
 
         Log.d(TAG, "onMapReady: chosenRestaurantLatLon = [" + chosenRestaurantLatLon[0]
                 + "," + chosenRestaurantLatLon[1] + "]");
+        LatLng chosenRestaurantCoords = null;
+
+        registerClickCallback();
+
+        // Move the camera to surrey
+        // TODO: The camera should pan to user's location on startup
+        // LatLng surrey = new LatLng(49.104431, -122.801094);
+        // mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
+
+        //Set Custom InfoWindow Adapter
+        CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
+        mMap.setInfoWindowAdapter(adapter);
 
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
@@ -193,11 +207,30 @@ public class MapsActivity extends AppCompatActivity
             Log.d(TAG, "onMapReady: Setting map to chosen restaurant coords");
             Log.d(TAG, "onMapReady: chosen restaurant lat: " + chosenRestaurantLatLon[0] + " chosen restaurant lon: " + chosenRestaurantLatLon[1]);
 
-            LatLng chosenRestaurantCoords = new LatLng(
+            chosenRestaurantCoords = new LatLng(
                     chosenRestaurantLatLon[0],
                     chosenRestaurantLatLon[1]
             );
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, 20));
+
+            /*for (Marker marker : visibleMarkers){
+                /*if (marker.getPosition().latitude == chosenRestaurantLatLon[0]
+                && marker.getPosition().longitude == chosenRestaurantLatLon[1]){
+                    marker.showInfoWindow();
+                }
+            }*/
+
+            /*Restaurant chosenRestaurant = new Restaurant();
+            for (Restaurant restaurant : manager.getRestaurants()){
+                if (restaurant.getLatitude() == chosenRestaurantLatLon[0]
+                && restaurant.getLongitude() == chosenRestaurantLatLon[1]){
+                    chosenRestaurant = restaurant;
+                }
+            }*/
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .position(chosenRestaurantCoords));
+            marker.showInfoWindow();
+
 
             // Open window of correct marker
             /*
@@ -260,17 +293,6 @@ public class MapsActivity extends AppCompatActivity
             }
              */
         }
-
-        registerClickCallback();
-
-        // Move the camera to surrey
-        // TODO: The camera should pan to user's location on startup
-        // LatLng surrey = new LatLng(49.104431, -122.801094);
-        // mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
-
-        //Set Custom InfoWindow Adapter
-        CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
-        mMap.setInfoWindowAdapter(adapter);
 
         // Receive intent from Restaurant Activity
         Intent i_receive = getIntent();
