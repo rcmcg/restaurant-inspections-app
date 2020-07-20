@@ -293,7 +293,7 @@ public class MapsActivity extends AppCompatActivity
             mClusterManager.clearItems();
             mClusterManager.cluster();
             setUpClusterer();
-            // mClusterManager.cluster();
+             //mClusterManager.cluster();
             refreshMap();
         }
     }
@@ -397,18 +397,15 @@ public class MapsActivity extends AppCompatActivity
             //getDeviceLocation();
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
+                            != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED
+            ) {
                 // TODO: Remove this return statement? What is it for?
                 return;
             }
             mMap.setMyLocationEnabled(true);
         }
-
         mMap.getUiSettings().setZoomControlsEnabled(true);
-
-        setUpClusterer();
 
         double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
 
@@ -416,11 +413,8 @@ public class MapsActivity extends AppCompatActivity
                 + "," + chosenRestaurantLatLon[1] + "]");
         LatLng chosenRestaurantCoords = null;
 
+        setUpClusterer();
         registerClickCallback();
-
-        // Move the camera to surrey
-        //LatLng surrey = new LatLng(49.104431, -122.801094);
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
 
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
@@ -441,17 +435,13 @@ public class MapsActivity extends AppCompatActivity
 
             Restaurant restaurant = manager.findRestaurantByLatLng(chosenRestaurantLatLon[0], chosenRestaurantLatLon[1]);
             if (restaurant.getLongitude() ==  chosenRestaurantLatLon[1] &&
-                restaurant.getLatitude() ==  chosenRestaurantLatLon[0]) {
+                    restaurant.getLatitude() ==  chosenRestaurantLatLon[0]) {
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .position(chosenRestaurantCoords)
                         .icon(getHazardIcon(restaurant)));
                 marker.showInfoWindow();
             }
         }
-
-        // Receive intent from Restaurant Activity
-        //Intent i_receive = getIntent();
-        //String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
     }
 
     private void registerClickCallback() {
@@ -529,7 +519,7 @@ public class MapsActivity extends AppCompatActivity
             );
             mClusterManager.addItem(pegItem);
         }
-        mClusterManager.cluster();
+        //mClusterManager.cluster();
     }
 
     private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
