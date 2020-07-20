@@ -116,25 +116,46 @@ public class Restaurant {
         }
 
 
-        public void setImgId(){
+        public void setImgId() {
             name = this.getName();
-            if (name.matches("(.*)A&W(.*)")){
+            String first = String.valueOf(name.charAt(0));
+            String second = String.valueOf(name.charAt(1));
+
+            if (name.matches("(.*)A&W(.*)")) {
                 iconImgId = R.drawable.a_and_w;
-            }
-            else if (name.matches("Lee Yuen Seafood Restaurant")){
-                iconImgId =  R.drawable.lee_yuen;
-            }
-            else if (name.matches("The Unfindable Bar")){
-                iconImgId =  R.drawable.the_unfindable_bar;
-            }
-            else if (name.matches("Top in Town Pizza") || name.matches("Top In Town Pizza")){
-                iconImgId =  R.drawable.restaurant_pizza;
-            }
-            else if (name.matches("104 Sushi & Co.")){
-                iconImgId =  R.drawable.sushi_and_co;
-            } else if (name.matches("Zugba Flame Grilled Chicken")){
-                iconImgId =  R.drawable.zugba_flame_grilled_chicken;
-            } else {
+            } else if (name.matches("A & W #0755")) {
+                iconImgId = R.drawable.a_and_w;
+            } else if (name.matches("Lee Yuen Seafood Restaurant")) {
+                iconImgId = R.drawable.lee_yuen;
+            } else if (name.matches("The Unfindable Bar")) {
+                iconImgId = R.drawable.the_unfindable_bar;
+            } else if (name.matches("Top in Town Pizza") || name.matches("Top In Town Pizza")) {
+                iconImgId = R.drawable.restaurant_pizza;
+            } else if (name.matches("104 Sushi & Co.")) {
+                iconImgId = R.drawable.sushi_and_co;
+            } else if (name.matches("Zugba Flame Grilled Chicken")) {
+                iconImgId = R.drawable.zugba_flame_grilled_chicken;
+            } else if (name.matches("7-Eleven(.*)")) {
+                iconImgId = R.drawable.seven_eleven;
+
+            } else if (name.matches("5 Star Catering")) {
+                iconImgId = R.drawable.five_star_logo;
+            } else if (name.matches("555 Pizza Ltd")) {
+                iconImgId = R.drawable.triple_five;
+            } else if (name.matches("777 Pizza & Donair")) {
+                iconImgId = R.drawable.triple_pizza_donair;
+            } else if (name.matches("Adana Grill")) {
+                iconImgId = R.drawable.adana_grill;
+            } else if (name.matches("Afghan Kitchen")) {
+                iconImgId = R.drawable.afghan_kitchen;
+            } else if (name.matches("Aggarwal Sweets")) {
+                iconImgId = R.drawable.aggarwal;
+
+            }else if(name.matches("Bengal Grill Restaurant")){
+                iconImgId=R.drawable.bengal_grill;
+            }else if(name.matches("Browns Socialhouse(.*)")) {
+                iconImgId=R.drawable.brown;
+            }else {
                 // Generic image if restaurant not found
                 iconImgId =  R.drawable.restaurant_icon_clipart;
             }
