@@ -1,5 +1,6 @@
 package com.example.group20restaurantapp.UI;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.PegItem;
 import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
@@ -19,9 +21,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -170,6 +176,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnCameraIdleListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);
 
+        mClusterManager.setRenderer(new MyClusterRenderer(this, mMap, mClusterManager));
+
         addItems();
     }
 
@@ -177,13 +185,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         double lat, lng;
         String title;
         String snippet = "this is the snippet";
+        BitmapDescriptor icon;
         for (Restaurant restaurant : manager) {
             lat = restaurant.getLatitude();
             lng = restaurant.getLongitude();
             title = restaurant.getName();
-            PegItem infoWindowItem = new PegItem(lat,lng, title, snippet);
+            icon = getBitmapDescriptorForPegItem(restaurant);
+            PegItem infoWindowItem = new PegItem(lat,lng, title, snippet, icon);
             mClusterManager.addItem(infoWindowItem);
         }
+    }
+
+    private BitmapDescriptor getBitmapDescriptorForPegItem(Restaurant restaurant) {
+        BitmapDescriptor icon;
+        Inspection lastInspection = null;
+        if (restaurant.getInspectionSize() != 0) {
+            lastInspection = restaurant.getInspectionList().get(0);
+            if (lastInspection.getHazardRating().equals("Low")) {
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.yellow_triangle_small);
+            } else if (lastInspection.getHazardRating().equals("Moderate")) {
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.orange_diamond_small);
+            } else {
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.red_octagon_small);
+            }
+        } else {
+            icon = BitmapDescriptorFactory.fromResource(R.drawable.no_inspection_qmark_small);
+        }
+        return icon;
     }
 
     private void saveAppLastUpdated(long currentDateInMs) {
@@ -201,5 +229,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
+    }
+
+    private class MyClusterRenderer extends DefaultClusterRenderer<PegItem> {
+
+        public MyClusterRenderer(Context context, GoogleMap map, ClusterManager<PegItem> clusterManager) {
+            super(context, map, clusterManager);
+        }
+
+        @Override
+        protected void onBeforeClusterItemRendered(@NonNull PegItem item, @NonNull MarkerOptions markerOptions) {
+            markerOptions.icon(item.getIcon());
+            super.onBeforeClusterItemRendered(item, markerOptions);
+        }
+
+        @Override
+        protected boolean shouldRenderAsCluster(@NonNull Cluster<PegItem> cluster) {
+            return (cluster.getSize() >= 8);
+        }
     }
 }
