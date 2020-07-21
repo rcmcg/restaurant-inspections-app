@@ -573,7 +573,7 @@ public class MapsActivity extends AppCompatActivity
             }
         }
         else{
-            hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_yellow_triangle);
+            hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_question_mark);
         }
         return hazardIcon;
     }
@@ -615,37 +615,28 @@ public class MapsActivity extends AppCompatActivity
             double lng = latLngF.longitude;
             Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng);
 
-            // Fill the view
             ImageView logo = itemView.findViewById(R.id.info_item_restaurantLogo);
-
             logo.setImageResource(restaurant.getIconImgId());
 
             TextView restaurantNameText = itemView.findViewById(R.id.info_item_restaurantName);
-
-            String temp = restaurant.getName();
-
-            if (temp.length() > 25) {
-                temp = temp.substring(0, 25) + "...";
-            }
-            restaurantNameText.setText(temp);
+            restaurantNameText.setText(restaurant.getName());
 
             TextView addressText = itemView.findViewById(R.id.info_item_address);
             addressText.setText(restaurant.getAddress());
 
-            Inspection RecentInspection = null;
             TextView lastInspectionText = itemView.findViewById(R.id.info_item_lastInspection);
             ImageView hazard = itemView.findViewById(R.id.info_item_hazardImage);
 
+            Inspection recentInspection = null;
             if (restaurant.getInspectionSize() > 0) {
-                RecentInspection = restaurant.getInspectionList().get(0);
-                //lastInspectionText.setText(RecentInspection.getInspectionDate());
+                recentInspection = restaurant.getInspectionList().get(0);
                 lastInspectionText.setText(
                         getString(
                                 R.string.restaurant_activity_inspection_item_date,
-                                RecentInspection.intelligentInspectDate())
+                                recentInspection.intelligentInspectDate())
                 );
 
-                String level = RecentInspection.getHazardRating();
+                String level = recentInspection.getHazardRating();
                 if (level.equals("Low")) {
                     hazard.setImageResource(R.drawable.yellow_triangle);
                 } else if (level.equals("Moderate")) {
@@ -654,7 +645,7 @@ public class MapsActivity extends AppCompatActivity
                     hazard.setImageResource(R.drawable.red_octogon);
                 }
             } else {
-                lastInspectionText.setText("");
+                // Leave text as default
                 hazard.setImageResource(R.drawable.no_inspection_qmark);
             }
             return itemView;
