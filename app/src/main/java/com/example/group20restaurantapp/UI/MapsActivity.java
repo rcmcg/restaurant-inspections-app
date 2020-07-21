@@ -557,7 +557,6 @@ public class MapsActivity extends AppCompatActivity
             );
             mClusterManager.addItem(pegItem);
         }
-        mClusterManager.cluster();
     }
 
     private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
