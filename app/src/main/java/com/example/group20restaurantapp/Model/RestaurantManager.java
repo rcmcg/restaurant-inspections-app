@@ -30,6 +30,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * Singleton class which contains all instances of Restaurant
  */
@@ -52,6 +54,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     private boolean userBeenAskedToUpdateThisSession = false;
     private boolean isDownloadCancelled = false;
+
+    public int numRestaurantsFromReadNewData = 0;
 
     OkHttpClient client = new OkHttpClient().newBuilder().build();
 
@@ -111,6 +115,10 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return restaurantList.size();
     }
 
+    public void resetRestaurantList() {
+        restaurantList.clear();
+    }
+
     public boolean hasUserBeenAskedToUpdateThisSession() {
         return userBeenAskedToUpdateThisSession;
     }
@@ -151,6 +159,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return null;
     }
 
+    /*
     public List<Restaurant> getRestaurants() {
         searchTerm = searchTerm.trim();
         if (searchTerm.isEmpty() &&
@@ -170,6 +179,9 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return filteredRestaurants;
     }
 
+     */
+
+    /*
     private boolean qualifies(Restaurant restaurant) {
         String restaurantName = restaurant.getName();
         restaurantName = restaurantName.toLowerCase();
@@ -179,6 +191,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 ((hazardLevelFilter.equalsIgnoreCase("All")) ||
                         (hazardLevel.equalsIgnoreCase(hazardLevelFilter)));
     }
+
+     */
 
     public String[] getURL(String requestURL) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -331,8 +345,17 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 newRestaurant.setLatitude(Double.parseDouble(restaurantData[5]));
                 newRestaurant.setLongitude(Double.parseDouble(restaurantData[6]));
                 newRestaurant.setImgId();
+                
+                if (newRestaurant.getName().equals("Dragon Lounge")) {
+                    Log.d(TAG, "readNewRestaurantData: adding Dragon Lounge to restaurantManager");
+                }
 
-                add(newRestaurant);
+                numRestaurantsFromReadNewData++;
+
+                // testing pls remove this if statement
+                if (newRestaurant.getName().equals("Dragon Lounge") || true) {
+                    add(newRestaurant);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -346,6 +369,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
             }
         }
     }
+
+    public int getNumRestaurantsFromReadNewData() { return numRestaurantsFromReadNewData; }
 
     public void initInspectionLists(Context context) {
         // Create arrays for briefDescriptions of violations
@@ -453,6 +478,10 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 lineSplit[0] = lineSplit[0].replace(" ", "");
 
                 //Find restaurant with matching report tracking number being read
+
+                // if (!prevTrackingNum.equals(lineSplit[0])){
+
+                // if (!prevTrackingNum.equals(lineSplit[0]) && lineSplit[0].equals("ACAK-96MQ4H")) {
                 if (!prevTrackingNum.equals(lineSplit[0])){
                     i = 0;
                     while (!lineSplit[0].equals(RestaurantManager.getInstance().getIndex(i).getTrackingNumber())) {
@@ -468,80 +497,81 @@ public class RestaurantManager implements Iterable<Restaurant>{
                         continue;
                     }
                 }
-                //Initializing inspection object variables
-                Inspection inspection = new Inspection();
-                inspection.setTrackingNumber(lineSplit[0].replace(" ", ""));
-                inspection.setInspectionDate(lineSplit[1]);
-                inspection.setInspType(lineSplit[2]);
-                inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
-                inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
 
-                if (lineSplit[5].equals(",Low") || lineSplit[5].equals(",")){
-                    inspection.setHazardRating("Low");
-                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
-                    continue;
-                }
-                if (lineSplit[5].equals(",Moderate")){
-                    inspection.setHazardRating("Moderate");
-                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
-                    continue;
-                }
-                if (lineSplit[5].equals(",High")){
-                    inspection.setHazardRating("High");
-                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
-                    continue;
-                }
-                String[] violationsArr = lineSplit[5].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
 
-                for (int violCount = 0; violCount < violationsArr.length; violCount++) { // For each token, split it up farther into number, crit, details, repeat
-                    String[] violSplit = violationsArr[violCount].split(",", 3);
 
-                    int violNumber = Integer.parseInt(violSplit[0]);
+                if (lineSplit[0].equals("ACAK-96MQ4H") || true) {
+                    //Initializing inspection object variables
+                    Inspection inspection = new Inspection();
+                    inspection.setTrackingNumber(lineSplit[0].replace(" ", ""));
+                    inspection.setInspectionDate(lineSplit[1]);
+                    inspection.setInspType(lineSplit[2]);
+                    inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
+                    inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
 
-                    boolean crit = false;
-                    if (violSplit[1].equals("Critical")) {
-                        violSplit[2] = violSplit[2].replace("Critical", "");
-                        crit = true;
-                    }
-                    else{
-                        violSplit[2] = violSplit[2].replace("Not Critical", "");
-                    }
-
-                    boolean repeat = true;
-                    if (violSplit[2].contains("Not Repeat")){
-                        violSplit[2] = violSplit[2].replace("Not Repeat", "");
-                        repeat = false;
-                    }
-                    else{
-                        violSplit[2] = violSplit[2].replace("Repeat", "");
-                    }
-
-                    if (violSplit[2].contains("Moderate")){
-                        violSplit[2] = violSplit[2].replace("Moderate", "");
-                        inspection.setHazardRating("Moderate");
-                    }
-                    else if (violSplit[2].contains("High")){
-                        violSplit[2] = violSplit[2].replace("High", "");
-                        inspection.setHazardRating("High");
-                    }
-                    else{
-                        violSplit[2] = violSplit[2].replace("Low", "");
+                    if (lineSplit[5].equals(",Low") || lineSplit[5].equals(",")) {
                         inspection.setHazardRating("Low");
+                        RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                        continue;
                     }
+                    if (lineSplit[5].equals(",Moderate")) {
+                        inspection.setHazardRating("Moderate");
+                        RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                        continue;
+                    }
+                    if (lineSplit[5].equals(",High")) {
+                        inspection.setHazardRating("High");
+                        RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                        continue;
+                    }
+                    String[] violationsArr = lineSplit[5].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
 
-                    String briefDesc;
-                    if (violNumbers.indexOf(violNumber) == -1){
-                        briefDesc = "Construction plans ignoring Regulations";
-                    }
-                    else{
-                        int briefDescIndex = violNumbers.indexOf(violNumber);
-                        briefDesc = violBriefDescriptions.get(briefDescIndex);
-                    }
+                    for (int violCount = 0; violCount < violationsArr.length; violCount++) { // For each token, split it up farther into number, crit, details, repeat
+                        String[] violSplit = violationsArr[violCount].split(",", 3);
 
-                    Violation violObj = new Violation(violNumber, crit, violSplit[2], briefDesc, repeat);
-                    inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
+                        int violNumber = Integer.parseInt(violSplit[0]);
+
+                        boolean crit = false;
+                        if (violSplit[1].equals("Critical")) {
+                            violSplit[2] = violSplit[2].replace("Critical", "");
+                            crit = true;
+                        } else {
+                            violSplit[2] = violSplit[2].replace("Not Critical", "");
+                        }
+
+                        boolean repeat = true;
+                        if (violSplit[2].contains("Not Repeat")) {
+                            violSplit[2] = violSplit[2].replace("Not Repeat", "");
+                            repeat = false;
+                        } else {
+                            violSplit[2] = violSplit[2].replace("Repeat", "");
+                        }
+
+                        if (violSplit[2].contains("Moderate")) {
+                            violSplit[2] = violSplit[2].replace("Moderate", "");
+                            inspection.setHazardRating("Moderate");
+                        } else if (violSplit[2].contains("High")) {
+                            violSplit[2] = violSplit[2].replace("High", "");
+                            inspection.setHazardRating("High");
+                        } else {
+                            violSplit[2] = violSplit[2].replace("Low", "");
+                            inspection.setHazardRating("Low");
+                        }
+
+                        String briefDesc;
+                        if (violNumbers.indexOf(violNumber) == -1) {
+                            briefDesc = "Construction plans ignoring Regulations";
+                        } else {
+                            int briefDescIndex = violNumbers.indexOf(violNumber);
+                            briefDesc = violBriefDescriptions.get(briefDescIndex);
+                        }
+
+                        Violation violObj = new Violation(violNumber, crit, violSplit[2], briefDesc, repeat);
+                        inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
+                    }
+                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+
                 }
-                RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
             }
         } catch (IOException e){
             e.printStackTrace();

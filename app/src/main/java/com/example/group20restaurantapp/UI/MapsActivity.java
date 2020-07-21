@@ -102,6 +102,9 @@ public class MapsActivity extends AppCompatActivity
 
     private DialogFragment pleaseWaitDialog;
 
+    private Boolean testDragonLoungeCluster = false;
+    private int testIter = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,6 +175,9 @@ public class MapsActivity extends AppCompatActivity
             }
         }
 
+        System.out.println(manager.numRestaurantsFromReadNewData);
+        manager.getSize();
+
         wireLaunchListButton();
     }
 
@@ -179,7 +185,8 @@ public class MapsActivity extends AppCompatActivity
     private void refillRestaurantManager() {
         // Call this function when the RestaurantManager needs to be updated with new data
         manager = RestaurantManager.getInstance();
-        manager.getRestaurants().clear();
+        // manager.getRestaurants().clear();
+        manager.resetRestaurantList();
         fillRestaurantManager(true);
     }
 
@@ -432,6 +439,7 @@ public class MapsActivity extends AppCompatActivity
         LatLng chosenRestaurantCoords = null;
 
         setUpClusterer();
+        mClusterManager.cluster();
         registerClickCallback();
 
         //Set Custom InfoWindow Adapter
@@ -439,8 +447,16 @@ public class MapsActivity extends AppCompatActivity
         mMap.setInfoWindowAdapter(adapter);
 
         // move camera to Surrey first
-        LatLng surrey = new LatLng(49.104431, -122.801094);
-        moveCamera(surrey, 10);
+        // LatLng surrey = new LatLng(49.104431, -122.801094);
+        // moveCamera(surrey, 10);
+
+        // move camera to Dragon Lounge for testing
+        LatLng dragonLounge = new LatLng(49.11171722,-122.72962952);
+        moveCamera(dragonLounge, 20);
+
+        // move camera to a different restaurant for testing
+        // LatLng hazelmereGolfTennis  = new LatLng(49.01621628,-122.71914673);
+        // moveCamera(hazelmereGolfTennis, 20);
 
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
@@ -482,6 +498,17 @@ public class MapsActivity extends AppCompatActivity
                 }
             }, 1000);
         }
+
+        // dragon lounge testing
+        /*
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                testDragonLoungeCluster = true;
+            }
+        }, 3000);   // 2 seconds
+
+         */
 
         // Receive intent from Restaurant Activity
         // Intent i_receive = getIntent();
@@ -562,6 +589,9 @@ public class MapsActivity extends AppCompatActivity
         Log.d(TAG, "populateMapWithMarkers: Populating map with markers");
 
         for (Restaurant restaurant : manager) {
+            if (restaurant.getName().equals("Dragon Lounge")) {
+                Log.d(TAG, "populateMapWithMarkers: adding Dragon Lounge to cluster manager");
+            }
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
                     restaurant.getLongitude(),
@@ -579,11 +609,20 @@ public class MapsActivity extends AppCompatActivity
         if (RecentInspection != null) {
             String hazardLevel = RecentInspection.getHazardRating();
             if (hazardLevel.equals("Low")) {
+                if (restaurant.getName().equals("Dragon Lounge")) {
+                    Log.d(TAG, "getHazardIcon: setting marker icon for Dragon Lounge to yellow triangle");
+                }
                 hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_yellow_triangle);
+                // hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_tank);
             } else if (hazardLevel.equals("Moderate")) {
+                if (restaurant.getName().equals("Dragon Lounge")) {
+                    Log.d(TAG, "getHazardIcon: setting marker icon for Dragon Lounge to orange diamond");
+                }
                 hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_orange_diamond);
+                // hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_coat_of_arms);
             } else {
                 hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_red_octagon);
+                // hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_no_nazi);
             }
         }
         else{
@@ -604,7 +643,6 @@ public class MapsActivity extends AppCompatActivity
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
     }
-
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
@@ -692,6 +730,17 @@ public class MapsActivity extends AppCompatActivity
             markerOptions.icon(item.getHazard());
             markerOptions.title(item.getTitle());
             super.onBeforeClusterItemRendered(item, markerOptions);
+        }
+
+        @Override
+        protected void onClusterItemRendered(PegItem clusterItem, Marker marker) {
+            if (testDragonLoungeCluster && testIter < 10) {
+                mClusterManager.getMarkerCollection().getMarkers().size();
+                clusterItem.getHazard();
+                testDragonLoungeCluster = false;
+                testIter = 10;
+            }
+            super.onClusterItemRendered(clusterItem, marker);
         }
 
         @Override
