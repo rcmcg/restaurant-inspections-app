@@ -1,10 +1,8 @@
 package com.example.group20restaurantapp.Model;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.group20restaurantapp.R;
 
@@ -18,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,11 +39,11 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
     private List<Restaurant> restaurantList = new ArrayList<>();
-    private static RestaurantManager  instance;
-    private String searchTerm = "";
-    private String hazardLevelFilter = "All";
-    private String comparator = "All";
-    private boolean favouriteOnly = false;
+    private static RestaurantManager manager;
+    // private String searchTerm = "";
+    // private String hazardLevelFilter = "All";
+    // private String comparator = "All";
+    // private boolean favouriteOnly = false;
     private List<Integer> violNumbers = new ArrayList<>();
     private List<String> violBriefDescriptions = new ArrayList<>();
     private String restaurantsLastModified = "";
@@ -54,8 +51,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     private boolean userBeenAskedToUpdateThisSession = false;
     private boolean isDownloadCancelled = false;
-
-    public int numRestaurantsFromReadNewData = 0;
 
     OkHttpClient client = new OkHttpClient().newBuilder().build();
 
@@ -83,8 +78,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public Restaurant getIndex(int n){
         return restaurantList.get(n);
     }
-    // Singleton class and adding restaurants from CSV
 
+    // Singleton class and adding restaurants from CSV
     public int findIndex(Restaurant restaurant){
         for(int i = 0 ; i < restaurantList.size() ; i++){
             if(restaurant == restaurantList.get(i)){
@@ -98,12 +93,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
         // Prevent from instantiating
     }
 
-    //Returns a single instance of the restaurant objects
+    // Returns a single instance of the RestaurantManager
     public static RestaurantManager getInstance() {
-        if (instance == null) {
-            instance = new RestaurantManager();
+        if (manager == null) {
+            manager = new RestaurantManager();
         }
-        return instance;
+        return manager;
     }
 
     @Override
@@ -150,9 +145,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
     }
 
-    public Restaurant findRestaurantByLatLng(double latitude, double longitude) {
-        for (Restaurant restaurant: restaurantList) {
-            if (restaurant.getLatitude() == latitude && restaurant.getLongitude() == longitude) {
+    public Restaurant findRestaurantByLatLng(double latitude, double longtitude, String name) {
+        for (Restaurant restaurant : restaurantList) {
+            if (
+                    restaurant.getLatitude() == latitude
+                    && restaurant.getLongitude() == longtitude
+                    && restaurant.getName().equals(name)
+                )
+            {
                 return restaurant;
             }
         }
@@ -191,15 +191,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 ((hazardLevelFilter.equalsIgnoreCase("All")) ||
                         (hazardLevel.equalsIgnoreCase(hazardLevelFilter)));
     }
-
      */
 
     public String[] getURL(String requestURL) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        // OkHttpClient client = new OkHttpClient().newBuilder()
-           //      .build();
         Request request = new Request.Builder()
                 .url(requestURL)
                 .method("GET", null)
@@ -234,8 +231,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        // OkHttpClient client = new OkHttpClient().newBuilder()
-                // .build();
         Request request = new Request.Builder()
                 .url(DataURL)
                 .method("GET", null)
@@ -244,7 +239,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         try {
             Response response = client.newCall(request).execute();
             csv = response.body().string();
-            //Log.d("MyActivity", getCSV); //Dump updated restaurants CSV into logcat
+            //Log.d("MyActivity", getCSV); // Dump updated restaurants CSV into logcat
 
         } catch (IOException e) {
             Log.e("MYACTIVITY!", "ERROR!!!!");
@@ -258,12 +253,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
         try {
             fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
             fos.write(newData.getBytes());
-            //Toast.makeText(this, "Saved to " + context.getFilesDir() + "/" + fileName, Toast.LENGTH_LONG).show();
+            // Toast.makeText(this, "Saved to " + context.getFilesDir() + "/" + fileName, Toast.LENGTH_LONG).show();
 
         } catch (IOException e) {
             e.printStackTrace();
         } finally{
-            //Execute even if catch
+            // Execute even if catch
             if(fos != null){
                 try {
                     fos.close();
@@ -349,13 +344,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 if (newRestaurant.getName().equals("Dragon Lounge")) {
                     Log.d(TAG, "readNewRestaurantData: adding Dragon Lounge to restaurantManager");
                 }
-
-                numRestaurantsFromReadNewData++;
-
-                // testing pls remove this if statement
-                if (newRestaurant.getName().equals("Dragon Lounge") || true) {
-                    add(newRestaurant);
-                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -369,8 +357,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
             }
         }
     }
-
-    public int getNumRestaurantsFromReadNewData() { return numRestaurantsFromReadNewData; }
 
     public void initInspectionLists(Context context) {
         // Create arrays for briefDescriptions of violations

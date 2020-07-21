@@ -102,16 +102,13 @@ public class MapsActivity extends AppCompatActivity
 
     private DialogFragment pleaseWaitDialog;
 
-    private Boolean testDragonLoungeCluster = false;
-    private int testIter = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
         getLocationPermissionFromUser();
-        Log.d("MapsActivity", "Working on oncreate");
+        Log.d("MapsActivity", "Working onCreate");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -154,6 +151,7 @@ public class MapsActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
+            // Check which data is out of date
             boolean restaurantDataOutOfDate = false, inspectionDataOutOfDate = false;
             assert restaurantLastUpdatedDate != null;
             if (restaurantLastUpdatedDate.getTime() > appLastUpdated) {
@@ -174,9 +172,6 @@ public class MapsActivity extends AppCompatActivity
                 }
             }
         }
-
-        System.out.println(manager.numRestaurantsFromReadNewData);
-        manager.getSize();
 
         wireLaunchListButton();
     }
@@ -212,8 +207,7 @@ public class MapsActivity extends AppCompatActivity
     private long timeSinceLastAppUpdateInHours(Date currentDate) {
         long appLastUpdatedInMs = getAppLastUpdated(this);
         long diffInMs = currentDate.getTime() - appLastUpdatedInMs;
-        long diffInHours = TimeUnit.HOURS.convert(diffInMs, TimeUnit.MILLISECONDS);
-        return diffInHours;
+        return TimeUnit.HOURS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 
     private void saveAppLastUpdated(long currentDateInMs) {
@@ -235,9 +229,7 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void finishPleaseWaitDialog() {
-        // Log.d(TAG, "finishPleaseWaitDialog: entered");
         if (pleaseWaitDialog != null) {
-            // Log.d(TAG, "finishPleaseWaitDialog: pleaseWaitDialog != null");
             pleaseWaitDialog.dismiss();
         }
     }
@@ -245,8 +237,8 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
         // User pressed dialog's negative button, ie, wants to cancel the download
-        Toast.makeText(MapsActivity.this,
-                "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(MapsActivity.this,
+                // "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
 
         manager.setDownloadCancelled(true);
         manager.cancelDownloads();
@@ -260,8 +252,8 @@ public class MapsActivity extends AppCompatActivity
 
     public void onAskUserToUpdateDialogPositiveClick(DialogFragment dialog) {
         // User touched the dialog's positive button
-        Toast.makeText(MapsActivity.this,
-                "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(MapsActivity.this,
+                // "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
         // Launch please-wait dialog and start the download
         showPleaseWaitDialog();
 
@@ -312,8 +304,8 @@ public class MapsActivity extends AppCompatActivity
 
     public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
         // User touched the dialog's negative button
-        Toast.makeText(MapsActivity.this,
-                "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(MapsActivity.this,
+                // "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
     }
 
     private void getDeviceLocation() {
@@ -383,14 +375,6 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
-    /*
-    private void refreshMap() {
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-    }
-     */
-
     private void wireLaunchListButton() {
         Button btn = findViewById(R.id.btnLaunchList);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -415,7 +399,7 @@ public class MapsActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if (mLocationPermissionsGranted) {
-            //getDeviceLocation();
+            // getDeviceLocation();
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED
@@ -432,12 +416,6 @@ public class MapsActivity extends AppCompatActivity
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-        double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
-
-        Log.d(TAG, "onMapReady: chosenRestaurantLatLon = [" + chosenRestaurantLatLon[0]
-                + "," + chosenRestaurantLatLon[1] + "]");
-        LatLng chosenRestaurantCoords = null;
-
         setUpClusterer();
         mClusterManager.cluster();
         registerClickCallback();
@@ -447,16 +425,16 @@ public class MapsActivity extends AppCompatActivity
         mMap.setInfoWindowAdapter(adapter);
 
         // move camera to Surrey first
-        // LatLng surrey = new LatLng(49.104431, -122.801094);
-        // moveCamera(surrey, 10);
+        LatLng surrey = new LatLng(49.104431, -122.801094);
+        moveCamera(surrey, 10);
 
-        // move camera to Dragon Lounge for testing
-        LatLng dragonLounge = new LatLng(49.11171722,-122.72962952);
-        moveCamera(dragonLounge, 20);
+        double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
+        String chosenRestaurantName = getIntent().getStringExtra(RestaurantActivity.RESTAURANT_NAME_INTENT_TAG);
 
-        // move camera to a different restaurant for testing
-        // LatLng hazelmereGolfTennis  = new LatLng(49.01621628,-122.71914673);
-        // moveCamera(hazelmereGolfTennis, 20);
+        Log.d(TAG, "onMapReady: chosenRestaurantName: " + chosenRestaurantName);
+        Log.d(TAG, "onMapReady: chosenRestaurantLatLon = [" + chosenRestaurantLatLon[0]
+                + "," + chosenRestaurantLatLon[1] + "]");
+        LatLng chosenRestaurantCoords = null;
 
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
@@ -471,17 +449,19 @@ public class MapsActivity extends AppCompatActivity
             );
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, DEFAULT_ZOOM));
 
-            Restaurant restaurant = manager.findRestaurantByLatLng(chosenRestaurantLatLon[0], chosenRestaurantLatLon[1]);
+            Restaurant restaurant = manager.findRestaurantByLatLng(chosenRestaurantLatLon[0],
+                    chosenRestaurantLatLon[1], chosenRestaurantName);
             if (restaurant.getLongitude() ==  chosenRestaurantLatLon[1] &&
-                restaurant.getLatitude() ==  chosenRestaurantLatLon[0]) {
+                restaurant.getLatitude() ==  chosenRestaurantLatLon[0])
+            {
                 singleRestaurantMarker = mMap.addMarker(new MarkerOptions()
                         .position(chosenRestaurantCoords)
-                        .icon(getHazardIcon(restaurant)));
+                        .icon(getHazardIcon(restaurant))
+                        .title(chosenRestaurantName));
                 singleRestaurantMarker.showInfoWindow();
             }
-            // singleRestaurantMarker.remove();
 
-            // Wait a few seconds
+            // Wait a to let camera adjust before removing the marker onCameraMove
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -498,21 +478,6 @@ public class MapsActivity extends AppCompatActivity
                 }
             }, 1000);
         }
-
-        // dragon lounge testing
-        /*
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                testDragonLoungeCluster = true;
-            }
-        }, 3000);   // 2 seconds
-
-         */
-
-        // Receive intent from Restaurant Activity
-        // Intent i_receive = getIntent();
-        // String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
     }
 
     private void registerClickCallback() {
@@ -523,7 +488,8 @@ public class MapsActivity extends AppCompatActivity
                 LatLng latLngF = marker.getPosition();
                 double lat = latLngF.latitude;
                 double lng = latLngF.longitude;
-                Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng);
+                String restaurantName = marker.getTitle();
+                Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
                 int tempIndex = manager.findIndex(restaurant);
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 intent.putExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG, tempIndex);
@@ -585,13 +551,9 @@ public class MapsActivity extends AppCompatActivity
     private void populateMapWithMarkers() {
         // Get Singleton RestaurantManager
         RestaurantManager manager = RestaurantManager.getInstance();
-
         Log.d(TAG, "populateMapWithMarkers: Populating map with markers");
 
         for (Restaurant restaurant : manager) {
-            if (restaurant.getName().equals("Dragon Lounge")) {
-                Log.d(TAG, "populateMapWithMarkers: adding Dragon Lounge to cluster manager");
-            }
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
                     restaurant.getLongitude(),
@@ -600,7 +562,6 @@ public class MapsActivity extends AppCompatActivity
             );
             mClusterManager.addItem(pegItem);
         }
-        //mClusterManager.cluster();
     }
 
     private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
@@ -609,23 +570,13 @@ public class MapsActivity extends AppCompatActivity
         if (RecentInspection != null) {
             String hazardLevel = RecentInspection.getHazardRating();
             if (hazardLevel.equals("Low")) {
-                if (restaurant.getName().equals("Dragon Lounge")) {
-                    Log.d(TAG, "getHazardIcon: setting marker icon for Dragon Lounge to yellow triangle");
-                }
                 hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_yellow_triangle);
-                // hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_tank);
             } else if (hazardLevel.equals("Moderate")) {
-                if (restaurant.getName().equals("Dragon Lounge")) {
-                    Log.d(TAG, "getHazardIcon: setting marker icon for Dragon Lounge to orange diamond");
-                }
                 hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_orange_diamond);
-                // hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_coat_of_arms);
             } else {
                 hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_red_octagon);
-                // hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_no_nazi);
             }
-        }
-        else{
+        } else {
             hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_question_mark);
         }
         return hazardIcon;
@@ -663,9 +614,10 @@ public class MapsActivity extends AppCompatActivity
 
             // Find the restaurant to work with.
             LatLng latLngF = marker.getPosition();
+            String restaurantName = marker.getTitle();
             double lat = latLngF.latitude;
             double lng = latLngF.longitude;
-            Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng);
+            Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
 
             ImageView logo = itemView.findViewById(R.id.info_item_restaurantLogo);
             logo.setImageResource(restaurant.getIconImgId());
@@ -730,17 +682,6 @@ public class MapsActivity extends AppCompatActivity
             markerOptions.icon(item.getHazard());
             markerOptions.title(item.getTitle());
             super.onBeforeClusterItemRendered(item, markerOptions);
-        }
-
-        @Override
-        protected void onClusterItemRendered(PegItem clusterItem, Marker marker) {
-            if (testDragonLoungeCluster && testIter < 10) {
-                mClusterManager.getMarkerCollection().getMarkers().size();
-                clusterItem.getHazard();
-                testDragonLoungeCluster = false;
-                testIter = 10;
-            }
-            super.onClusterItemRendered(clusterItem, marker);
         }
 
         @Override

@@ -30,10 +30,9 @@ public class RestaurantActivity extends AppCompatActivity {
     public static final String RESTAURANT_ACTIVITY_INSPECTION_TAG = "inspection";
     public static final String RESTAURANT_LATITUDE_INTENT_TAG = "Restaurant latitude";
     public static final String RESTAURANT_LONGITUDE_INTENT_TAG = "Restaurant longitude";
+    public static final String RESTAURANT_NAME_INTENT_TAG = "Restaurant name";
     private RestaurantManager manager;
     List<Inspection> inspections;
-    // int MapIndex;
-    // boolean openMap = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +59,11 @@ public class RestaurantActivity extends AppCompatActivity {
 
         setRestaurantText(restaurant);
         setAddressText(restaurant);
-        setCoordsText(restaurant);
+        setCoordsTextAndClickCallback(restaurant);
 
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
         setupDefaultIntent();
-
     }
 
     // Source
@@ -94,7 +92,7 @@ public class RestaurantActivity extends AppCompatActivity {
         );
     }
 
-    private void setCoordsText(final Restaurant restaurant) {
+    private void setCoordsTextAndClickCallback(final Restaurant restaurant) {
         TextView txtViewCoords = findViewById(R.id.coords_resActivity);
         String coordsString = "" + restaurant.getLatitude() + "," + restaurant.getLongitude();
         txtViewCoords.setText(
@@ -108,6 +106,7 @@ public class RestaurantActivity extends AppCompatActivity {
                 Intent intent = MapsActivity.makeIntent(RestaurantActivity.this);
                 intent.putExtra(RESTAURANT_LATITUDE_INTENT_TAG, restaurant.getLatitude());
                 intent.putExtra(RESTAURANT_LONGITUDE_INTENT_TAG, restaurant.getLongitude());
+                intent.putExtra(RESTAURANT_NAME_INTENT_TAG, restaurant.getName());
                 startActivity(intent);
             }
         });
@@ -176,7 +175,9 @@ public class RestaurantActivity extends AppCompatActivity {
         }
 
     }
+
     private void registerClickCallback(final Restaurant restaurant) {
+        // Set list of inspections as clickable to launch InspectionActivity
         ListView list = findViewById(R.id.restaurant_view);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
