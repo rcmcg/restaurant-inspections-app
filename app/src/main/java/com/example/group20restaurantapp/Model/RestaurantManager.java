@@ -340,10 +340,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 newRestaurant.setLatitude(Double.parseDouble(restaurantData[5]));
                 newRestaurant.setLongitude(Double.parseDouble(restaurantData[6]));
                 newRestaurant.setImgId();
-                
-                if (newRestaurant.getName().equals("Dragon Lounge")) {
-                    Log.d(TAG, "readNewRestaurantData: adding Dragon Lounge to restaurantManager");
-                }
+
+                RestaurantManager.getInstance().add(newRestaurant);
             }
         } catch (IOException e) {
             e.printStackTrace();
