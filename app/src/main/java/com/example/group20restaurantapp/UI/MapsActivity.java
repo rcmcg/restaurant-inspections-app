@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -107,7 +108,7 @@ public class MapsActivity extends AppCompatActivity
         setContentView(R.layout.activity_maps);
 
         getLocationPermissionFromUser();
-        Log.d("MapsActivity", "Working on oncreate");
+        Log.d("MapsActivity", "Working onCreate");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -150,6 +151,7 @@ public class MapsActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
+            // Check which data is out of date
             boolean restaurantDataOutOfDate = false, inspectionDataOutOfDate = false;
             assert restaurantLastUpdatedDate != null;
             if (restaurantLastUpdatedDate.getTime() > appLastUpdated) {
@@ -178,7 +180,8 @@ public class MapsActivity extends AppCompatActivity
     private void refillRestaurantManager() {
         // Call this function when the RestaurantManager needs to be updated with new data
         manager = RestaurantManager.getInstance();
-        manager.getRestaurants().clear();
+        // manager.getRestaurants().clear();
+        manager.resetRestaurantList();
         fillRestaurantManager(true);
     }
 
@@ -204,8 +207,7 @@ public class MapsActivity extends AppCompatActivity
     private long timeSinceLastAppUpdateInHours(Date currentDate) {
         long appLastUpdatedInMs = getAppLastUpdated(this);
         long diffInMs = currentDate.getTime() - appLastUpdatedInMs;
-        long diffInHours = TimeUnit.HOURS.convert(diffInMs, TimeUnit.MILLISECONDS);
-        return diffInHours;
+        return TimeUnit.HOURS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 
     private void saveAppLastUpdated(long currentDateInMs) {
@@ -227,9 +229,7 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void finishPleaseWaitDialog() {
-        // Log.d(TAG, "finishPleaseWaitDialog: entered");
         if (pleaseWaitDialog != null) {
-            // Log.d(TAG, "finishPleaseWaitDialog: pleaseWaitDialog != null");
             pleaseWaitDialog.dismiss();
         }
     }
@@ -237,8 +237,8 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
         // User pressed dialog's negative button, ie, wants to cancel the download
-        Toast.makeText(MapsActivity.this,
-                "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(MapsActivity.this,
+                // "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
 
         manager.setDownloadCancelled(true);
         manager.cancelDownloads();
@@ -252,8 +252,8 @@ public class MapsActivity extends AppCompatActivity
 
     public void onAskUserToUpdateDialogPositiveClick(DialogFragment dialog) {
         // User touched the dialog's positive button
-        Toast.makeText(MapsActivity.this,
-                "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(MapsActivity.this,
+                // "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
         // Launch please-wait dialog and start the download
         showPleaseWaitDialog();
 
@@ -304,8 +304,8 @@ public class MapsActivity extends AppCompatActivity
 
     public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
         // User touched the dialog's negative button
-        Toast.makeText(MapsActivity.this,
-                "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(MapsActivity.this,
+                // "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
     }
 
     private void getDeviceLocation() {
@@ -375,14 +375,6 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
-    /*
-    private void refreshMap() {
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-    }
-     */
-
     private void wireLaunchListButton() {
         Button btn = findViewById(R.id.btnLaunchList);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -407,7 +399,7 @@ public class MapsActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if (mLocationPermissionsGranted) {
-            //getDeviceLocation();
+            // getDeviceLocation();
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED
@@ -424,13 +416,8 @@ public class MapsActivity extends AppCompatActivity
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-        double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
-
-        Log.d(TAG, "onMapReady: chosenRestaurantLatLon = [" + chosenRestaurantLatLon[0]
-                + "," + chosenRestaurantLatLon[1] + "]");
-        LatLng chosenRestaurantCoords = null;
-
         setUpClusterer();
+        mClusterManager.cluster();
         registerClickCallback();
 
         //Set Custom InfoWindow Adapter
@@ -440,6 +427,14 @@ public class MapsActivity extends AppCompatActivity
         // move camera to Surrey first
         LatLng surrey = new LatLng(49.104431, -122.801094);
         moveCamera(surrey, 10);
+
+        double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
+        String chosenRestaurantName = getIntent().getStringExtra(RestaurantActivity.RESTAURANT_NAME_INTENT_TAG);
+
+        Log.d(TAG, "onMapReady: chosenRestaurantName: " + chosenRestaurantName);
+        Log.d(TAG, "onMapReady: chosenRestaurantLatLon = [" + chosenRestaurantLatLon[0]
+                + "," + chosenRestaurantLatLon[1] + "]");
+        LatLng chosenRestaurantCoords = null;
 
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
@@ -454,17 +449,19 @@ public class MapsActivity extends AppCompatActivity
             );
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, DEFAULT_ZOOM));
 
-            Restaurant restaurant = manager.findRestaurantByLatLng(chosenRestaurantLatLon[0], chosenRestaurantLatLon[1]);
+            Restaurant restaurant = manager.findRestaurantByLatLng(chosenRestaurantLatLon[0],
+                    chosenRestaurantLatLon[1], chosenRestaurantName);
             if (restaurant.getLongitude() ==  chosenRestaurantLatLon[1] &&
-                restaurant.getLatitude() ==  chosenRestaurantLatLon[0]) {
+                restaurant.getLatitude() ==  chosenRestaurantLatLon[0])
+            {
                 singleRestaurantMarker = mMap.addMarker(new MarkerOptions()
                         .position(chosenRestaurantCoords)
-                        .icon(getHazardIcon(restaurant)));
+                        .icon(getHazardIcon(restaurant))
+                        .title(chosenRestaurantName));
                 singleRestaurantMarker.showInfoWindow();
             }
-            // singleRestaurantMarker.remove();
 
-            // Wait a few seconds
+            // Wait a to let camera adjust before removing the marker onCameraMove
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -481,10 +478,6 @@ public class MapsActivity extends AppCompatActivity
                 }
             }, 1000);
         }
-
-        // Receive intent from Restaurant Activity
-        // Intent i_receive = getIntent();
-        // String resID = i_receive.getStringExtra(EXTRA_MESSAGE);
     }
 
     private void registerClickCallback() {
@@ -495,7 +488,8 @@ public class MapsActivity extends AppCompatActivity
                 LatLng latLngF = marker.getPosition();
                 double lat = latLngF.latitude;
                 double lng = latLngF.longitude;
-                Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng);
+                String restaurantName = marker.getTitle();
+                Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
                 int tempIndex = manager.findIndex(restaurant);
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 intent.putExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG, tempIndex);
@@ -508,7 +502,7 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                moveCamera(marker.getPosition(), DEFAULT_ZOOM);
+                moveCamera(marker.getPosition());
                 marker.showInfoWindow();
                 return true;
             }
@@ -539,6 +533,11 @@ public class MapsActivity extends AppCompatActivity
         mMap.animateCamera(location);
     }
 
+    private void moveCamera(LatLng latLng) {
+        CameraUpdate location = CameraUpdateFactory.newLatLng(latLng);
+        mMap.animateCamera(location);
+    }
+
     private void setUpClusterer() {
         // Initialize new clusterManager
         mClusterManager = new ClusterManager<PegItem>(this, mMap);
@@ -552,7 +551,6 @@ public class MapsActivity extends AppCompatActivity
     private void populateMapWithMarkers() {
         // Get Singleton RestaurantManager
         RestaurantManager manager = RestaurantManager.getInstance();
-
         Log.d(TAG, "populateMapWithMarkers: Populating map with markers");
 
         for (Restaurant restaurant : manager) {
@@ -564,7 +562,6 @@ public class MapsActivity extends AppCompatActivity
             );
             mClusterManager.addItem(pegItem);
         }
-        //mClusterManager.cluster();
     }
 
     private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
@@ -573,15 +570,14 @@ public class MapsActivity extends AppCompatActivity
         if (RecentInspection != null) {
             String hazardLevel = RecentInspection.getHazardRating();
             if (hazardLevel.equals("Low")) {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_yellow);
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_yellow_triangle);
             } else if (hazardLevel.equals("Moderate")) {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_orangle);
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_orange_diamond);
             } else {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_red);
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_red_octagon);
             }
-        }
-        else{
-            hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_green);
+        } else {
+            hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_question_mark);
         }
         return hazardIcon;
     }
@@ -598,7 +594,6 @@ public class MapsActivity extends AppCompatActivity
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
     }
-
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
@@ -619,41 +614,33 @@ public class MapsActivity extends AppCompatActivity
 
             // Find the restaurant to work with.
             LatLng latLngF = marker.getPosition();
+            String restaurantName = marker.getTitle();
             double lat = latLngF.latitude;
             double lng = latLngF.longitude;
-            Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng);
+            Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
 
-            // Fill the view
             ImageView logo = itemView.findViewById(R.id.info_item_restaurantLogo);
-
             logo.setImageResource(restaurant.getIconImgId());
 
             TextView restaurantNameText = itemView.findViewById(R.id.info_item_restaurantName);
-
-            String temp = restaurant.getName();
-
-            if (temp.length() > 25) {
-                temp = temp.substring(0, 25) + "...";
-            }
-            restaurantNameText.setText(temp);
+            restaurantNameText.setText(restaurant.getName());
 
             TextView addressText = itemView.findViewById(R.id.info_item_address);
             addressText.setText(restaurant.getAddress());
 
-            Inspection RecentInspection = null;
             TextView lastInspectionText = itemView.findViewById(R.id.info_item_lastInspection);
             ImageView hazard = itemView.findViewById(R.id.info_item_hazardImage);
 
+            Inspection recentInspection = null;
             if (restaurant.getInspectionSize() > 0) {
-                RecentInspection = restaurant.getInspectionList().get(0);
-                //lastInspectionText.setText(RecentInspection.getInspectionDate());
+                recentInspection = restaurant.getInspectionList().get(0);
                 lastInspectionText.setText(
                         getString(
                                 R.string.restaurant_activity_inspection_item_date,
-                                RecentInspection.intelligentInspectDate())
+                                recentInspection.intelligentInspectDate())
                 );
 
-                String level = RecentInspection.getHazardRating();
+                String level = recentInspection.getHazardRating();
                 if (level.equals("Low")) {
                     hazard.setImageResource(R.drawable.yellow_triangle);
                 } else if (level.equals("Moderate")) {
@@ -662,7 +649,7 @@ public class MapsActivity extends AppCompatActivity
                     hazard.setImageResource(R.drawable.red_octogon);
                 }
             } else {
-                lastInspectionText.setText("");
+                // Leave text as default
                 hazard.setImageResource(R.drawable.no_inspection_qmark);
             }
             return itemView;
