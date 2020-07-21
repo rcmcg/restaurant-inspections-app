@@ -174,6 +174,7 @@ public class MapsActivity extends AppCompatActivity
         wireLaunchListButton();
     }
 
+    // TODO: Move to RestaurantManager.java?
     private void refillRestaurantManager() {
         // Call this function when the RestaurantManager needs to be updated with new data
         manager = RestaurantManager.getInstance();
@@ -181,6 +182,7 @@ public class MapsActivity extends AppCompatActivity
         fillRestaurantManager(true);
     }
 
+    // TODO: Move to RestaurantManager.java?
     private void fillRestaurantManager(boolean hasAppBeenUpdated) {
         manager = RestaurantManager.getInstance();
         if (!hasAppBeenUpdated) {
@@ -295,8 +297,8 @@ public class MapsActivity extends AppCompatActivity
             mClusterManager.clearItems();
             mClusterManager.cluster();
             setUpClusterer();
-            // mClusterManager.cluster();
-            refreshMap();
+            mClusterManager.cluster();
+            // refreshMap();
         }
     }
 
@@ -360,17 +362,26 @@ public class MapsActivity extends AppCompatActivity
                         }
                     }
                     mLocationPermissionsGranted = true;
-                    refreshMap();
+
+                    // Restart activity with new permission
+                    finish();
+                    Intent refreshIntent = makeIntent(this);
+                    overridePendingTransition(0, 0);
+                    startActivity(refreshIntent);
+                    overridePendingTransition(0, 0);
+                    manager.setUserBeenAskedToUpdateThisSession(false);
                 }
             }
         }
     }
 
+    /*
     private void refreshMap() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+     */
 
     private void wireLaunchListButton() {
         Button btn = findViewById(R.id.btnLaunchList);
@@ -399,7 +410,9 @@ public class MapsActivity extends AppCompatActivity
             //getDeviceLocation();
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                    &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED
                 ) {
                 // TODO: Remove this return statement? What is it for?
@@ -409,8 +422,7 @@ public class MapsActivity extends AppCompatActivity
         }
 
         mMap.getUiSettings().setZoomControlsEnabled(true);
-
-        setUpClusterer();
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
 
@@ -418,15 +430,16 @@ public class MapsActivity extends AppCompatActivity
                 + "," + chosenRestaurantLatLon[1] + "]");
         LatLng chosenRestaurantCoords = null;
 
+        setUpClusterer();
         registerClickCallback();
-
-        // Move the camera to surrey
-        //LatLng surrey = new LatLng(49.104431, -122.801094);
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(surrey));
 
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
         mMap.setInfoWindowAdapter(adapter);
+
+        // move camera to Surrey first
+        LatLng surrey = new LatLng(49.104431, -122.801094);
+        moveCamera(surrey, 10);
 
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
@@ -551,7 +564,7 @@ public class MapsActivity extends AppCompatActivity
             );
             mClusterManager.addItem(pegItem);
         }
-        mClusterManager.cluster();
+        //mClusterManager.cluster();
     }
 
     private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
@@ -684,42 +697,9 @@ public class MapsActivity extends AppCompatActivity
             super.onBeforeClusterItemRendered(item, markerOptions);
         }
 
-        /*
         @Override
-        protected void onClusterItemRendered(PegItem clusterItem, Marker marker) {
-            if (singleRestaurantMarker != null) {
-                Log.d(TAG, "onClusterItemRendered: removing singleRestaurantMarker");
-                singleRestaurantMarker.remove();
-                singleRestaurantMarker = null;
-            }
-            super.onClusterItemRendered(clusterItem, marker);
+        protected boolean shouldRenderAsCluster(Cluster<PegItem> cluster) {
+            return (cluster.getSize() >= 8);
         }
-
-         */
-
-        /*
-        @Override
-        protected void onClusterRendered(Cluster<PegItem> cluster, Marker marker) {
-            if (singleRestaurantMarker != null) {
-                Log.d(TAG, "onClusterRendered: removing singleRestaurantMarker");
-                singleRestaurantMarker.remove();
-                singleRestaurantMarker = null;
-            }
-            super.onClusterRendered(cluster, marker);
-        }
-         */
-
-        /*
-        @Override
-        public void onClustersChanged(Set<? extends Cluster<PegItem>> clusters) {
-            if (singleRestaurantMarker != null) {
-                Log.d(TAG, "onClustersChanged: removing singleRestaurantMarker");
-                singleRestaurantMarker.remove();
-                singleRestaurantMarker = null;
-            }
-            super.onClustersChanged(clusters);
-        }
-
-         */
     }
 }
