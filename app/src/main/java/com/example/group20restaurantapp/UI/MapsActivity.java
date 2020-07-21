@@ -80,7 +80,10 @@ public class MapsActivity extends AppCompatActivity
     private static final String TAG = "MapActivity";
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
-    private static final float DEFAULT_ZOOM = 10f;
+    private static final float DEFAULT_ZOOM = 18f;
+    private static final float BUILDINGS_ZOOM = 20f;
+    private static final float STREETS_ZOOM = 15f;
+    private static final float CITY_ZOOM = 10f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
@@ -94,6 +97,7 @@ public class MapsActivity extends AppCompatActivity
 
     private Boolean updateData = false;
     private Boolean newData = false;
+    private Boolean followUser;
     private String restaurantDataURL;
     private String inspectionDataURL;
     private Date currentDate;
@@ -320,7 +324,7 @@ public class MapsActivity extends AppCompatActivity
                         if (task.isSuccessful()) {
                             Log.d("MapsActivity", "Found Location");
                             Location currentLocation = (Location) task.getResult();
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), BUILDINGS_ZOOM);
                         } else {
                             Log.d("MapsActivity", "Current location cannot be found");
                             Toast.makeText(MapsActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
@@ -406,6 +410,11 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        // move camera to Surrey first
+        LatLng surrey = new LatLng(49.104431, -122.801094);
+        moveCamera(surrey, 10);
+
         if (mLocationPermissionsGranted) {
             //getDeviceLocation();
             if (
@@ -436,10 +445,6 @@ public class MapsActivity extends AppCompatActivity
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
         mMap.setInfoWindowAdapter(adapter);
-
-        // move camera to Surrey first
-        LatLng surrey = new LatLng(49.104431, -122.801094);
-        moveCamera(surrey, 10);
 
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
@@ -520,6 +525,8 @@ public class MapsActivity extends AppCompatActivity
             }
         });
 
+        // mMap.setOnMyLocationChangeListener();
+
         mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<PegItem>() {
             @Override
             public boolean onClusterClick(Cluster<PegItem> cluster) {
@@ -528,6 +535,8 @@ public class MapsActivity extends AppCompatActivity
             }
         });
     }
+
+
 
     /**
      * Move the camera according to Latitude and longitude
