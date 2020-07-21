@@ -71,11 +71,29 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class MapsActivity extends AppCompatActivity
-        implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
-        PleaseWaitDialogFragment.PleaseWaitDialogListener
+        implements
+        GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMyLocationClickListener,
+        OnMapReadyCallback,
+        AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
+        PleaseWaitDialogFragment.PleaseWaitDialogListener,
+        ActivityCompat.OnRequestPermissionsResultCallback
 {
 
     private GoogleMap mMap;
+
+    /**
+     * Request code for location permission request.
+     *
+     * @see #onRequestPermissionsResult(int, String[], int[])
+     */
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+
+    /**
+     * Flag indicating whether a requested permission has been denied after returning in
+     * {@link #onRequestPermissionsResult(int, String[], int[])}.
+     */
+    private Boolean mLocationPermissionsGranted = false;
 
     private static final String TAG = "MapActivity";
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
@@ -86,10 +104,8 @@ public class MapsActivity extends AppCompatActivity
     private static final float CITY_ZOOM = 10f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     public static final String RESTAURANT_ACTIVITY_RESTAURANT_TAG = "restaurant";
     private static final String EXTRA_MESSAGE = "Extra";
-    private Boolean mLocationPermissionsGranted = false;
     private Marker mMarker;
     private RestaurantManager manager = RestaurantManager.getInstance();
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -525,6 +541,13 @@ public class MapsActivity extends AppCompatActivity
             }
         });
 
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                return false;
+            }
+        });
+
         // mMap.setOnMyLocationChangeListener();
 
         mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<PegItem>() {
@@ -608,6 +631,15 @@ public class MapsActivity extends AppCompatActivity
         return new Intent(context, MapsActivity.class);
     }
 
+    @Override
+    public boolean onMyLocationButtonClick() {
+        return false;
+    }
+
+    @Override
+    public void onMyLocationClick(@NonNull Location location) {
+
+    }
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 

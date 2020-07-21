@@ -53,6 +53,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private boolean userBeenAskedToUpdateThisSession = false;
     private boolean isDownloadCancelled = false;
 
+    private boolean followUser;
+
     OkHttpClient client = new OkHttpClient().newBuilder().build();
 
     public boolean isDownloadCancelled() {
