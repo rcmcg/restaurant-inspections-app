@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -508,7 +509,7 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                moveCamera(marker.getPosition(), DEFAULT_ZOOM);
+                moveCamera(marker.getPosition());
                 marker.showInfoWindow();
                 return true;
             }
@@ -536,6 +537,11 @@ public class MapsActivity extends AppCompatActivity
     private void moveCamera(LatLng latLng, float zoom) {
         Log.d(TAG, "moveCamera: moving camera to: " + latLng);
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
+        mMap.animateCamera(location);
+    }
+
+    private void moveCamera(LatLng latLng) {
+        CameraUpdate location = CameraUpdateFactory.newLatLng(latLng);
         mMap.animateCamera(location);
     }
 
@@ -573,15 +579,15 @@ public class MapsActivity extends AppCompatActivity
         if (RecentInspection != null) {
             String hazardLevel = RecentInspection.getHazardRating();
             if (hazardLevel.equals("Low")) {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_yellow);
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_yellow_triangle);
             } else if (hazardLevel.equals("Moderate")) {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_orangle);
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_orange_diamond);
             } else {
-                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_red);
+                hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_red_octagon);
             }
         }
         else{
-            hazardIcon = bitmapDescriptorFromVector(this, R.drawable.peg_green);
+            hazardIcon = bitmapDescriptorFromVector(this, R.drawable.ic_yellow_triangle);
         }
         return hazardIcon;
     }
