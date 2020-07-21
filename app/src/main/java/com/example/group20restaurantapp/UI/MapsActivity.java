@@ -150,8 +150,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         // Add a marker in Surrey and move the camera
-        LatLng surrey = new LatLng(49.104431, -122.801094);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surrey, 10));
+        // LatLng surrey = new LatLng(49.104431, -122.801094);
+        // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(surrey, 10));
+
+        // Move camera to Dragon Lounge
+        LatLng dragonLounge = new LatLng(49.11171722,-122.72962952);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dragonLounge, 20));
 
         setUpClusterer();
     }
