@@ -60,8 +60,7 @@ public class MapsActivity extends AppCompatActivity
         OnMapReadyCallback,
         AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
         PleaseWaitDialogFragment.PleaseWaitDialogListener,
-        GoogleMap.OnCameraMoveStartedListener,
-        GoogleMap.OnCameraMoveListener
+        GoogleMap.OnCameraMoveStartedListener
 {
 
     private GoogleMap mMap;
@@ -91,11 +90,8 @@ public class MapsActivity extends AppCompatActivity
     private DialogFragment pleaseWaitDialog;
 
     private Boolean followUser = false;
-    private Boolean isZooming = false;
-    private float prevZoom = -1.0f;
     private Location mCurrentLocation;
     private static int updateLocationIter = 0;      // Used to update the users location as they move
-    private Boolean initialZoomToUserLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -252,7 +248,7 @@ public class MapsActivity extends AppCompatActivity
         // Launch please-wait dialog and start the download
         showPleaseWaitDialog();
 
-        // Wait a few seconds
+        // Wait a few seconds to give the user a chance to cancel
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -313,10 +309,10 @@ public class MapsActivity extends AppCompatActivity
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
+                            Log.d("MapsActivity", "Found Location");
                             Location currentLocation = (Location) task.getResult();
-                            Log.d("MapsActivity", "getDeviceLocation: Found Location: " + currentLocation.toString());
                             followUser = true;
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 5);
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 20);
                         } else {
                             Log.d("MapsActivity", "Current location cannot be found");
                             Toast.makeText(MapsActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
@@ -336,21 +332,6 @@ public class MapsActivity extends AppCompatActivity
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionsGranted = true;
-                // Get last location
-                /*
-                mFusedLocationProviderClient.getLastLocation()
-                        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                // Got last known location.
-                                if (location != null) {
-                                    // Logic to handle location object
-                                    mCurrentLocation = location;
-                                }
-                            }
-                        });
-
-                 */
             } else {
                 ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
             }
@@ -431,8 +412,12 @@ public class MapsActivity extends AppCompatActivity
                     updateLocationIter++;
                     if (followUser && (updateLocationIter %3 == 0)) {
                         Log.d(TAG, "onMyLocationChange: moveCamera()");
-                        mCurrentLocation = location;
-                        moveCamera(new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
+
+                        // Let the camera settle on user's location first
+                        if (updateLocationIter > 15) {
+                            mCurrentLocation = location;
+                            moveCamera(new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
+                        }
                     }
                 }
             });
@@ -466,8 +451,6 @@ public class MapsActivity extends AppCompatActivity
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
             getDeviceLocation();
-            Log.d(TAG, "onMapReady: Zooming camera to 5");
-            // mMap.animateCamera(CameraUpdateFactory.zoomTo(1));
         } else {
             Log.d(TAG, "onMapReady: Setting map to chosen restaurant coords");
             Log.d(TAG, "onMapReady: chosen restaurant lat: " + chosenRestaurantLatLon[0] + " chosen restaurant lon: " + chosenRestaurantLatLon[1]);
@@ -489,25 +472,6 @@ public class MapsActivity extends AppCompatActivity
                         .title(chosenRestaurantName));
                 singleRestaurantMarker.showInfoWindow();
             }
-
-            // Wait a second to let camera adjust before removing the marker onCameraMove
-            /*
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-                        @Override
-                        public void onCameraMove() {
-                            if (singleRestaurantMarker != null) {
-                                Log.d(TAG, "onCameraMove: singleRestaurantMarker.remove()");
-                                singleRestaurantMarker.remove();
-                                singleRestaurantMarker = null;
-                            }
-                        }
-                    });
-                }
-            }, 1000);
-            */
         }
     }
 
@@ -525,7 +489,6 @@ public class MapsActivity extends AppCompatActivity
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 intent.putExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG, tempIndex);
 
-                // what is 451 for?
                 MapsActivity.this.startActivityForResult(intent, 451);
             }
         });
@@ -561,6 +524,7 @@ public class MapsActivity extends AppCompatActivity
             @Override
             public boolean onClusterClick(Cluster<PegItem> cluster) {
                 moveCamera(cluster.getPosition(), 15);
+                followUser = false;
                 return true;
             }
         });
@@ -577,6 +541,7 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void moveCamera(LatLng latLng) {
+        Log.d(TAG, "moveCamera : moving: " + latLng);
         CameraUpdate location = CameraUpdateFactory.newLatLng(latLng);
         mMap.animateCamera(location);
     }
@@ -649,32 +614,6 @@ public class MapsActivity extends AppCompatActivity
                 }
         }
     }
-
-    @Override
-    public void onCameraMove() {
-        float currZoom = CameraPosition.builder().build().zoom;
-        Log.d(TAG, "onCameraMove: currZoom: " + currZoom);
-        if (currZoom != prevZoom) {
-            Log.d(TAG, "onCameraMove: Zooming prevZoom: " + prevZoom + ", currZoom: " + currZoom);
-            isZooming = true;
-            prevZoom = currZoom;
-        } else {
-            isZooming = false;
-        }
-    }
-
-    /*
-    @Override
-    public void onCameraIdle() {
-        Log.d(TAG, "onCameraIdle: locationPermission: " + mLocationPermissionsGranted + ", initialZoomToUserLocation: " + initialZoomToUserLocation);
-        if (mLocationPermissionsGranted && !initialZoomToUserLocation) {
-            Log.d(TAG, "onCameraIdle: Zooming to users location");
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(1));
-            initialZoomToUserLocation = true;
-        }
-    }
-
-     */
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
