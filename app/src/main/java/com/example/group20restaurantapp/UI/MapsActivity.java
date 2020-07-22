@@ -65,28 +65,22 @@ public class MapsActivity extends AppCompatActivity
     // Map variables
     private GoogleMap mMap;
     private Boolean mLocationPermissionsGranted = false;
-    // private Marker mMarker;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private ClusterManager<PegItem> mClusterManager;
     private Marker singleRestaurantMarker;
     private Boolean followUser = false;
-    private Location mCurrentLocation;
     private static int updateLocationIter = 0;      // Used to update the users location as they move
 
     // Constants
     private static final String TAG = "MapActivity";
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
-    public static final String RESTAURANT_ACTIVITY_RESTAURANT_TAG = "restaurant";
-    // private static final float DEFAULT_ZOOM = 10f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     public static final int ZOOM_STREETS = 15;
     public static final int ZOOM_CITY = 10;
     public static final int ZOOM_BUILDINGS = 20;
-
-    // private static final String EXTRA_MESSAGE = "Extra";
 
     // Model variables
     private RestaurantManager manager = RestaurantManager.getInstance();
@@ -124,7 +118,7 @@ public class MapsActivity extends AppCompatActivity
             }
         }
 
-        // Decide whether or not to ask user to update
+        // Decide whether or not we ask user to update
         currentDate = new Date();
         Log.d(TAG, "onCreate: Time since last update in hours: " +  timeSinceLastAppUpdateInHours(currentDate));
         if (appLastUpdated == -1 || timeSinceLastAppUpdateInHours(currentDate) >= 20) {
@@ -288,7 +282,7 @@ public class MapsActivity extends AppCompatActivity
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
             if (mLocationPermissionsGranted) {
-                 Task<Location> location = mFusedLocationProviderClient.getLastLocation();
+                Task<Location> location = mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
@@ -311,7 +305,7 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d("MapsActivity", "Working onrequestPermissionResult");
+        Log.d("MapsActivity", "Working onRequestPermissionsResult");
         mLocationPermissionsGranted = false;
         switch (requestCode) {
             case LOCATION_PERMISSION_REQUEST_CODE: {
@@ -383,8 +377,7 @@ public class MapsActivity extends AppCompatActivity
                     if (followUser && (updateLocationIter %3 == 0)) {   // Only update the location every 3 ticks
                         if (updateLocationIter > 8) {                   // Let the camera settle on user's location first
                             Log.d(TAG, "onMyLocationChange: moveCamera()");
-                            mCurrentLocation = location;
-                            moveCamera(new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
+                            moveCamera(new LatLng(location.getLatitude(),location.getLongitude()));
                         }
                     }
                 }

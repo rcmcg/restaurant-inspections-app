@@ -328,7 +328,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 newRestaurant.setLongitude(Double.parseDouble(restaurantData[6]));
                 newRestaurant.setImgId();
 
-                // RestaurantManager.getInstance().add(newRestaurant);
                 add(newRestaurant);
             }
         } catch (IOException e) {
@@ -382,7 +381,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
                 String[] lineSplit = line.split(",", 7);
                 //Find restaurant matching report tracking number being read
-                while (!lineSplit[0].equals(RestaurantManager.getInstance().getIndex(i).getTrackingNumber())){
+                while (!lineSplit[0].equals(getIndex(i).getTrackingNumber())){
                     i++;
                 }
                 //Initializing inspection object variables
@@ -426,7 +425,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
                         inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
                     }
                 }
-                RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
             }
         } catch (IOException e){
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
@@ -475,9 +474,9 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 //Find restaurant with matching report tracking number being read
                 if (!prevTrackingNum.equals(lineSplit[0])){
                     i = 0;
-                    while (!lineSplit[0].equals(RestaurantManager.getInstance().getIndex(i).getTrackingNumber())) {
+                    while (!lineSplit[0].equals(getIndex(i).getTrackingNumber())) {
                         i++;
-                        if (i == RestaurantManager.getInstance().getSize()-1) {
+                        if (i == getSize()-1) {
                             unknownRestaurant = true;
                             break;
                         }
@@ -499,17 +498,17 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
                 if (lineSplit[5].equals(",Low") || lineSplit[5].equals(",")) {
                     inspection.setHazardRating("Low");
-                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
                     continue;
                 }
                 if (lineSplit[5].equals(",Moderate")) {
                     inspection.setHazardRating("Moderate");
-                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
                     continue;
                 }
                 if (lineSplit[5].equals(",High")) {
                     inspection.setHazardRating("High");
-                    RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
                     continue;
                 }
                 String[] violationsArr = lineSplit[5].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
@@ -559,7 +558,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     Violation violObj = new Violation(violNumber, crit, violSplit[2], briefDesc, repeat);
                     inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
                 }
-                RestaurantManager.getInstance().getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
             }
         } catch (IOException e){
             e.printStackTrace();
