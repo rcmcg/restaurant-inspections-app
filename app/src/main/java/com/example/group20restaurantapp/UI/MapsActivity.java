@@ -44,7 +44,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
@@ -96,6 +95,7 @@ public class MapsActivity extends AppCompatActivity
     private float prevZoom = -1.0f;
     private Location mCurrentLocation;
     private static int updateLocationIter = 0;      // Used to update the users location as they move
+    private Boolean initialZoomToUserLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -662,6 +662,19 @@ public class MapsActivity extends AppCompatActivity
             isZooming = false;
         }
     }
+
+    /*
+    @Override
+    public void onCameraIdle() {
+        Log.d(TAG, "onCameraIdle: locationPermission: " + mLocationPermissionsGranted + ", initialZoomToUserLocation: " + initialZoomToUserLocation);
+        if (mLocationPermissionsGranted && !initialZoomToUserLocation) {
+            Log.d(TAG, "onCameraIdle: Zooming to users location");
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(1));
+            initialZoomToUserLocation = true;
+        }
+    }
+
+     */
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
