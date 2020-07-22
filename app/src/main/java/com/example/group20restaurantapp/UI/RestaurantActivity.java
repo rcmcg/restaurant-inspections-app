@@ -60,6 +60,7 @@ public class RestaurantActivity extends AppCompatActivity {
         setRestaurantText(restaurant);
         setAddressText(restaurant);
         setCoordsTextAndClickCallback(restaurant);
+        setRestaurantImg(restaurant);
 
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
@@ -76,6 +77,11 @@ public class RestaurantActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setRestaurantImg(Restaurant restaurant) {
+        ImageView imgViewRestaurant = findViewById(R.id.restaurant_img);
+        imgViewRestaurant.setImageResource(restaurant.getIconImgId());
     }
 
     private void setRestaurantText(Restaurant restaurant) {
