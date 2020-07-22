@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -25,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import com.example.group20restaurantapp.Model.Inspection;
 import com.example.group20restaurantapp.Model.PegItem;
@@ -41,39 +39,28 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.algo.Algorithm;
-import com.google.maps.android.clustering.view.ClusterRenderer;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-
-import java.util.List;
-
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class MapsActivity extends AppCompatActivity
-        implements OnMapReadyCallback, AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
-        PleaseWaitDialogFragment.PleaseWaitDialogListener
+        implements
+        OnMapReadyCallback,
+        AskUserToUpdateDialogFragment.AskUserToUpdateDialogListener,
+        PleaseWaitDialogFragment.PleaseWaitDialogListener,
+        GoogleMap.OnCameraMoveStartedListener
 {
 
     private GoogleMap mMap;
@@ -101,6 +88,10 @@ public class MapsActivity extends AppCompatActivity
     private Marker singleRestaurantMarker;
 
     private DialogFragment pleaseWaitDialog;
+
+    private Boolean followUser = false;
+    private Location mCurrentLocation;
+    private static int updateLocationIter = 0;      // Used to update the users location as they move
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,7 +248,7 @@ public class MapsActivity extends AppCompatActivity
         // Launch please-wait dialog and start the download
         showPleaseWaitDialog();
 
-        // Wait a few seconds
+        // Wait a few seconds to give the user a chance to cancel
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -309,7 +300,7 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void getDeviceLocation() {
-        Log.d("MapsActivity", "Code has executed till getdevicelocation function");
+        Log.d("MapsActivity", "Getting device location...");
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
             if (mLocationPermissionsGranted) {
@@ -320,7 +311,8 @@ public class MapsActivity extends AppCompatActivity
                         if (task.isSuccessful()) {
                             Log.d("MapsActivity", "Found Location");
                             Location currentLocation = (Location) task.getResult();
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                            followUser = true;
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 20);
                         } else {
                             Log.d("MapsActivity", "Current location cannot be found");
                             Toast.makeText(MapsActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
@@ -398,6 +390,7 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
         if (mLocationPermissionsGranted) {
             // getDeviceLocation();
             if (
@@ -411,10 +404,33 @@ public class MapsActivity extends AppCompatActivity
                 return;
             }
             mMap.setMyLocationEnabled(true);
+            mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                @Override
+                public void onMyLocationChange(Location location) {
+                    // Don't constantly print to log
+                    if (updateLocationIter%5 == 0) {
+                        Log.d(TAG, "onMyLocationChange: followUser: " + followUser + ", updateIter: " + updateLocationIter);
+                    }
+
+                    updateLocationIter++;
+                    // Only update the location every 3 ticks
+                    if (followUser && (updateLocationIter %3 == 0)) {
+                        Log.d(TAG, "onMyLocationChange: moveCamera()");
+
+                        // Let the camera settle on user's location first
+                        if (updateLocationIter > 5) {
+                            mCurrentLocation = location;
+                            moveCamera(new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
+                        }
+                    }
+                }
+            });
         }
 
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        mMap.setOnCameraMoveStartedListener(this);
 
         setUpClusterer();
         mClusterManager.cluster();
@@ -460,23 +476,6 @@ public class MapsActivity extends AppCompatActivity
                         .title(chosenRestaurantName));
                 singleRestaurantMarker.showInfoWindow();
             }
-
-            // Wait a to let camera adjust before removing the marker onCameraMove
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-                        @Override
-                        public void onCameraMove() {
-                            if (singleRestaurantMarker != null) {
-                                Log.d(TAG, "onCameraMove: singleRestaurantMarker.remove()");
-                                singleRestaurantMarker.remove();
-                                singleRestaurantMarker = null;
-                            }
-                        }
-                    });
-                }
-            }, 1000);
         }
     }
 
@@ -494,7 +493,6 @@ public class MapsActivity extends AppCompatActivity
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 intent.putExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG, tempIndex);
 
-                // what is 451 for?
                 MapsActivity.this.startActivityForResult(intent, 451);
             }
         });
@@ -504,6 +502,7 @@ public class MapsActivity extends AppCompatActivity
             public boolean onMarkerClick(Marker marker) {
                 moveCamera(marker.getPosition());
                 marker.showInfoWindow();
+                followUser = false;
                 return true;
             }
         });
@@ -511,6 +510,16 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
+                followUser = false;
+            }
+        });
+
+
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                followUser = true;
+                return false;
             }
         });
 
@@ -518,6 +527,7 @@ public class MapsActivity extends AppCompatActivity
             @Override
             public boolean onClusterClick(Cluster<PegItem> cluster) {
                 moveCamera(cluster.getPosition(), 15);
+                followUser = false;
                 return true;
             }
         });
@@ -528,12 +538,13 @@ public class MapsActivity extends AppCompatActivity
      * DEFAULT_ZOOM = 15
      */
     private void moveCamera(LatLng latLng, float zoom) {
-        Log.d(TAG, "moveCamera: moving camera to: " + latLng);
+        Log.d(TAG, "moveCamera (zoom): moving: " + latLng + ", zoom: " + zoom);
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
         mMap.animateCamera(location);
     }
 
     private void moveCamera(LatLng latLng) {
+        Log.d(TAG, "moveCamera : moving: " + latLng);
         CameraUpdate location = CameraUpdateFactory.newLatLng(latLng);
         mMap.animateCamera(location);
     }
@@ -593,6 +604,18 @@ public class MapsActivity extends AppCompatActivity
 
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
+    }
+
+    @Override
+    public void onCameraMoveStarted(int reason) {
+        switch (reason) {
+            case GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE:
+                followUser = false;
+                if (singleRestaurantMarker != null) {
+                    singleRestaurantMarker.remove();
+                    singleRestaurantMarker = null;
+                }
+        }
     }
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
