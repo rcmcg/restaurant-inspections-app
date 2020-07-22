@@ -6,7 +6,7 @@
     <string name="latitude">Latitude:</string>
     <string name="title_activity_restaurant">Restaurant</string>
     <string name="display_formate_criticalnum_non_criticalnum_relative_type_hazardlevel_icon">Display Formate: CriticalNum,Non-CriticalNum,Relative,Type,HazardLevel,Icon</string>
-    <string name="lat">Lat:</string>
+    <string name="coordinates">Coordinates:</string>
 
     <string name="main_activity_restaurant_name">%1$s</string>
     <string name="main_activity_restaurant_item_last_inspection_date">Last inspection: %1$s</string>
@@ -36,6 +36,7 @@
     <string name="ask_user_to_update_decline">No</string>
     <string name="please_wait_dialog_message">Please wait while the data is being downloaded. Press cancel if you would like to cancel the download.</string>
     <string name="please_wait_dialog_cancel">Cancel</string>
+    <string name="launch_list">LAUNCH LIST</string>
 
 
 </resources>
