@@ -31,6 +31,7 @@ import static android.content.ContentValues.TAG;
 
 /**
  * Singleton class which contains all instances of Restaurant
+ * Contains functions for reading and writing to files, downloading new data, among others
  */
 
 public class RestaurantManager implements Iterable<Restaurant>{
@@ -40,8 +41,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     // Variables
     private List<Restaurant> restaurantList = new ArrayList<>();
-    // private List<Integer> violNumbers = new ArrayList<>();
-    // private List<String> violBriefDescriptions = new ArrayList<>();
     private List<Integer> violNumbers;
     private List<String> violBriefDescriptions;
     private static RestaurantManager manager;
@@ -50,11 +49,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private boolean userBeenAskedToUpdateThisSession = false;
     private boolean isDownloadCancelled = false;
     OkHttpClient client = new OkHttpClient().newBuilder().build();
-
-    // private String searchTerm = "";
-    // private String hazardLevelFilter = "All";
-    // private String comparator = "All";
-    // private boolean favouriteOnly = false;
 
     // Iterable and a singleton class of restaurants object
     public RestaurantManager(){

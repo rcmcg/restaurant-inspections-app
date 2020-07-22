@@ -10,9 +10,10 @@
         android:id="@+id/btnLaunchMap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
-        android:text="LAUNCH MAP"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:text="@string/launch_map"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
