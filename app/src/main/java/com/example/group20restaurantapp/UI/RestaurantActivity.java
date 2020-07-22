@@ -25,6 +25,12 @@ import com.example.group20restaurantapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity to display information about a single restaurant. User can select an inspection to get
+ * more information about it by launching InspectionActivity, or select the coordinates to launch
+ * MapsActivity centered on the restaurant.
+ */
+
 public class RestaurantActivity extends AppCompatActivity {
 
     public static final String RESTAURANT_ACTIVITY_INSPECTION_TAG = "inspection";
@@ -195,14 +201,6 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
     }
-
-    /*
-    private void setupDefaultIntent() {
-        Intent i = new Intent();
-        i.putExtra("result", 0);
-        setResult(Activity.RESULT_OK, i);
-    }
-     */
 
     public static Intent makeLaunchIntent(Context c) {
         return new Intent(c, RestaurantActivity.class);

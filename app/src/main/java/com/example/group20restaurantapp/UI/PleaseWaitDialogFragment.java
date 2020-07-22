@@ -12,6 +12,11 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.group20restaurantapp.R;
 
+/**
+ * Dialog to give user a change to cancel dialog initiated by AskUserToUpdateDialogFragment.
+ * MapsActivity implements the listener.
+ */
+
 // source: https://developer.android.com/guide/topics/ui/dialogs
 public class PleaseWaitDialogFragment extends DialogFragment {
     @NonNull

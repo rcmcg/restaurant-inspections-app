@@ -54,6 +54,12 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Activity that utilizes Google Maps to show user restaurants in internal storage, restaurants
+ * in Surrey in this case. User can interact with the map and markers or switch to the list
+ * of restaurants by launching MainActivity.
+ */
+
 public class MapsActivity extends AppCompatActivity
         implements
         OnMapReadyCallback,
@@ -229,9 +235,6 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
         // User pressed dialog's negative button, ie, wants to cancel the download
-        // Toast.makeText(MapsActivity.this,
-                // "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
-
         manager.setDownloadCancelled(true);
         manager.cancelDownloads();
     }
@@ -515,7 +518,6 @@ public class MapsActivity extends AppCompatActivity
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
                 intent.putExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG, restaurantIndex);
                 startActivity(intent);
-                // MapsActivity.this.startActivityForResult(intent, 451);
             }
         });
 

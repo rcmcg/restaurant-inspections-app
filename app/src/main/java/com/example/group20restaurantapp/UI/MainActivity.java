@@ -25,6 +25,11 @@ import com.example.group20restaurantapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity that displays restaurants in internal storage in list form. User can switch to the
+ * MapActivity or select a restaurant in the list to launch RestaurantActivity for that restaurant
+ */
+
 public class MainActivity extends AppCompatActivity {
     public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";

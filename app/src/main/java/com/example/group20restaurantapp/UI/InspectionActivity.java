@@ -27,6 +27,11 @@ import com.example.group20restaurantapp.R;
 import java.io.ObjectInputStream;
 import java.util.List;
 
+/**
+ * Activity for an individual violation. Displays a list of violations for that inspection report.
+ * User can press a violation to get more information about it.
+ */
+
 public class InspectionActivity extends AppCompatActivity {
 
     private static List<Violation> violationList;
