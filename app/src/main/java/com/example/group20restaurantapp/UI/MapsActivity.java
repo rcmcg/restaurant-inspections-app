@@ -78,10 +78,13 @@ public class MapsActivity extends AppCompatActivity
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
     public static final String RESTAURANT_ACTIVITY_RESTAURANT_TAG = "restaurant";
-    private static final float DEFAULT_ZOOM = 10f;
+    // private static final float DEFAULT_ZOOM = 10f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    public static final int ZOOM_STREETS = 15;
+    public static final int ZOOM_CITY = 10;
+    public static final int ZOOM_BUILDINGS = 20;
 
     // private static final String EXTRA_MESSAGE = "Extra";
 
@@ -129,8 +132,10 @@ public class MapsActivity extends AppCompatActivity
             Log.d(TAG, "onCreate: App has never been updated or it's been over 20 hours since the last update");
 
             // Check server for new data, get URL as well as date data last updated
-            String[] restaurantDataURLDate = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
-            String[] inspectionDataURLDate = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
+            String[] restaurantDataURLDate = manager
+                    .getURLDateLastModified("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
+            String[] inspectionDataURLDate = manager
+                    .getURLDateLastModified("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
 
             // Update global URL variables
             restaurantDataURL = restaurantDataURLDate[0];
@@ -171,31 +176,20 @@ public class MapsActivity extends AppCompatActivity
         wireLaunchListButton();
     }
 
-    /*
-    // TODO: Move to RestaurantManager.java?
-    private void refillRestaurantManager() {
-        // Call this function when the RestaurantManager needs to be updated with new data
-        manager = RestaurantManager.getInstance();
-        // manager.getRestaurants().clear();
-        manager.resetRestaurantList();
-        fillRestaurantManager(true);
-    }
-
-    // TODO: Move to RestaurantManager.java?
-    private void fillRestaurantManager(boolean hasAppBeenUpdated) {
-        manager = RestaurantManager.getInstance();
-        if (!hasAppBeenUpdated) {
-            manager.readRestaurantData(this);
-            manager.initInspectionLists(this);
+    private void getLocationPermissionFromUser() {
+        Log.d("MapsActivity", "Working till get location permission");
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION};
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                mLocationPermissionsGranted = true;
+            } else {
+                ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
+            }
         } else {
-            manager.readNewRestaurantData(this);
-            manager.initNewInspectionLists(this);
+            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
         }
-        manager.sortInspListsByDate();
-        manager.sortRestaurantsByName();
     }
-
-     */
 
     private Date getDateFromString(String rawString) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -208,40 +202,6 @@ public class MapsActivity extends AppCompatActivity
         return TimeUnit.HOURS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
 
-    private void saveAppLastUpdated(long currentDateInMs) {
-        SharedPreferences prefs = this.getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong("appLastUpdated", currentDateInMs);
-        editor.apply();
-    }
-
-    static public long getAppLastUpdated(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        return prefs.getLong("appLastUpdated", -1);
-    }
-
-    public void showPleaseWaitDialog() {
-        // Create an instance of the dialog fragment and show it
-        pleaseWaitDialog = new PleaseWaitDialogFragment();
-        pleaseWaitDialog.show(getSupportFragmentManager(), "PleaseWaitFragment");
-    }
-
-    private void finishPleaseWaitDialog() {
-        if (pleaseWaitDialog != null) {
-            pleaseWaitDialog.dismiss();
-        }
-    }
-
-    @Override
-    public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
-        // User pressed dialog's negative button, ie, wants to cancel the download
-        // Toast.makeText(MapsActivity.this,
-                // "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
-
-        manager.setDownloadCancelled(true);
-        manager.cancelDownloads();
-    }
-
     public void showAskUserToUpdateDialog() {
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new AskUserToUpdateDialogFragment();
@@ -250,8 +210,6 @@ public class MapsActivity extends AppCompatActivity
 
     public void onAskUserToUpdateDialogPositiveClick(DialogFragment dialog) {
         // User touched the dialog's positive button
-        // Toast.makeText(MapsActivity.this,
-                // "MapsActivity: User pressed yes to update", Toast.LENGTH_SHORT).show();
         // Launch please-wait dialog and start the download
         showPleaseWaitDialog();
 
@@ -262,6 +220,26 @@ public class MapsActivity extends AppCompatActivity
                 initiateDownload();
             }
         }, 2000);   // 2 seconds
+    }
+
+    public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
+    }
+
+    public void showPleaseWaitDialog() {
+        // Create an instance of the dialog fragment and show it
+        pleaseWaitDialog = new PleaseWaitDialogFragment();
+        pleaseWaitDialog.show(getSupportFragmentManager(), "PleaseWaitFragment");
+    }
+
+    @Override
+    public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
+        // User pressed dialog's negative button, ie, wants to cancel the download
+        // Toast.makeText(MapsActivity.this,
+                // "User pressed cancel. Cancel the download", Toast.LENGTH_SHORT).show();
+
+        manager.setDownloadCancelled(true);
+        manager.cancelDownloads();
     }
 
     private void initiateDownload() {
@@ -296,14 +274,13 @@ public class MapsActivity extends AppCompatActivity
             mClusterManager.cluster();
             setUpClusterer();
             mClusterManager.cluster();
-            // refreshMap();
         }
     }
 
-    public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
-        // User touched the dialog's negative button
-        // Toast.makeText(MapsActivity.this,
-                // "MapsActivity: User pressed no, do not update", Toast.LENGTH_SHORT).show();
+    private void finishPleaseWaitDialog() {
+        if (pleaseWaitDialog != null) {
+            pleaseWaitDialog.dismiss();
+        }
     }
 
     private void getDeviceLocation() {
@@ -319,7 +296,7 @@ public class MapsActivity extends AppCompatActivity
                             Log.d("MapsActivity", "Found Location");
                             Location currentLocation = (Location) task.getResult();
                             followUser = true;
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 20);
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), ZOOM_BUILDINGS);
                         } else {
                             Log.d("MapsActivity", "Current location cannot be found");
                             Toast.makeText(MapsActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
@@ -329,21 +306,6 @@ public class MapsActivity extends AppCompatActivity
             }
         } catch (SecurityException e) {
             Log.e(TAG, "getDeviceLocation: " + e.getMessage());
-        }
-    }
-
-    private void getLocationPermissionFromUser() {
-        Log.d("MapsActivity", "Working till get location permission");
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION};
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mLocationPermissionsGranted = true;
-            } else {
-                ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
-            }
-        } else {
-            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
 
@@ -399,7 +361,6 @@ public class MapsActivity extends AppCompatActivity
         mMap = googleMap;
 
         if (mLocationPermissionsGranted) {
-            // getDeviceLocation();
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED
@@ -407,7 +368,6 @@ public class MapsActivity extends AppCompatActivity
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED
                 ) {
-                // TODO: Remove this return statement? What is it for?
                 return;
             }
             mMap.setMyLocationEnabled(true);
@@ -420,12 +380,9 @@ public class MapsActivity extends AppCompatActivity
                     }
 
                     updateLocationIter++;
-                    // Only update the location every 3 ticks
-                    if (followUser && (updateLocationIter %3 == 0)) {
-                        Log.d(TAG, "onMyLocationChange: moveCamera()");
-
-                        // Let the camera settle on user's location first
-                        if (updateLocationIter > 8) {
+                    if (followUser && (updateLocationIter %3 == 0)) {   // Only update the location every 3 ticks
+                        if (updateLocationIter > 8) {                   // Let the camera settle on user's location first
+                            Log.d(TAG, "onMyLocationChange: moveCamera()");
                             mCurrentLocation = location;
                             moveCamera(new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
                         }
@@ -434,8 +391,13 @@ public class MapsActivity extends AppCompatActivity
             });
         }
 
+        // Configure map UI
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        //Set Custom InfoWindow Adapter
+        CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
+        mMap.setInfoWindowAdapter(adapter);
 
         mMap.setOnCameraMoveStartedListener(this);
 
@@ -443,40 +405,45 @@ public class MapsActivity extends AppCompatActivity
         mClusterManager.cluster();
         registerClickCallback();
 
-        //Set Custom InfoWindow Adapter
-        CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
-        mMap.setInfoWindowAdapter(adapter);
-
-        // move camera to Surrey first
+        // Move camera to Surrey first
         LatLng surrey = new LatLng(49.104431, -122.801094);
-        moveCamera(surrey, 10);
+        moveCamera(surrey, ZOOM_CITY);
 
+        // Get chosen restaurant from intent (if it exists)
         double[] chosenRestaurantLatLon = getChosenRestaurantLocation();
         String chosenRestaurantName = getIntent().getStringExtra(RestaurantActivity.RESTAURANT_NAME_INTENT_TAG);
 
         Log.d(TAG, "onMapReady: chosenRestaurantName: " + chosenRestaurantName);
-        Log.d(TAG, "onMapReady: chosenRestaurantLatLon = [" + chosenRestaurantLatLon[0]
+        Log.d(TAG, "onMapReady: chosenRestaurantLatLon = ["
+                + chosenRestaurantLatLon[0]
                 + "," + chosenRestaurantLatLon[1] + "]");
-        LatLng chosenRestaurantCoords = null;
 
+        LatLng chosenRestaurantCoords = null;
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
             getDeviceLocation();
         } else {
             Log.d(TAG, "onMapReady: Setting map to chosen restaurant coords");
-            Log.d(TAG, "onMapReady: chosen restaurant lat: " + chosenRestaurantLatLon[0] + " chosen restaurant lon: " + chosenRestaurantLatLon[1]);
+            Log.d(TAG, "onMapReady: chosen restaurant lat: "
+                    + chosenRestaurantLatLon[0] + " chosen restaurant lon: "
+                    + chosenRestaurantLatLon[1]);
 
             chosenRestaurantCoords = new LatLng(
                     chosenRestaurantLatLon[0],
                     chosenRestaurantLatLon[1]
             );
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, 15));
+
+            // Move camera to chosen restaurant
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, ZOOM_STREETS));
 
             Restaurant restaurant = manager.findRestaurantByLatLng(chosenRestaurantLatLon[0],
                     chosenRestaurantLatLon[1], chosenRestaurantName);
+
+            // Confirm we have the correct position
             if (restaurant.getLongitude() ==  chosenRestaurantLatLon[1] &&
                 restaurant.getLatitude() ==  chosenRestaurantLatLon[0])
             {
+                // Add a marker and display it's window, delete when the user pans
                 singleRestaurantMarker = mMap.addMarker(new MarkerOptions()
                         .position(chosenRestaurantCoords)
                         .icon(getHazardIcon(restaurant))
@@ -484,76 +451,6 @@ public class MapsActivity extends AppCompatActivity
                 singleRestaurantMarker.showInfoWindow();
             }
         }
-    }
-
-    private void registerClickCallback() {
-        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                // Find the restaurant to work with.
-                LatLng latLngF = marker.getPosition();
-                double lat = latLngF.latitude;
-                double lng = latLngF.longitude;
-                String restaurantName = marker.getTitle();
-                Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
-                int tempIndex = manager.findIndex(restaurant);
-                Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
-                intent.putExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG, tempIndex);
-
-                MapsActivity.this.startActivityForResult(intent, 451);
-            }
-        });
-
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                moveCamera(marker.getPosition());
-                marker.showInfoWindow();
-                Log.d(TAG, "onMarkerClick: Marker clicked, setting followUser to false");
-                followUser = false;
-                return true;
-            }
-        });
-
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                followUser = false;
-            }
-        });
-
-        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-            @Override
-            public boolean onMyLocationButtonClick() {
-                followUser = true;
-                return false;
-            }
-        });
-
-        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<PegItem>() {
-            @Override
-            public boolean onClusterClick(Cluster<PegItem> cluster) {
-                moveCamera(cluster.getPosition(), 15);
-                followUser = false;
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Move the camera according to Latitude and longitude
-     * DEFAULT_ZOOM = 15
-     */
-    private void moveCamera(LatLng latLng, float zoom) {
-        Log.d(TAG, "moveCamera (zoom): moving: " + latLng + ", zoom: " + zoom);
-        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
-        mMap.animateCamera(location);
-    }
-
-    private void moveCamera(LatLng latLng) {
-        Log.d(TAG, "moveCamera : moving: " + latLng);
-        CameraUpdate location = CameraUpdateFactory.newLatLng(latLng);
-        mMap.animateCamera(location);
     }
 
     private void setUpClusterer() {
@@ -609,6 +506,74 @@ public class MapsActivity extends AppCompatActivity
         return new double[]{restaurantLatitude, restaurantLongitude};
     }
 
+    private void registerClickCallback() {
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                // Find the restaurant we need to open for RestaurantActivity
+                LatLng latLngF = marker.getPosition();
+                double lat = latLngF.latitude;
+                double lng = latLngF.longitude;
+                String restaurantName = marker.getTitle();
+                Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
+                int restaurantIndex = manager.findIndex(restaurant);
+
+                // Launch RestaurantActivity with the correct index
+                Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
+                intent.putExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG, restaurantIndex);
+                startActivity(intent);
+                // MapsActivity.this.startActivityForResult(intent, 451);
+            }
+        });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                moveCamera(marker.getPosition());
+                marker.showInfoWindow();
+                Log.d(TAG, "onMarkerClick: Marker clicked, setting followUser to false");
+                followUser = false;
+                return true;
+            }
+        });
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                followUser = false;
+            }
+        });
+
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                followUser = true;
+                return false;
+            }
+        });
+
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<PegItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<PegItem> cluster) {
+                moveCamera(cluster.getPosition(), ZOOM_STREETS);
+                followUser = false;
+                return true;
+            }
+        });
+    }
+
+    private void moveCamera(LatLng latLng, float zoom) {
+        Log.d(TAG, "moveCamera (zoom): moving: " + latLng + ", zoom: " + zoom);
+        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
+        mMap.animateCamera(location);
+    }
+
+    private void moveCamera(LatLng latLng) {
+        Log.d(TAG, "moveCamera : moving: " + latLng);
+        CameraUpdate location = CameraUpdateFactory.newLatLng(latLng);
+        mMap.animateCamera(location);
+    }
+
     public static Intent makeIntent(Context context) {
         return new Intent(context, MapsActivity.class);
     }
@@ -623,6 +588,18 @@ public class MapsActivity extends AppCompatActivity
                     singleRestaurantMarker = null;
                 }
         }
+    }
+
+    private void saveAppLastUpdated(long currentDateInMs) {
+        SharedPreferences prefs = this.getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong("appLastUpdated", currentDateInMs);
+        editor.apply();
+    }
+
+    static public long getAppLastUpdated(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        return prefs.getLong("appLastUpdated", -1);
     }
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
