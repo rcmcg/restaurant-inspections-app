@@ -300,7 +300,7 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void getDeviceLocation() {
-        Log.d("MapsActivity", "Code has executed till getdevicelocation function");
+        Log.d("MapsActivity", "Getting device location...");
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
             if (mLocationPermissionsGranted) {
