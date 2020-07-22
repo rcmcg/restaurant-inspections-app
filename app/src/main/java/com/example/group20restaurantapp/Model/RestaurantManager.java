@@ -38,6 +38,11 @@ public class RestaurantManager implements Iterable<Restaurant>{
     // Iterable and a singleton class of restaurants object
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
+
+    public List<Restaurant> getRestaurantList() {
+        return restaurantList;
+    }
+
     private List<Restaurant> restaurantList = new ArrayList<>();
     private static RestaurantManager manager;
     // private String searchTerm = "";

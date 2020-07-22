@@ -447,7 +447,7 @@ public class MapsActivity extends AppCompatActivity
                     chosenRestaurantLatLon[0],
                     chosenRestaurantLatLon[1]
             );
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, DEFAULT_ZOOM));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chosenRestaurantCoords, 15));
 
             Restaurant restaurant = manager.findRestaurantByLatLng(chosenRestaurantLatLon[0],
                     chosenRestaurantLatLon[1], chosenRestaurantName);
@@ -614,10 +614,14 @@ public class MapsActivity extends AppCompatActivity
 
             // Find the restaurant to work with.
             LatLng latLngF = marker.getPosition();
-            String restaurantName = marker.getTitle();
             double lat = latLngF.latitude;
             double lng = latLngF.longitude;
-            Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
+            Restaurant restaurant = null;
+            restaurant = manager.findRestaurantByLatLng(lat, lng, marker.getTitle());
+            if (restaurant == null){
+                Log.d(TAG, "Cluster Click!");
+                return null;
+            }
 
             ImageView logo = itemView.findViewById(R.id.info_item_restaurantLogo);
             logo.setImageResource(restaurant.getIconImgId());
