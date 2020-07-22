@@ -39,7 +39,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -63,68 +62,73 @@ public class MapsActivity extends AppCompatActivity
         GoogleMap.OnCameraMoveStartedListener
 {
 
+    // Map variables
     private GoogleMap mMap;
+    private Boolean mLocationPermissionsGranted = false;
+    // private Marker mMarker;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private ClusterManager<PegItem> mClusterManager;
+    private Marker singleRestaurantMarker;
+    private Boolean followUser = false;
+    private Location mCurrentLocation;
+    private static int updateLocationIter = 0;      // Used to update the users location as they move
 
+    // Constants
     private static final String TAG = "MapActivity";
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
+    public static final String RESTAURANT_ACTIVITY_RESTAURANT_TAG = "restaurant";
     private static final float DEFAULT_ZOOM = 10f;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    public static final String RESTAURANT_ACTIVITY_RESTAURANT_TAG = "restaurant";
-    private static final String EXTRA_MESSAGE = "Extra";
-    private Boolean mLocationPermissionsGranted = false;
-    private Marker mMarker;
-    private RestaurantManager manager = RestaurantManager.getInstance();
-    private FusedLocationProviderClient mFusedLocationProviderClient;
-    private ClusterManager<PegItem> mClusterManager;
 
+    // private static final String EXTRA_MESSAGE = "Extra";
+
+    // Model variables
+    private RestaurantManager manager = RestaurantManager.getInstance();
     private Boolean updateData = false;
     private Boolean newData = false;
     private String restaurantDataURL;
     private String inspectionDataURL;
     private Date currentDate;
-    private Marker singleRestaurantMarker;
-
     private DialogFragment pleaseWaitDialog;
-
-    private Boolean followUser = false;
-    private Location mCurrentLocation;
-    private static int updateLocationIter = 0;      // Used to update the users location as they move
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        Log.d("MapsActivity", "Working onCreate");
 
         getLocationPermissionFromUser();
-        Log.d("MapsActivity", "Working onCreate");
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        currentDate = new Date();
+
         long appLastUpdated = getAppLastUpdated(this);
 
         // read data on startup
         if (manager.getSize() == 0) {
             if (appLastUpdated == -1) {
                 Log.d(TAG, "onCreate: Filling with default restaurants");
-                fillRestaurantManager(false);
+                manager.fillRestaurantManager(false, this);
             } else {
                 Log.d(TAG, "onCreate: Filling with updated restaurants");
-                fillRestaurantManager(true);
+                manager.fillRestaurantManager(true, this);
             }
         }
 
+        // Decide whether or not to ask user to update
+        currentDate = new Date();
         Log.d(TAG, "onCreate: Time since last update in hours: " +  timeSinceLastAppUpdateInHours(currentDate));
         if (appLastUpdated == -1 || timeSinceLastAppUpdateInHours(currentDate) >= 20) {
             // App has never been updated or it's been over 20 hours since the last update
             Log.d(TAG, "onCreate: App has never been updated or it's been over 20 hours since the last update");
 
-            // Check server for new data
+            // Check server for new data, get URL as well as date data last updated
             String[] restaurantDataURLDate = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
             String[] inspectionDataURLDate = manager.getURL("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
 
@@ -167,6 +171,7 @@ public class MapsActivity extends AppCompatActivity
         wireLaunchListButton();
     }
 
+    /*
     // TODO: Move to RestaurantManager.java?
     private void refillRestaurantManager() {
         // Call this function when the RestaurantManager needs to be updated with new data
@@ -189,6 +194,8 @@ public class MapsActivity extends AppCompatActivity
         manager.sortInspListsByDate();
         manager.sortRestaurantsByName();
     }
+
+     */
 
     private Date getDateFromString(String rawString) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -281,7 +288,7 @@ public class MapsActivity extends AppCompatActivity
             manager.writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV, this);
             Log.d(TAG, "initiateDownload: finished writing newInspectionData");
 
-            refillRestaurantManager();
+            manager.refillRestaurantManagerNewData(this);
             saveAppLastUpdated(currentDate.getTime());
 
             // Update the map
@@ -418,7 +425,7 @@ public class MapsActivity extends AppCompatActivity
                         Log.d(TAG, "onMyLocationChange: moveCamera()");
 
                         // Let the camera settle on user's location first
-                        if (updateLocationIter > 5) {
+                        if (updateLocationIter > 8) {
                             mCurrentLocation = location;
                             moveCamera(new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
                         }
@@ -502,6 +509,7 @@ public class MapsActivity extends AppCompatActivity
             public boolean onMarkerClick(Marker marker) {
                 moveCamera(marker.getPosition());
                 marker.showInfoWindow();
+                Log.d(TAG, "onMarkerClick: Marker clicked, setting followUser to false");
                 followUser = false;
                 return true;
             }
@@ -513,7 +521,6 @@ public class MapsActivity extends AppCompatActivity
                 followUser = false;
             }
         });
-
 
         mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override

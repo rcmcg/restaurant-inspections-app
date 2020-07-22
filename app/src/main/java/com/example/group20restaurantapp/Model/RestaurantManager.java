@@ -164,6 +164,23 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return null;
     }
 
+    public void refillRestaurantManagerNewData(Context context) {
+        resetRestaurantList();
+        fillRestaurantManager(true, context);
+    }
+
+    public void fillRestaurantManager(boolean hasAppBeenUpdated, Context context) {
+        if (!hasAppBeenUpdated) {
+            readRestaurantData(context);
+            initInspectionLists(context);
+        } else {
+            readNewRestaurantData(context);
+            initNewInspectionLists(context);
+        }
+        sortInspListsByDate();
+        sortRestaurantsByName();
+    }
+
     /*
     public List<Restaurant> getRestaurants() {
         searchTerm = searchTerm.trim();
