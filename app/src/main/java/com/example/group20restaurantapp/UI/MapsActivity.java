@@ -407,9 +407,13 @@ public class MapsActivity extends AppCompatActivity
             mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
                 @Override
                 public void onMyLocationChange(Location location) {
-                    Log.d(TAG, "onMyLocationChange: followUser: " + followUser + ", updateIter: " + updateLocationIter);
-                    // Only update the location every 5 ticks
+                    // Don't constantly print to log
+                    if (updateLocationIter%5 == 0) {
+                        Log.d(TAG, "onMyLocationChange: followUser: " + followUser + ", updateIter: " + updateLocationIter);
+                    }
+
                     updateLocationIter++;
+                    // Only update the location every 3 ticks
                     if (followUser && (updateLocationIter %3 == 0)) {
                         Log.d(TAG, "onMyLocationChange: moveCamera()");
 
@@ -515,7 +519,6 @@ public class MapsActivity extends AppCompatActivity
             @Override
             public boolean onMyLocationButtonClick() {
                 followUser = true;
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(5));
                 return false;
             }
         });
