@@ -418,7 +418,7 @@ public class MapsActivity extends AppCompatActivity
                         Log.d(TAG, "onMyLocationChange: moveCamera()");
 
                         // Let the camera settle on user's location first
-                        if (updateLocationIter > 15) {
+                        if (updateLocationIter > 5) {
                             mCurrentLocation = location;
                             moveCamera(new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
                         }
