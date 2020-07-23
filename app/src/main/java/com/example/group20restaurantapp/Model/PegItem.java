@@ -4,6 +4,10 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
+/**
+ * Custom ClusterItem class for use with the ClusterManager for the Google Maps functionality
+ */
+
 public class PegItem implements ClusterItem {
     private LatLng mPosition;
     private String mTitle;

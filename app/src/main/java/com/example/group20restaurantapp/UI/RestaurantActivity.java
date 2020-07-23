@@ -25,6 +25,12 @@ import com.example.group20restaurantapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity to display information about a single restaurant. User can select an inspection to get
+ * more information about it by launching InspectionActivity, or select the coordinates to launch
+ * MapsActivity centered on the restaurant.
+ */
+
 public class RestaurantActivity extends AppCompatActivity {
 
     public static final String RESTAURANT_ACTIVITY_INSPECTION_TAG = "inspection";
@@ -64,7 +70,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
-        setupDefaultIntent();
+        // setupDefaultIntent();
     }
 
     // Source
@@ -110,6 +116,8 @@ public class RestaurantActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Get intent from MapsActivity
                 Intent intent = MapsActivity.makeIntent(RestaurantActivity.this);
+
+                // Launch maps activity to open restaurant marker with location data and name
                 intent.putExtra(RESTAURANT_LATITUDE_INTENT_TAG, restaurant.getLatitude());
                 intent.putExtra(RESTAURANT_LONGITUDE_INTENT_TAG, restaurant.getLongitude());
                 intent.putExtra(RESTAURANT_NAME_INTENT_TAG, restaurant.getName());
@@ -132,7 +140,6 @@ public class RestaurantActivity extends AppCompatActivity {
         }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
             View itemView = convertView;
             if (itemView == null) {
                 itemView = getLayoutInflater().inflate(R.layout.inspection_item_view, parent, false);
@@ -179,7 +186,6 @@ public class RestaurantActivity extends AppCompatActivity {
 
             return itemView;
         }
-
     }
 
     private void registerClickCallback(final Restaurant restaurant) {
@@ -194,12 +200,6 @@ public class RestaurantActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    private void setupDefaultIntent() {
-        Intent i = new Intent();
-        i.putExtra("result", 0);
-        setResult(Activity.RESULT_OK, i);
     }
 
     public static Intent makeLaunchIntent(Context c) {

@@ -15,12 +15,14 @@
 
     <Button
         android:id="@+id/btnLaunchList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="122dp"
+        android:layout_height="37dp"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="26dp"
-        android:layout_marginTop="21dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
         android:text="@string/launch_list" />
 
 </RelativeLayout>

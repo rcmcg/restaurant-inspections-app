@@ -13,6 +13,10 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.group20restaurantapp.R;
 
+/**
+ * Dialog to ask user if they want to update. MapsActivity implements listener
+ */
+
 // source: https://developer.android.com/guide/topics/ui/dialogs
 public class AskUserToUpdateDialogFragment extends DialogFragment {
     @NonNull
