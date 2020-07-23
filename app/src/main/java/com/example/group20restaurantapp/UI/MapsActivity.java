@@ -293,7 +293,7 @@ public class MapsActivity extends AppCompatActivity
                             Log.d("MapsActivity", "Found Location");
                             Location currentLocation = (Location) task.getResult();
                             followUser = true;
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), ZOOM_BUILDINGS);
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), ZOOM_STREETS);
                         } else {
                             Log.d("MapsActivity", "Current location cannot be found");
                             Toast.makeText(MapsActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
@@ -380,7 +380,7 @@ public class MapsActivity extends AppCompatActivity
                     if (followUser && (updateLocationIter %3 == 0)) {   // Only update the location every 3 ticks
                         if (updateLocationIter > 8) {                   // Let the camera settle on user's location first
                             Log.d(TAG, "onMyLocationChange: moveCamera()");
-                            moveCamera(new LatLng(location.getLatitude(),location.getLongitude()));
+                            moveCamera(new LatLng(location.getLatitude(),location.getLongitude()), ZOOM_STREETS);
                         }
                     }
                 }

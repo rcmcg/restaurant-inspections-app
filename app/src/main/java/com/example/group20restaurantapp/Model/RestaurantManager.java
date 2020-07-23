@@ -51,7 +51,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
     OkHttpClient client = new OkHttpClient().newBuilder().build();
 
     // Iterable and a singleton class of restaurants object
-    public RestaurantManager(){
+    private RestaurantManager(){
         // Prevent from instantiating
     }
 
@@ -436,7 +436,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
         violBriefDescriptions = new ArrayList<>();
 
         try {
-            bufferedReader.readLine();
             while ( (line = bufferedReader.readLine()) != null) {
                 String[] lineSplit = line.split(",");
                 violNumbers.add(Integer.parseInt(lineSplit[0]));
@@ -542,12 +541,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     }
 
                     String briefDesc;
-                    if (violNumbers.indexOf(violNumber) == -1) {
-                        briefDesc = "Construction plans ignoring Regulations";
-                    } else {
-                        int briefDescIndex = violNumbers.indexOf(violNumber);
-                        briefDesc = violBriefDescriptions.get(briefDescIndex);
-                    }
+                    int briefDescIndex = violNumbers.indexOf(violNumber);
+                    briefDesc = violBriefDescriptions.get(briefDescIndex);
 
                     Violation violObj = new Violation(violNumber, crit, violSplit[2], briefDesc, repeat);
                     inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
