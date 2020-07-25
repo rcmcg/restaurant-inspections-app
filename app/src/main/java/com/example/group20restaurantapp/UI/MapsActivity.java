@@ -103,6 +103,8 @@ public class MapsActivity extends AppCompatActivity
         setContentView(R.layout.activity_maps);
         Log.d("MapsActivity", "Working onCreate");
 
+        Toast.makeText(this, "ONCREATE TOAST", Toast.LENGTH_SHORT).show();
+
         getLocationPermissionFromUser();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
