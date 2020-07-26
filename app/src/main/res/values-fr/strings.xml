@@ -8,20 +8,20 @@
     <string name = "display_formate_criticalnum_non_criticalnum_relative_type_hazardlevel_icon"> Format daffichage: CriticalNum, Non-CriticalNum, Relative, Type, HazardLevel, Icon </string>
     <string name = "coordinates"> Coordonnées: </string>
 
-    <string name = "main_activity_restaurant_name">% 1 $ s </string>
-    <string name = "main_activity_restaurant_item_last_inspection_date"> Dernière inspection:% 1 $ s </string>
+    <string name = "main_activity_restaurant_name" >%1$s </string>
+    <string name = "main_activity_restaurant_item_last_inspection_date"> Dernière inspection:%1$s </string>
     <string name = "main_activity_restaurant_item_last_inspection_date_no_inspection"> Ce restaurant na jamais fait lobjet dune inspection </string>
-    <string name = "main_activity_restaurant_item_violations"> Violations:% 1 $ s </string>
+    <string name = "main_activity_restaurant_item_violations" > Violations:% 1 $ s </string>
     <string name = "main_activity_restaurant_item_violations_no_inspection" />
 
-    <string name = "restaurant_activity_restaurant_name">% 1 $ s </string>
-    <string name = "restaurant_activity_restaurant_address"> Adresse:% 1 $ s </string>
-    <string name = "restaurant_activity_restaurant_coords"> Coordonnées:% 1 $ s </string>
-    <string name = "restaurant_activity_inspection_item_date"> Dernière inspection:% 1 $ s </string>
-    <string name = "restaurant_activity_inspection_item_crit_viols"> Violations critiques:% 1 $ s </string>
-    <string name = "restaurant_activity_inspection_item_non_crit_viols"> Violations non critiques:% 1 $ s </string>
+    <string name = "restaurant_activity_restaurant_name">%1$s </string>
+    <string name = "restaurant_activity_restaurant_address"> Adresse:%1$s </string>
+    <string name = "restaurant_activity_restaurant_coords" > Coordonnées:%1$s </string>
+    <string name = "restaurant_activity_inspection_item_date" > Dernière inspection: %1$s</string>
+    <string name = "restaurant_activity_inspection_item_crit_viols"> Violations critiques:%1$s </string>
+    <string name = "restaurant_activity_inspection_item_non_crit_viols"> Violations non critiques:%1$s </string>
 
-    <string name = "inspection_activity_violation_item_brief_description">% 1 $ s </string>
+    <string name = "inspection_activity_violation_item_brief_description">%1$s </string>
     <string name = "inspection_activity_violation_item_full_description">
         Numéro de violation:% 1 $ s. Violation critique:% 2 $ s. % 3 $ s. Répéter:% 4 $ s.
     </string>
@@ -48,7 +48,7 @@
     <string name = "last_inspection"> Dernière inspection </string>
     <string name = "of_violations_here"> Nombre de violations ici </string>
 
-    <string name = "n_a"> N / A </string>
+    <string name = "n_a"> N/A </string>
     <string name = "inspection_date_here"> Date dinspection ici </string>
     <string name = "num_crit_viols"> Num crit viols </string>
     <string name = "num_noncrit_viols"> Num nonCrit viols </string>
