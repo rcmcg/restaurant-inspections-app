@@ -21,7 +21,7 @@
         android:layout_marginTop="36dp"
         android:fontFamily="@font/roboto_light"
         android:textColor="@color/black"
-        android:text="Jan 22nd 2020"
+        android:text="@string/jan_22nd_2020"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,7 +34,7 @@
         android:layout_marginTop="20dp"
         android:fontFamily="@font/roboto_light"
         android:textColor="@color/black"
-        android:text="Type: Follow-up"
+        android:text="@string/type_follow_up"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtInspectionDate" />
@@ -47,7 +47,7 @@
         android:layout_marginTop="20dp"
         android:fontFamily="@font/roboto_light"
         android:textColor="@color/black"
-        android:text="# Critical Violations: 5"
+        android:text="@string/critical_violations_5"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtInspectionType" />
@@ -60,7 +60,7 @@
         android:textColor="@color/black"
         android:layout_marginTop="20dp"
         android:fontFamily="@font/roboto_light"
-        android:text="# Non-critical Violations: 5"
+        android:text="@string/non_critical_violations_5"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtNumberCritViolations" />
@@ -84,7 +84,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="20dp"
         android:fontFamily="@font/roboto_light"
-        android:text="Hazard Rating: Medium"
+        android:text="@string/hazard_rating_medium"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtNumberNonCritViolations" />

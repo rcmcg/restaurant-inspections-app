@@ -1,0 +1,57 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name = "app_name"> Inspections des restaurants: Surrey </string>
+    <string name = "name"> Nom: </string>
+    <string name = "address"> Adresse: </string>
+    <string name = "longitude"> Longitude: </string>
+    <string name = "latitude"> Latitude: </string>
+    <string name = "title_activity_restaurant"> Restaurant </string>
+    <string name = "display_formate_criticalnum_non_criticalnum_relative_type_hazardlevel_icon"> Format daffichage: CriticalNum, Non-CriticalNum, Relative, Type, HazardLevel, Icon </string>
+    <string name = "coordinates"> Coordonnées: </string>
+
+    <string name = "main_activity_restaurant_name">% 1 $ s </string>
+    <string name = "main_activity_restaurant_item_last_inspection_date"> Dernière inspection:% 1 $ s </string>
+    <string name = "main_activity_restaurant_item_last_inspection_date_no_inspection"> Ce restaurant na jamais fait lobjet dune inspection </string>
+    <string name = "main_activity_restaurant_item_violations"> Violations:% 1 $ s </string>
+    <string name = "main_activity_restaurant_item_violations_no_inspection" />
+
+    <string name = "restaurant_activity_restaurant_name">% 1 $ s </string>
+    <string name = "restaurant_activity_restaurant_address"> Adresse:% 1 $ s </string>
+    <string name = "restaurant_activity_restaurant_coords"> Coordonnées:% 1 $ s </string>
+    <string name = "restaurant_activity_inspection_item_date"> Dernière inspection:% 1 $ s </string>
+    <string name = "restaurant_activity_inspection_item_crit_viols"> Violations critiques:% 1 $ s </string>
+    <string name = "restaurant_activity_inspection_item_non_crit_viols"> Violations non critiques:% 1 $ s </string>
+
+    <string name = "inspection_activity_violation_item_brief_description">% 1 $ s </string>
+    <string name = "inspection_activity_violation_item_full_description">
+        Numéro de violation:% 1 $ s. Violation critique:% 2 $ s. % 3 $ s. Répéter:% 4 $ s.
+    </string>
+    <string name = "inspection_activity_date"> Date:% 1 $ s </string>
+    <string name = "inspection_activity_type"> Type:% 1 $ s </string>
+    <string name = "inspection_activity_critical_violations"> Violations critiques:% 1 $ s </string>
+    <string name = "inspection_activity_non_critical_violations"> Violations non critiques:% 1 $ s </string>
+    <string name = "inspection_activity_hazard_rating"> Indice de risque:% 1 $ s </string>
+    <string name = "title_activity_maps"> Carte </string>
+    <string name = "ask_user_to_update_message"> Il y a de nouvelles données à télécharger. Souhaitez-vous le télécharger? </string>
+    <string name = "ask_user_to_update_accept"> Oui </string>
+    <string name = "ask_user_to_update_decline"> Non </string>
+    <string name = "please_wait_dialog_message"> Veuillez patienter pendant le téléchargement des données. Appuyez sur Annuler si vous souhaitez annuler le téléchargement. </string>
+    <string name = "please_wait_dialog_cancel"> Annuler </string>
+    <string name = "launch_list"> Passer à la liste </string>
+    <string name = "launch_map"> Passer à la carte </string>
+    <string name = "no_inspection_data_available"> Aucune donnée dinspection disponible. </string>
+    <string name = "type_follow_up"> Type: Suivi </string>
+    <string name = "jan_22nd_2020"> 22 janvier 2020 </string>
+    <string name = "critical_violations_5"> # Violations critiques: 5 </string>
+    <string name = "non_critical_violations_5"> # Violations non critiques: 5 </string>
+    <string name = "hazard_rating_medium"> Cote de danger: moyenne </string>
+    <string name = "restaurant_name_here"> Nom du restaurant ici </string>
+    <string name = "last_inspection"> Dernière inspection </string>
+    <string name = "of_violations_here"> Nombre de violations ici </string>
+
+    <string name = "n_a"> N / A </string>
+    <string name = "inspection_date_here"> Date dinspection ici </string>
+    <string name = "num_crit_viols"> Num crit viols </string>
+    <string name = "num_noncrit_viols"> Num nonCrit viols </string>
+
+
+</resources>
