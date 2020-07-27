@@ -11,7 +11,7 @@
     <string name = "main_activity_restaurant_name" >%1$s </string>
     <string name = "main_activity_restaurant_item_last_inspection_date"> Dernière inspection:%1$s </string>
     <string name = "main_activity_restaurant_item_last_inspection_date_no_inspection"> Ce restaurant na jamais fait lobjet dune inspection </string>
-    <string name = "main_activity_restaurant_item_violations" > Violations:% 1 $ s </string>
+    <string name = "main_activity_restaurant_item_violations" > Violations:%1$s </string>
     <string name = "main_activity_restaurant_item_violations_no_inspection" />
 
     <string name = "restaurant_activity_restaurant_name">%1$s </string>
@@ -23,13 +23,13 @@
 
     <string name = "inspection_activity_violation_item_brief_description">%1$s </string>
     <string name = "inspection_activity_violation_item_full_description">
-        Numéro de violation:% 1 $ s. Violation critique:% 2 $ s. % 3 $ s. Répéter:% 4 $ s.
+        Numéro de violation:%1$s. Violation critique:%2$s. %3$s. Répéter:%4$s.
     </string>
-    <string name = "inspection_activity_date"> Date:% 1 $ s </string>
-    <string name = "inspection_activity_type"> Type:% 1 $ s </string>
-    <string name = "inspection_activity_critical_violations"> Violations critiques:% 1 $ s </string>
-    <string name = "inspection_activity_non_critical_violations"> Violations non critiques:% 1 $ s </string>
-    <string name = "inspection_activity_hazard_rating"> Indice de risque:% 1 $ s </string>
+    <string name = "inspection_activity_date"> Date:%1$s </string>
+    <string name = "inspection_activity_type"> Type:%1$s </string>
+    <string name = "inspection_activity_critical_violations"> Violations critiques:%1$s </string>
+    <string name = "inspection_activity_non_critical_violations"> Violations non critiques:%1$s </string>
+    <string name = "inspection_activity_hazard_rating"> Indice de risque:%1$s </string>
     <string name = "title_activity_maps"> Carte </string>
     <string name = "ask_user_to_update_message"> Il y a de nouvelles données à télécharger. Souhaitez-vous le télécharger? </string>
     <string name = "ask_user_to_update_accept"> Oui </string>
