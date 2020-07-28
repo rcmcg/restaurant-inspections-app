@@ -1,5 +1,7 @@
 package com.example.group20restaurantapp.Model;
 
+import android.util.Log;
+
 import com.example.group20restaurantapp.R;
 
 import java.io.Serializable;
@@ -89,7 +91,55 @@ public class Violation implements Serializable {
     }
 
     public String getViolDetails() {
-        return violDetails;
+        if(Locale.getDefault().getLanguage()=="fr"){
+            if(this.getViolNumber()==201){
+                return"Aliments contaminés ou impropres à la consommation humaine [art. 13]";
+            }else if(this.getViolNumber()==202){
+                return"Food non transformé en manière qui rend la consommation sans danger [par. 14 (1)]";
+            }else if(this.getViolNumber()==203){
+                return"Aliments non refroidis de manière acceptable [art. 12 (a)]";
+            }else if(this.getViolNumber()==205){
+                return"Cold Food potentiellement dangereux stocké / affiché au-dessus de 4 ° C. [S. 14 (2)]";
+            }else if(this.getViolNumber()==206){
+                return"Aliments chauds potentiellement dangereux stockés / affichés en dessous de 60 ° C. [S. 14 (2)]";
+            }else if(this.getViolNumber()==209){
+                return"Aliments non protégés contre la contamination [par. 12 (a)]";
+            }else if(this.getViolNumber()==210){
+                return"Food not décongelé de manière acceptable [par. 14 (2)]";
+            }else if(this.getViolNumber()==211){
+                return"Congelé aliments potentiellement dangereux entreposés / exposés au-dessus de -18 ° C. [par. 14 (3)]";
+            }else if(this.getViolNumber()==301){
+                return"Équipement / ustensiles / surfaces en contact avec les aliments non maintenus dans des conditions sanitaires [par. 17 (1)]";
+            }else if(this.getViolNumber()==302){
+                return"Équipement / ustensiles / surfaces en contact avec les aliments mal lavés et désinfectés [par. 17 (2)]";
+            }else if(this.getViolNumber()==304){
+                return"Locaux non exempts de parasites [par. 26 (a)]";
+            }else if(this.getViolNumber()==305){
+                return"Conditions observées pouvant permettre l'entrée / l'hébergement / la reproduction d'organismes nuisibles [al. 26 (b) (c)]";
+            }else if(this.getViolNumber()==306){
+                return"Locaux destinés aux aliments non maintenu dans un état sanitaire [art. 17 (1)]";
+            }else if(this.getViolNumber()==308){
+                return"L'équipement / les ustensiles / les surfaces en contact avec les aliments ne sont pas en bon état de fonctionnement [art. 16 (b)]";
+            }else if(this.getViolNumber()==309){
+                return"Nettoyants chimiques et agents similaires entreposés ou étiquetés incorrectement [art. 27]";
+            }else if(this.getViolNumber()==315){
+                return"Les unités de réfrigération et l'équipement de maintien au chaud manquent de thermomètres précis [par. 19 (2)]";
+            }else if(this.getViolNumber()==401){
+                return" Stations de lavage des mains adéquates non disponibles pour les employés [par. 21 (4)]";
+            }else if(this.getViolNumber()==402){
+                return"L'employé ne se lave pas les mains correctement ou à une fréquence adéquate [par. 21 (3)]";
+            }else if(this.getViolNumber()==501){
+                return"l'exploitant n'a pas le niveau FOODSAFE 1 ou l'équivalent [par. 10 (1)]";
+            }else{
+                //Log.d("");
+
+                        return "violation générique";
+            }
+
+        }else{
+        return violDetails;}
+
+
     }
 
     public String getBriefDetails() {
@@ -182,6 +232,7 @@ public class Violation implements Serializable {
 
 
     public Boolean getRepeat() {
+
         return repeat;
     }
 }
