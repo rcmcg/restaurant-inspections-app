@@ -21,7 +21,7 @@
         android:layout_marginTop="36dp"
         android:fontFamily="@font/roboto_light"
         android:textColor="@color/black"
-        android:text="@string/jan_22nd_2020"
+        android:text="@string/Date_place_holder"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

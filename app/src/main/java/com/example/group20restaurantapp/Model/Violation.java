@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Contains information about a particular violation
@@ -91,7 +92,94 @@ public class Violation implements Serializable {
         return violDetails;
     }
 
-    public String getBriefDetails() { return briefDetails; }
+    public String getBriefDetails() {
+        if (Locale.getDefault().getLanguage() == "fr") {
+            if (this.getViolNumber() == 101) {
+                return "Plans de construction ignorant les règlements";
+            } else if (this.getViolNumber() == 102) {
+                return "prémisse non approuvée";
+            } else if (this.getViolNumber() == 103) {
+                return "Permis invalide";
+
+            } else if (this.getViolNumber() == 104) {
+                return "permis caché";
+            } else if (this.getViolNumber() == 201) {
+                return "aliments contaminés";
+            } else if (this.getViolNumber() == 202) {
+                return "Aliments mal transformés";
+            } else if (this.getViolNumber() == 203) {
+                return "les aliments ne sont pas refroidis correctement";
+            } else if (this.getViolNumber() == 204) {
+                return "La nourriture n'est pas cuite correctement";
+            } else if (this.getViolNumber() == 205) {
+                return "aliments froids mal stockés";
+            } else if (this.getViolNumber() == 206) {
+                return "aliments chauds mal stockés";
+            } else if (this.getViolNumber() == 208) {
+                return "Aliments obtenus d'une source non approuvée";
+            } else if (this.getViolNumber() == 209) {
+                return "Aliments non protégés contre la contamination";
+            } else if (this.getViolNumber() == 210) {
+                return "nourriture non décongelée correctement";
+            } else if (this.getViolNumber() == 211) {
+                return "les aliments surgelés ne sont pas stockés correctement";
+            } else if (this.getViolNumber() == 212) {
+                return "Mauvaises procédures écrites de manipulation des aliments";
+            } else if (this.getViolNumber() == 301) {
+                return "Surfaces et équipements de cuisine sales";
+            } else if (this.getViolNumber() == 302) {
+                return "Surfaces et équipements de cuisine sales";
+            } else if (this.getViolNumber() == 303) {
+                return "Mauvais équipement ou installations sanitaires";
+            } else if (this.getViolNumber() == 304) {
+                return "Ravageurs trouvés sur place";
+            } else if (this.getViolNumber() == 305) {
+                return "mauvaise prévention des ravageurs";
+            } else if (this.getViolNumber() == 306) {
+                return "local insalubre";
+            } else if (this.getViolNumber() == 307) {
+                return "Matériel ou ustensiles de mauvaise qualité";
+            } else if (this.getViolNumber() == 308) {
+                return "Mauvais entretien des équipements";
+            } else if (this.getViolNumber() == 309) {
+                return "produits chimiques de nettoyage mal stockés";
+            } else if (this.getViolNumber() == 310) {
+                return "articles à usage unique non éliminés après utilisation";
+            } else if (this.getViolNumber() == 311) {
+                return "Locaux mal entretenus";
+            } else if (this.getViolNumber() == 312) {
+                return "articles hors cuisine stockés sur place";
+            } else if (this.getViolNumber() == 313) {
+                return "animal non-aidant sur place";
+            } else if (this.getViolNumber() == 314) {
+                return "Mauvaises procédures sanitaires écrites";
+            } else if (this.getViolNumber() == 315) {
+                return "thermomètres inexacts ou inexistants";
+            } else if (this.getViolNumber() == 401) {
+                return "stations de lavage des mains médiocres ou inexistantes";
+            } else if (this.getViolNumber() == 402) {
+                return "Mauvaise pratique de lavage des mains des employés";
+            } else if (this.getViolNumber() == 403) {
+                return "mauvaise hygiène personnelle des employés";
+            } else if (this.getViolNumber() == 404) {
+                return "Employé qui fume près des zones critiques";
+            } else if (this.getViolNumber() == 501) {
+                return "l'opérateur n'a pas la certification FOODSAFE";
+            } else if (this.getViolNumber() == 502) {
+                return "pas de certification FOODSAFE sur site";
+            } else {
+                return "Violation générique trouvée";
+
+            }
+        } else {
+
+            return briefDetails;
+        }
+    }
+
+
+
+
 
     public Boolean getRepeat() {
         return repeat;

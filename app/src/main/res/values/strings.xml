@@ -40,7 +40,7 @@
     <string name="launch_map">Switch to map</string>
     <string name="no_inspection_data_available">No inspection data available.</string>
     <string name="type_follow_up">Type: Follow-up</string>
-    <string name="jan_22nd_2020">Jan 22nd 2020</string>
+    <string name="Date_place_holder">Jan 22nd 2020</string>
     <string name="critical_violations_5"># Critical Violations: 5</string>
     <string name="non_critical_violations_5"># Non-critical Violations: 5</string>
     <string name="hazard_rating_medium">Hazard Rating: Medium</string>

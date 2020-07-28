@@ -40,7 +40,7 @@
     <string name = "launch_map"> Passer à la carte </string>
     <string name = "no_inspection_data_available"> Aucune donnée dinspection disponible. </string>
     <string name = "type_follow_up"> Type: Suivi </string>
-    <string name = "jan_22nd_2020"> 22 janvier 2020 </string>
+    <string name = "Date_place_holder"> 22 janvier 2020 </string>
     <string name = "critical_violations_5"> # Violations critiques: 5 </string>
     <string name = "non_critical_violations_5"> # Violations non critiques: 5 </string>
     <string name = "hazard_rating_medium"> Cote de danger: moyenne </string>
