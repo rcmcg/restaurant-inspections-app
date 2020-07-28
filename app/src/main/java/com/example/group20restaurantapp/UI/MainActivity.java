@@ -97,6 +97,20 @@ public class MainActivity extends AppCompatActivity {
             // Find the restaurant to work with
             Restaurant currentRestaurant = manager.getIndex(position);
 
+            final ImageView imgFavourite = itemView.findViewById(R.id.img_favourite);
+            imgFavourite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (imgFavourite.getTag().equals("favourited")){
+                        imgFavourite.setImageResource(R.drawable.star_off);
+                        imgFavourite.setTag("unfavourited");
+                    }
+                    else{
+                        imgFavourite.setImageResource(R.drawable.star_on);
+                        imgFavourite.setTag("favourited");
+                    }
+                }
+            });
             // Fill the restaurantIcon
             ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
             imgRestaurant.setImageResource(currentRestaurant.getIconImgId());
