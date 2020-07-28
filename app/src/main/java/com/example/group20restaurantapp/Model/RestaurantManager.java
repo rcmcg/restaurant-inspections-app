@@ -41,6 +41,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     // Variables
     private List<Restaurant> restaurantList = new ArrayList<>();
+    private List<Restaurant> filteredRestaurantList = new ArrayList<>();
     private List<Integer> violNumbers;
     private List<String> violBriefDescriptions;
     private static RestaurantManager manager;
@@ -119,7 +120,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return restaurantList.iterator();
     }
 
-    private void resetRestaurantList() {
+    // public for testing
+    public void resetRestaurantList() {
         restaurantList.clear();
     }
 
@@ -158,6 +160,37 @@ public class RestaurantManager implements Iterable<Restaurant>{
             }
         }
         return null;
+    }
+
+    private void resetFilteredRestaurants() {
+        filteredRestaurantList.clear();
+    }
+
+    public void createFilteredRestaurants(
+            String searchTerm,
+            String hazardRatingLastInspection,
+            int isNumCritViolationsLessThanOrEqualTo,        // -1, 0, 1: N/A, >=, <=
+            int numCritViolationsInLastYear,
+            boolean favouritesOnly
+    ) {
+        // searchTerm: Restaurant name must contain searchTerm as a substring
+        // hazardLevelLastInspection: Restaurants last inspection have this hazard level
+        for (Restaurant restaurant : manager) {
+            if (restaurant.getName().toLowerCase().contains(searchTerm.toLowerCase())   // Check the name contains the search term
+                && (hazardRatingLastInspection.equals("") // If user doesn't care about hazard level the condition evaluates to true
+                    || (restaurant.getInspectionList().size() != 0 && restaurant.getInspection(0).getHazardRating().contains(hazardRatingLastInspection)))   // Verify most recent inspection is correct
+                && (isNumCritViolationsLessThanOrEqualTo == -1  // User doesn't care about violations, evaluates to true
+                    || (isNumCritViolationsLessThanOrEqualTo == 0 && restaurant.countCriticalViolation() >= numCritViolationsInLastYear)    // User wants to check if number >= N
+                    || (isNumCritViolationsLessThanOrEqualTo == 1 && restaurant.countCriticalViolation() <= numCritViolationsInLastYear))   // User wants to check if number <= N
+                && (!favouritesOnly || restaurant.isFavourite())    // If user doesn't care about favourites, evaluate to true, otherwise verify restaurant is a favourite or not
+            ) {
+                filteredRestaurantList.add(restaurant);
+            }
+        }
+    }
+
+    public List<Restaurant> getFilteredRestaurantList() {
+        return filteredRestaurantList;
     }
 
     public void refillRestaurantManagerNewData(Context context) {

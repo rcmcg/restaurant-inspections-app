@@ -48,6 +48,21 @@ public class MainActivity extends AppCompatActivity {
         populateListView();
         registerClickCallback();
         wireLaunchMapButton();
+
+        // Testing getFilteredRestaurants
+        manager.createFilteredRestaurants(
+                "pizza",
+                "",
+                1,
+                5,
+                false
+        );
+
+        List<Restaurant> filteredRestaurants = manager.getFilteredRestaurantList();
+        System.out.println("filterTest: printing filtered restaurants");
+        for (Restaurant restaurant : filteredRestaurants) {
+            System.out.println("filterTest:" + restaurant.toString());
+        }
     }
 
     private void wireLaunchMapButton() {
