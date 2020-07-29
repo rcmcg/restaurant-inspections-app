@@ -1,18 +1,15 @@
 package com.example.group20restaurantapp.UI;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -24,7 +21,7 @@ public class SearchActivity extends AppCompatActivity {
     //Search filters
     private EditText searchField;
     private EditText violationCountField;
-    private Button searchSumbitBtn;
+    private Button btnSearch;
     private Button clearBtn;
     private Spinner hazardSpinner;
     private Spinner ViolationSpinner;
@@ -53,9 +50,9 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
-        searchSumbitBtn = (Button) findViewById(R.id.btn_search);
+        btnSearch= (Button) findViewById(R.id.btn_search);
         clearBtn = (Button) findViewById(R.id.btn_clean);
-        searchSumbitBtn.setOnClickListener(new View.OnClickListener() {
+        btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 submitSearch();
