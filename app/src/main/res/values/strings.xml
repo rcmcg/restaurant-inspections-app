@@ -47,14 +47,14 @@
     <string name="click_to_clean">Click to clean</string>
     <string name="num">Num</string>
     <string name="please_enter_the_key_word">Please enter the key word</string>
-    <string-array name="Hazardlevel">
+    <string-array name="HazardlevelStr">
         <item>All</item>
         <item>Low</item>
         <item>Moderate</item>
         <item>High</item>
     </string-array>
 
-    <string-array name="ViolationNum">
+    <string-array name="ViolationNumBound">
         <item>All</item>
         <item>Greater or Equal</item>
         <item>Lesser or Equal</item>

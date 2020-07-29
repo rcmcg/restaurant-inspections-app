@@ -72,7 +72,7 @@ public class SearchActivity extends AppCompatActivity {
     private void setupSpinners() {
         hazardSpinner = (Spinner) findViewById(R.id.Hazardlevel);
         ArrayAdapter<CharSequence> hazardAdapter = ArrayAdapter.createFromResource(this,
-                R.array.Hazardlevel, android.R.layout.simple_spinner_dropdown_item);
+                R.array.HazardlevelStr, android.R.layout.simple_spinner_dropdown_item);
         hazardAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         hazardSpinner.setAdapter(hazardAdapter);
         hazardSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -90,7 +90,7 @@ public class SearchActivity extends AppCompatActivity {
 
         ViolationSpinner = (Spinner) findViewById(R.id.ViolationNum);
         ArrayAdapter<CharSequence> ViolationAdapter = ArrayAdapter.createFromResource(this,
-                R.array.ViolationNum, android.R.layout.simple_spinner_dropdown_item);
+                R.array.ViolationNumBound, android.R.layout.simple_spinner_dropdown_item);
         ViolationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         ViolationSpinner.setAdapter(ViolationAdapter);
         ViolationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
