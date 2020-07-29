@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".UI.SearchActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/favorite"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UI.SearchActivity">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/search"
@@ -106,6 +107,17 @@ tools:context=".UI.SearchActivity">
         app:layout_constraintVertical_bias="0.0"
         tools:visibility="visible" />
 
+    <Spinner
+        android:id="@+id/ChooseFavorite"
+        android:layout_width="137dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="24dp"
+        android:background="#D3D2D2"
+        app:layout_constraintEnd_toEndOf="@+id/Hazardlevel"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/Hazardlevel"
+        app:layout_constraintTop_toBottomOf="@+id/Hazardlevel" />
+
     <Button
         android:id="@+id/btn_search"
         android:layout_width="150dp"
@@ -127,5 +139,17 @@ tools:context=".UI.SearchActivity">
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btn_search"
         app:layout_constraintTop_toTopOf="@+id/btn_search" />
+
+    <TextView
+        android:id="@+id/favor"
+        android:layout_width="238dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="4dp"
+        android:text="@string/click_to_get_favorite_only"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/ChooseFavorite"
+        app:layout_constraintStart_toEndOf="@+id/ChooseFavorite"
+        app:layout_constraintTop_toTopOf="@+id/ChooseFavorite"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

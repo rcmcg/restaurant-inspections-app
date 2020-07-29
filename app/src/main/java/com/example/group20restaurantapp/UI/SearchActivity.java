@@ -25,6 +25,7 @@ public class SearchActivity extends AppCompatActivity {
     private Button clearBtn;
     private Spinner hazardSpinner;
     private Spinner ViolationSpinner;
+    private Spinner FavoriteSpinner;
 
     private RestaurantManager manager = RestaurantManager.getInstance();
 
@@ -94,6 +95,23 @@ public class SearchActivity extends AppCompatActivity {
         ViolationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         ViolationSpinner.setAdapter(ViolationAdapter);
         ViolationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                manager.setViloationNum(position);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                manager.setViloationNum(0);
+            }
+        });
+
+        FavoriteSpinner = (Spinner) findViewById(R.id.ChooseFavorite);
+        ArrayAdapter<CharSequence> favoriteAdapter = ArrayAdapter.createFromResource(this,
+                R.array.ChooseFavor, android.R.layout.simple_spinner_dropdown_item);
+        favoriteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        FavoriteSpinner.setAdapter(favoriteAdapter);
+        FavoriteSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
