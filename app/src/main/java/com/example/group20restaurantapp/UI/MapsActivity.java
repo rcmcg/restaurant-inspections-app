@@ -362,11 +362,11 @@ public class MapsActivity extends AppCompatActivity
         if (mLocationPermissionsGranted) {
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED
-                    &&
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
+                            != PackageManager.PERMISSION_GRANTED
+                            &&
+                            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                                    != PackageManager.PERMISSION_GRANTED
+            ) {
                 return;
             }
             mMap.setMyLocationEnabled(true);
@@ -439,7 +439,7 @@ public class MapsActivity extends AppCompatActivity
 
             // Confirm we have the correct position
             if (restaurant.getLongitude() ==  chosenRestaurantLatLon[1] &&
-                restaurant.getLatitude() ==  chosenRestaurantLatLon[0])
+                    restaurant.getLatitude() ==  chosenRestaurantLatLon[0])
             {
                 // Add a marker and display it's window, delete when the user pans
                 singleRestaurantMarker = mMap.addMarker(new MarkerOptions()

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
             super(MainActivity.this, R.layout.restaurant_item_view, restaurantList);
         }
 
+        @SuppressLint({"StringFormatMatches", "StringFormatInvalid"})
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -124,16 +126,18 @@ public class MainActivity extends AppCompatActivity {
 
             // Set restaurant name text
             TextView restaurantName = itemView.findViewById(R.id.restaurant_item_txtRestaurantName);
-            restaurantName.setText(getString(R.string.main_activity_restaurant_name,currentRestaurant.getName()));
+            String temp=String.format(getResources().getString(R.string.main_activity_restaurant_name,currentRestaurant.getName()));
+            restaurantName.setText(temp);
 
             // Set last inspection date text
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                lastInspectionDate.setText(
-                        getString(R.string.main_activity_restaurant_item_last_inspection_date,
-                                lastInspection.intelligentInspectDate())
-                );
+                String temp2=String.format(getResources().getString(R.string.main_activity_restaurant_item_last_inspection_date,
+                        lastInspection.intelligentInspectDate()));
+                lastInspectionDate.setText(temp2);
+
+
             } else {
                 lastInspectionDate.setText(getString(R.string.main_activity_restaurant_item_last_inspection_date_no_inspection));
             }
@@ -145,9 +149,10 @@ public class MainActivity extends AppCompatActivity {
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
                 String sumOfViolations = "" + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical());
-                numViolationsLastInspection.setText(
-                        getString(R.string.main_activity_restaurant_item_violations, sumOfViolations)
-                        );
+                String temp3= String.format(getResources().getString(R.string.main_activity_restaurant_item_violations, sumOfViolations));
+                numViolationsLastInspection.setText(temp3);
+
+
             } else {
                 numViolationsLastInspection.setText(getString(R.string.main_activity_restaurant_item_violations_no_inspection));
             }
