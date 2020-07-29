@@ -39,6 +39,13 @@
     <string name="launch_list">Switch to list</string>
     <string name="launch_map">Switch to map</string>
     <string name="no_inspection_data_available">No inspection data available.</string>
+    <string name="enter_the_key_word_here">Enter the key word here</string>
+    <string name="please_enter_some_key_words_to_help_search">please_enter_some_key_words_to_help_search</string>
+    <string name="search_by_violation_num">Search by violation num</string>
+    <string name="search_by_the_hazard_level">Search by the hazard level</string>
+    <string name="click_to_start">Click to start</string>
+    <string name="click_to_clean">Click to clean</string>
+    <string name="num">Num</string>
 
 
 </resources>
