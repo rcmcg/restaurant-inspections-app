@@ -48,6 +48,17 @@ public class MainActivity extends AppCompatActivity {
         populateListView();
         registerClickCallback();
         wireLaunchMapButton();
+        wireLaunchSearchButton();
+    }
+    private void wireLaunchSearchButton() {
+        Button btnSearch = findViewById(R.id.GoToSearch);
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i3 = new Intent(MainActivity.this, SearchActivity.class);
+                startActivityForResult(i3, 458);
+            }
+        });
     }
 
     private void wireLaunchMapButton() {

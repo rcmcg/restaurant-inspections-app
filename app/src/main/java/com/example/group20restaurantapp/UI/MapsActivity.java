@@ -176,6 +176,14 @@ public class MapsActivity extends AppCompatActivity
         }
 
         wireLaunchListButton();
+        Button searchButton = findViewById(R.id.MaptoSearch);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i3 = new Intent(MapsActivity.this, SearchActivity.class);
+                startActivityForResult(i3, 458);
+            }
+        });
     }
 
     private void getLocationPermissionFromUser() {
@@ -697,4 +705,5 @@ public class MapsActivity extends AppCompatActivity
             return (cluster.getSize() >= 8);
         }
     }
+
 }
