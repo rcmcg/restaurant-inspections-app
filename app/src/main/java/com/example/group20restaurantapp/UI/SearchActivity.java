@@ -12,7 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
@@ -80,12 +79,12 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                manager.sethazardLevelStr(position);
+                manager.setHazardLevelStr(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                manager.sethazardLevelStr(0);
+                manager.setHazardLevelStr(0);
             }
         });
 
@@ -98,11 +97,11 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                manager.setViloationNum(position);
+                manager.setViolationNum(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                manager.setViloationNum(0);
+                manager.setViolationNum(0);
             }
         });
 
@@ -112,14 +111,13 @@ public class SearchActivity extends AppCompatActivity {
         favoriteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         FavoriteSpinner.setAdapter(favoriteAdapter);
         FavoriteSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                manager.setViloationNum(position);
+                manager.setViolationNum(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                manager.setViloationNum(0);
+                manager.setViolationNum(0);
             }
         });
     }
@@ -142,8 +140,8 @@ public class SearchActivity extends AppCompatActivity {
 
     private void clearFilters() {
         manager.setItemSearch(null);
-        manager.sethazardLevelStr(0);
-        manager.setViloationNum(0);
+        manager.setHazardLevelStr(0);
+        manager.setViolationNum(0);
     }
 
     private void setDefaultIntent() {

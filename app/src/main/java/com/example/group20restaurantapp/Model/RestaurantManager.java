@@ -49,10 +49,13 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private boolean userBeenAskedToUpdateThisSession = false;
     private boolean isDownloadCancelled = false;
     OkHttpClient client = new OkHttpClient().newBuilder().build();
+
+    // Search parameters
     private String hazardLevelStr = "All";
-    private String viloationNum = "All";
+    private String violationNum = "All";
     private String itemSearch = "";
     private int violationBound;
+
     // Iterable and a singleton class of restaurants object
     private RestaurantManager(){
         // Prevent from instantiating
@@ -71,26 +74,20 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return manager;
     }
 
-    public void sethazardLevelStr(int index) {
+    public void setHazardLevelStr(int index) {
         if (index == 0) this.hazardLevelStr = "All";
         else if (index == 1) this.hazardLevelStr = "Low";
         else if (index == 2) this.hazardLevelStr = "Moderate";
         else if (index == 3) this.hazardLevelStr = "High";
     }
 
-    public void setViloationNum(int index) {
+    public void setViolationNum(int index) {
         if (index == 0) {
-
-            this.viloationNum = "All";
-
+            this.violationNum = "All";
         } else if (index == 1) {
-
-            this.viloationNum = "Greater or Equal";
-
+            this.violationNum = "Greater or Equal";
         } else if (index == 2) {
-
-            this.viloationNum = "Lesser or Equal";
-
+            this.violationNum = "Lesser or Equal";
         }
     }
 
