@@ -80,8 +80,6 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 manager.sethazardLevelStr(position);
-                String text = parent.getItemAtPosition(position).toString();
-                Toast.makeText(parent.getContext(),text,Toast.LENGTH_SHORT);
             }
 
             @Override
@@ -100,8 +98,6 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 manager.setViloationNum(position);
-                String text = parent.getItemAtPosition(position).toString();
-                Toast.makeText(parent.getContext(),text,Toast.LENGTH_SHORT);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
