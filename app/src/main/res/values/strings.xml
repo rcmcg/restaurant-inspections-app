@@ -65,4 +65,18 @@
         <item>YES</item>
         <item>No</item>
     </string-array>
+    <string name="type_follow_up">Type: Follow-up</string>
+    <string name="Date_place_holder">Jan 22nd 2020</string>
+    <string name="critical_violations_5"># Critical Violations: 5</string>
+    <string name="non_critical_violations_5"># Non-critical Violations: 5</string>
+    <string name="hazard_rating_medium">Hazard Rating: Medium</string>
+    <string name="restaurant_name_here">Restaurant Name Here</string>
+    <string name="last_inspection">Last Inspection</string>
+    <string name="of_violations_here"># of Violations Here</string>
+
+    <string name="n_a">N/A</string>
+    <string name="inspection_date_here">Inspection Date Here</string>
+    <string name="num_crit_viols">Num crit viols</string>
+    <string name="num_noncrit_viols">Num nonCrit viols</string>
+
 </resources>
