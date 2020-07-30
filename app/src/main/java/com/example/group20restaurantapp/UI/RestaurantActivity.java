@@ -43,7 +43,7 @@ public class RestaurantActivity extends AppCompatActivity {
     public static final String RESTAURANT_NAME_INTENT_TAG = "Restaurant name";
     private RestaurantManager manager;
     List<Inspection> inspections;
-    private boolean favourited = false;
+    //private boolean favourited = false;
     SharedPreferences preferences;
     private Menu restaurantMenu;
     int restaurantIndex;
@@ -77,7 +77,6 @@ public class RestaurantActivity extends AppCompatActivity {
         setRestaurantImg(restaurant);
 
         preferences = getSharedPreferences("favourites", 0);
-        favourited = preferences.getBoolean(restaurant.getTrackingNumber(), false);
 
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
@@ -90,21 +89,22 @@ public class RestaurantActivity extends AppCompatActivity {
         restaurantMenu = menu;
         setFavouritedImg();
         final MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
+        final Restaurant restaurant = manager.getIndex(restaurantIndex);
 
         favouriteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (favourited){
+                if (restaurant.isFavourite()){
                     favouriteItem.setIcon(R.drawable.star_off);
-                    favourited = false;
+                    restaurant.setFavourite(false);
                 }
                 else{
                     favouriteItem.setIcon(R.drawable.star_on);
-                    favourited = true;
+                    restaurant.setFavourite(true);
                 }
 
                 SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean(manager.getIndex(restaurantIndex).getTrackingNumber(), favourited);
+                editor.putBoolean(restaurant.getTrackingNumber(), restaurant.isFavourite());
                 editor.apply();
 
                 return false;
@@ -154,8 +154,8 @@ public class RestaurantActivity extends AppCompatActivity {
         Restaurant restaurant = manager.getIndex(restaurantIndex);
         MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
 
-        favourited = preferences.getBoolean(restaurant.getTrackingNumber(), false);
-        if (favourited){
+        //favourited = preferences.getBoolean(restaurant.getTrackingNumber(), false);
+        if (restaurant.isFavourite()){
             favouriteItem.setIcon(R.drawable.star_on);
         }
         else{
