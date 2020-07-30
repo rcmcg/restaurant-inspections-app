@@ -3,7 +3,6 @@ package com.example.group20restaurantapp.UI;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,7 +21,6 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,7 +55,7 @@ public class RestaurantActivity extends AppCompatActivity {
         if (restaurantIndex == -1) {
             Log.e("RestaurantActivity", "onCreate: Activity opened with no restaurant");
         } else {
-            restaurant = manager.getIndex(restaurantIndex);
+            restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
         }
 
         assert restaurant != null;

@@ -22,7 +22,6 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,10 +45,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        populateListView();
-        registerClickCallback();
-        wireLaunchMapButton();
-
         // Testing getFilteredRestaurants
         manager.updateFilteredRestaurants(
                 "",
@@ -59,9 +54,13 @@ public class MainActivity extends AppCompatActivity {
                 false
         );
 
-        List<Restaurant> filteredRestaurants = manager.getFilteredRestaurantList();
+        populateListView();
+        registerClickCallback();
+        wireLaunchMapButton();
+
+        // List<Restaurant> filteredRestaurants = manager.getFilteredRestaurantList();
         System.out.println("filterTest: printing filtered restaurants");
-        for (Restaurant restaurant : filteredRestaurants) {
+        for (Restaurant restaurant : manager) {
             System.out.println("filterTest:" + restaurant.toString());
         }
     }
@@ -90,8 +89,14 @@ public class MainActivity extends AppCompatActivity {
 
     public ArrayList<Restaurant> restaurantList() {
         ArrayList<Restaurant> newRestaurantList = new ArrayList<>();
-        for (int i = 0; i < manager.getSize(); i++) {
-            newRestaurantList.add(manager.getIndex(i));
+        /*
+        for (int i = 0; i < manager.getSizeFilteredRestaurants(); i++) {
+            newRestaurantList.add(manager.getIndexFilteredRestaurants(i));
+        }
+
+         */
+        for (Restaurant restaurant : manager) {
+            newRestaurantList.add(restaurant);
         }
         return newRestaurantList;
     };
@@ -111,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Find the restaurant to work with
-            Restaurant currentRestaurant = manager.getIndex(position);
+            Restaurant currentRestaurant = manager.getIndexFilteredRestaurants(position);
 
             // Fill the restaurantIcon
             ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
@@ -177,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                Restaurant clickedRestaurant = manager.getIndex(position);
+                Restaurant clickedRestaurant = manager.getIndexFilteredRestaurants(position);
 
                 // Launch restaurant activity
                 Intent intent = RestaurantActivity.makeLaunchIntent(MainActivity.this);

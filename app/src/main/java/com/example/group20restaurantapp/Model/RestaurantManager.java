@@ -38,8 +38,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
 
     // Variables
-    private List<Restaurant> restaurantList = new ArrayList<>();
-    private List<Restaurant> filteredRestaurantList = new ArrayList<>();
+    private List<Restaurant> restaurantList = new ArrayList<>();            // Master list of restaurants
+    private List<Restaurant> filteredRestaurantList = new ArrayList<>();    // Filtered list for use by app
     private List<Integer> violNumbers;
     private List<String> violBriefDescriptions;
     private static RestaurantManager manager;
@@ -62,8 +62,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return manager;
     }
 
-    public int getSize() {
+    public int getSizeAllRestaurants() {
         return restaurantList.size();
+    }
+
+    public int getSizeFilteredRestaurants() {
+        return filteredRestaurantList.size();
     }
 
     public boolean isDownloadCancelled() {
@@ -82,13 +86,17 @@ public class RestaurantManager implements Iterable<Restaurant>{
         this.userBeenAskedToUpdateThisSession = userBeenAskedToUpdateThisSession;
     }
 
-    public List<Restaurant> getRestaurantList() {
+    private List<Restaurant> getRestaurantList() {
         return restaurantList;
     }
 
     // Return a restaurant object by taking an input of index in restaurant List
-    public Restaurant getIndex(int n){
+    public Restaurant getIndexAllRestaurants(int n){
         return restaurantList.get(n);
+    }
+
+    public Restaurant getIndexFilteredRestaurants(int n) {
+        return filteredRestaurantList.get(n);
     }
 
     public void cancelDownloads() {
@@ -104,9 +112,9 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
 
     // Singleton class and adding restaurants from CSV
-    public int findIndex(Restaurant restaurant){
-        for(int i = 0 ; i < restaurantList.size() ; i++){
-            if(restaurant == restaurantList.get(i)){
+    public int findIndexFromFilteredRestaurants(Restaurant restaurant){
+        for(int i = 0 ; i < filteredRestaurantList.size() ; i++){
+            if(restaurant == filteredRestaurantList.get(i)){
                 return i;
             }
         }
@@ -115,15 +123,25 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     @Override
     public Iterator<Restaurant> iterator() {
-        return restaurantList.iterator();
+        if (filteredRestaurantList.size() == 0) {
+            // Fill filtered restaurant with all restaurants
+            updateFilteredRestaurants(
+                    "",
+                    "",
+                    -1,
+                    -1,
+                    false
+                    );
+        }
+        return filteredRestaurantList.iterator();
     }
 
-    // public for testing
-    public void resetRestaurantList() {
+    private void resetRestaurantList() {
         restaurantList.clear();
     }
 
     public void sortRestaurantsByName() {
+        // Sorts master list of restaurants
         Comparator<Restaurant> compareByName = new Comparator<Restaurant>() { //Compares restaurant names
             @Override
             public int compare(Restaurant r1, Restaurant r2) {
@@ -177,7 +195,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         filteredRestaurantList.clear();
 
         // Refill filtered list with the correct restaurants
-        for (Restaurant restaurant : manager) {
+        for (Restaurant restaurant : manager.getRestaurantList()) {
             if (restaurant.getName().toLowerCase().contains(searchTerm.toLowerCase())   // Check the name contains the search term
                 && (hazardRatingLastInspection.equals("") // If user doesn't care about hazard level the condition evaluates to true
                     || (restaurant.getInspectionList().size() != 0 && restaurant.getInspection(0).getHazardRating().contains(hazardRatingLastInspection)))   // Verify most recent inspection is correct
@@ -191,7 +209,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
     }
 
-    public List<Restaurant> getFilteredRestaurantList() {
+    private List<Restaurant> getFilteredRestaurantList() {
         return filteredRestaurantList;
     }
 
@@ -287,7 +305,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     public void readRestaurantData(Context context) {
         // Get instance of RestaurantManager
-        if (getSize() == 0) {
+        if (getSizeAllRestaurants() == 0) {
             // To read a resource, need an input stream
             InputStream is = context.getResources().openRawResource(R.raw.restaurants_itr1);
 
@@ -410,7 +428,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
                 String[] lineSplit = line.split(",", 7);
                 //Find restaurant matching report tracking number being read
-                while (!lineSplit[0].equals(getIndex(i).getTrackingNumber())){
+                while (!lineSplit[0].equals(getIndexAllRestaurants(i).getTrackingNumber())){
                     i++;
                 }
                 //Initializing inspection object variables
@@ -454,7 +472,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
                         inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
                     }
                 }
-                getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
             }
         } catch (IOException e){
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
@@ -502,9 +520,9 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 //Find restaurant with matching report tracking number being read
                 if (!prevTrackingNum.equals(lineSplit[0])){
                     i = 0;
-                    while (!lineSplit[0].equals(getIndex(i).getTrackingNumber())) {
+                    while (!lineSplit[0].equals(getIndexAllRestaurants(i).getTrackingNumber())) {
                         i++;
-                        if (i == getSize()-1) {
+                        if (i == getSizeAllRestaurants()-1) {
                             unknownRestaurant = true;
                             break;
                         }
@@ -526,17 +544,17 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
                 if (lineSplit[5].equals(",Low") || lineSplit[5].equals(",")) {
                     inspection.setHazardRating("Low");
-                    getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
                     continue;
                 }
                 if (lineSplit[5].equals(",Moderate")) {
                     inspection.setHazardRating("Moderate");
-                    getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
                     continue;
                 }
                 if (lineSplit[5].equals(",High")) {
                     inspection.setHazardRating("High");
-                    getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
                     continue;
                 }
                 String[] violationsArr = lineSplit[5].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
@@ -582,7 +600,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     Violation violObj = new Violation(violNumber, crit, violSplit[2], briefDesc, repeat);
                     inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
                 }
-                getIndex(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
             }
         } catch (IOException e){
             e.printStackTrace();

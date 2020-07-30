@@ -116,7 +116,7 @@ public class MapsActivity extends AppCompatActivity
         long appLastUpdated = getAppLastUpdated(this);
 
         // read data on startup
-        if (manager.getSize() == 0) {
+        if (manager.getSizeAllRestaurants() == 0) {
             if (appLastUpdated == -1) {
                 Log.d(TAG, "onCreate: Filling with default restaurants");
                 manager.fillRestaurantManager(false, this);
@@ -514,7 +514,7 @@ public class MapsActivity extends AppCompatActivity
                 double lng = latLngF.longitude;
                 String restaurantName = marker.getTitle();
                 Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
-                int restaurantIndex = manager.findIndex(restaurant);
+                int restaurantIndex = manager.findIndexFromFilteredRestaurants(restaurant);
 
                 // Launch RestaurantActivity with the correct index
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);
