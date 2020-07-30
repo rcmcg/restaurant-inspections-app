@@ -7,6 +7,20 @@
     tools:context=".UI.MainActivity">
 
     <Button
+        android:id="@+id/GoToSearch"
+        android:layout_width="122dp"
+        android:layout_height="37dp"
+        android:background="@color/colorPrimary"
+        android:text="Search"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/btnLaunchMap"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/btnLaunchMap"
+        app:layout_constraintTop_toBottomOf="@+id/btnLaunchMap"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
         android:id="@+id/btnLaunchMap"
         android:layout_width="122dp"
         android:layout_height="37dp"

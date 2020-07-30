@@ -50,9 +50,25 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private boolean isDownloadCancelled = false;
     OkHttpClient client = new OkHttpClient().newBuilder().build();
 
+    // Search parameters
+    private String hazardLevelStr = "All";
+    private String violationNum = "All";
+    private String itemSearch = "";
+    private int violationBound;
+    private boolean favorite;
     // Iterable and a singleton class of restaurants object
     private RestaurantManager(){
         // Prevent from instantiating
+    }
+
+    //set the favorite of search
+    public void setFavorite(boolean favorite){
+        this.favorite = favorite;
+    }
+
+    //set the limit of the violationNum from search
+    public void setViolationBound(int violationBound) {
+        this.violationBound = violationBound;
     }
 
     // Returns a single instance of the RestaurantManager
@@ -62,6 +78,24 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return manager;
     }
+
+    public void setHazardLevelStr(int index) {
+        if (index == 0) this.hazardLevelStr = "All";
+        else if (index == 1) this.hazardLevelStr = "Low";
+        else if (index == 2) this.hazardLevelStr = "Moderate";
+        else if (index == 3) this.hazardLevelStr = "High";
+    }
+
+    public void setViolationNum(int index) {
+        if (index == 0) {
+            this.violationNum = "All";
+        } else if (index == 1) {
+            this.violationNum = "Greater or Equal";
+        } else if (index == 2) {
+            this.violationNum = "Lesser or Equal";
+        }
+    }
+
 
     public int getSize() {
         return restaurantList.size();
@@ -553,4 +587,5 @@ public class RestaurantManager implements Iterable<Restaurant>{
             e.printStackTrace();
         }
     }
+    public void setItemSearch(String itemSearch) { this.itemSearch = itemSearch; }
 }

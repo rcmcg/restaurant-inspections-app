@@ -41,4 +41,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.android.volley:volley:1.1.0'
+
+    //add Library
+    compile 'com.miguelcatalan:materialsearchview:1.4.0'
 }
