@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -48,6 +49,19 @@ public class MainActivity extends AppCompatActivity {
         populateListView();
         registerClickCallback();
         wireLaunchMapButton();
+        for (Restaurant restaurant : manager.getRestaurantList()){
+            SharedPreferences preferences = getSharedPreferences("favourites", 0);
+            if (preferences.getBoolean(restaurant.getTrackingNumber(), false)){
+                Log.d("MainActivity", restaurant.getName());
+            }
+        }
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        finish();
+        startActivity(getIntent());
     }
 
     private void wireLaunchMapButton() {
@@ -95,20 +109,39 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Find the restaurant to work with
-            Restaurant currentRestaurant = manager.getIndex(position);
+            final Restaurant currentRestaurant = manager.getIndex(position);
 
             final ImageView imgFavourite = itemView.findViewById(R.id.img_favourite);
+            final SharedPreferences preferences = getSharedPreferences("favourites", 0);
+            // Check 'favourited' status of restaurant
+            boolean isFavourited = preferences.getBoolean(currentRestaurant.getTrackingNumber(), false);
+
+            // Set imgFavourite accordingly
+            if (isFavourited){
+                imgFavourite.setImageResource(R.drawable.star_on);
+                imgFavourite.setTag("favourited");
+            }
+            else{
+                imgFavourite.setImageResource(R.drawable.star_off);
+                imgFavourite.setTag("unfavourited");
+            }
+            // imgFavourite onClick => Change imgFavourite image resource on click and store 'favourited' status
             imgFavourite.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    SharedPreferences.Editor editor = preferences.edit();
+
                     if (imgFavourite.getTag().equals("favourited")){
                         imgFavourite.setImageResource(R.drawable.star_off);
                         imgFavourite.setTag("unfavourited");
+                        editor.putBoolean(currentRestaurant.getTrackingNumber(), false);
                     }
                     else{
                         imgFavourite.setImageResource(R.drawable.star_on);
                         imgFavourite.setTag("favourited");
+                        editor.putBoolean(currentRestaurant.getTrackingNumber(), true);
                     }
+                    editor.apply();
                 }
             });
             // Fill the restaurantIcon
