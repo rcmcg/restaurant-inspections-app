@@ -115,6 +115,9 @@ public class Inspection implements Serializable {
     }
 
     public String getInspType() {
+        if(Locale.getDefault().getLanguage()=="fr"){
+            return"suivre";
+        }
         return inspType;
     }
 

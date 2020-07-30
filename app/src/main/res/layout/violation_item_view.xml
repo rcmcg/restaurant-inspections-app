@@ -28,7 +28,7 @@
         android:layout_toStartOf="@+id/violation_item_imgSeverityIcon"
         android:layout_toEndOf="@+id/violation_item_imgViolationIcon"
         android:fontFamily="@font/roboto_light"
-        android:text="Restaurant Name Here"
+        android:text="@string/restaurant_name_here"
         android:textSize="18sp" />
 
     <ImageView

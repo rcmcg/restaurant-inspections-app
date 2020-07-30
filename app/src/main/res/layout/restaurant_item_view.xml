@@ -26,7 +26,7 @@
         android:layout_marginStart="5dp"
         android:layout_toEndOf="@+id/restaurant_item_imgRestaurantIcon"
         android:fontFamily="@font/roboto_bold"
-        android:text="Restaurant Name Here"
+        android:text="@string/restaurant_name_here"
         android:textSize="20sp" />
 
     <ImageView
@@ -51,7 +51,7 @@
         android:layout_marginTop="5dp"
         android:layout_toEndOf="@+id/restaurant_item_imgHazardRating"
         android:fontFamily="@font/roboto_light"
-        android:text="Last Inspection"
+        android:text="@string/last_inspection"
         android:textSize="18sp" />
 
     <TextView
@@ -63,7 +63,7 @@
         android:layout_marginTop="0dp"
         android:layout_toEndOf="@+id/restaurant_item_imgHazardRating"
         android:fontFamily="@font/roboto_light"
-        android:text="# of Violations Here"
+        android:text="@string/of_violations_here"
         android:textSize="18sp" />
 
 </RelativeLayout>
