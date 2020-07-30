@@ -1,7 +1,10 @@
 package com.example.group20restaurantapp.Model;
 
+import android.util.Log;
+
 import com.example.group20restaurantapp.R;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +14,7 @@ import java.util.List;
 
 public class Restaurant {
 
+    private static final String TAG = "Restaurant.java";
     private String name;
     private String address;
     private double latitude;
@@ -199,11 +203,15 @@ public class Restaurant {
         return inspectionList.get(0).getHazardRating();
     }
 
-    public int countCriticalViolation() {
+    public int countCriticalViolationInLastYear() {
         int count = 0;
         for (Inspection inspection : inspectionList) {
-            if (inspection.getDiffInDay() <= 365) {
-                count = count + inspection.getNumCritical();
+            try {
+                if (inspection.getDiffInDay() <= 365) {
+                    count = count + inspection.getNumCritical();
+                }
+            } catch (ParseException e){
+                Log.e(TAG, "countCriticalViolation: ", e);
             }
         }
         return count;

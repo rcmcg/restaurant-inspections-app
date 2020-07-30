@@ -27,8 +27,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * Singleton class which contains all instances of Restaurant
  * Contains functions for reading and writing to files, downloading new data, among others
@@ -166,7 +164,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         filteredRestaurantList.clear();
     }
 
-    public void createFilteredRestaurants(
+    public void updateFilteredRestaurants(
             String searchTerm,
             String hazardRatingLastInspection,
             int isNumCritViolationsLessThanOrEqualTo,        // -1, 0, 1: N/A, >=, <=
@@ -175,13 +173,17 @@ public class RestaurantManager implements Iterable<Restaurant>{
     ) {
         // searchTerm: Restaurant name must contain searchTerm as a substring
         // hazardLevelLastInspection: Restaurants last inspection have this hazard level
+        // Clear the filtered restaurant list before updating
+        filteredRestaurantList.clear();
+
+        // Refill filtered list with the correct restaurants
         for (Restaurant restaurant : manager) {
             if (restaurant.getName().toLowerCase().contains(searchTerm.toLowerCase())   // Check the name contains the search term
                 && (hazardRatingLastInspection.equals("") // If user doesn't care about hazard level the condition evaluates to true
                     || (restaurant.getInspectionList().size() != 0 && restaurant.getInspection(0).getHazardRating().contains(hazardRatingLastInspection)))   // Verify most recent inspection is correct
                 && (isNumCritViolationsLessThanOrEqualTo == -1  // User doesn't care about violations, evaluates to true
-                    || (isNumCritViolationsLessThanOrEqualTo == 0 && restaurant.countCriticalViolation() >= numCritViolationsInLastYear)    // User wants to check if number >= N
-                    || (isNumCritViolationsLessThanOrEqualTo == 1 && restaurant.countCriticalViolation() <= numCritViolationsInLastYear))   // User wants to check if number <= N
+                    || (isNumCritViolationsLessThanOrEqualTo == 0 && restaurant.countCriticalViolationInLastYear() >= numCritViolationsInLastYear)    // User wants to check if number >= N
+                    || (isNumCritViolationsLessThanOrEqualTo == 1 && restaurant.countCriticalViolationInLastYear() <= numCritViolationsInLastYear))   // User wants to check if number <= N
                 && (!favouritesOnly || restaurant.isFavourite())    // If user doesn't care about favourites, evaluate to true, otherwise verify restaurant is a favourite or not
             ) {
                 filteredRestaurantList.add(restaurant);

@@ -22,6 +22,7 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,11 +51,11 @@ public class MainActivity extends AppCompatActivity {
         wireLaunchMapButton();
 
         // Testing getFilteredRestaurants
-        manager.createFilteredRestaurants(
-                "pizza",
+        manager.updateFilteredRestaurants(
                 "",
-                1,
-                5,
+                "High",
+                -1,
+                4,
                 false
         );
 
