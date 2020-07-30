@@ -14,7 +14,7 @@
             android:layout_width="104dp"
             android:layout_height="39dp"
             android:layout_marginStart="16dp"
-            android:text="N/A"
+            android:text="@string/n_a"
             app:layout_constraintStart_toEndOf="@+id/info_item_restaurantLogo"
             app:layout_constraintTop_toBottomOf="@+id/info_item_restaurantName" />
 

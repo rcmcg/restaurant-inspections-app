@@ -176,6 +176,14 @@ public class MapsActivity extends AppCompatActivity
         }
 
         wireLaunchListButton();
+        Button searchButton = findViewById(R.id.MaptoSearch);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i3 = new Intent(MapsActivity.this, SearchActivity.class);
+                startActivityForResult(i3, 458);
+            }
+        });
     }
 
     private void getLocationPermissionFromUser() {
@@ -362,11 +370,11 @@ public class MapsActivity extends AppCompatActivity
         if (mLocationPermissionsGranted) {
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED
-                    &&
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
+                            != PackageManager.PERMISSION_GRANTED
+                            &&
+                            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                                    != PackageManager.PERMISSION_GRANTED
+            ) {
                 return;
             }
             mMap.setMyLocationEnabled(true);
@@ -439,7 +447,7 @@ public class MapsActivity extends AppCompatActivity
 
             // Confirm we have the correct position
             if (restaurant.getLongitude() ==  chosenRestaurantLatLon[1] &&
-                restaurant.getLatitude() ==  chosenRestaurantLatLon[0])
+                    restaurant.getLatitude() ==  chosenRestaurantLatLon[0])
             {
                 // Add a marker and display it's window, delete when the user pans
                 singleRestaurantMarker = mMap.addMarker(new MarkerOptions()
@@ -697,4 +705,5 @@ public class MapsActivity extends AppCompatActivity
             return (cluster.getSize() >= 8);
         }
     }
+
 }

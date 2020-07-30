@@ -1,28 +1,42 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-<fragment
-    xmlns:map="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".UI.MapsActivity" />
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".UI.MapsActivity" />
 
     <Button
         android:id="@+id/btnLaunchList"
-        android:layout_width="122dp"
-        android:layout_height="37dp"
-        android:textColor="@color/white"
-        android:background="@color/colorPrimary"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:layout_below="@+id/MaptoSearch"
+        android:layout_alignEnd="@+id/MaptoSearch"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="2dp"
-        android:text="@string/launch_list" />
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginEnd="0dp"
+        android:background="@color/colorPrimary"
+        android:text="@string/launch_list"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/MaptoSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="-1dp"
+        android:layout_marginEnd="308dp"
+        android:background="@color/colorPrimary"
+        android:text="Search"
+        android:textColor="#FDFAFA" />
 
 </RelativeLayout>

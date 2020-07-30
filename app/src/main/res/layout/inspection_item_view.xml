@@ -14,7 +14,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:fontFamily="@font/roboto_light"
-        android:text="Inspection Date Here"
+        android:text="@string/inspection_date_here"
         android:textSize="18sp" />
 
     <TextView
@@ -26,7 +26,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:fontFamily="@font/roboto_light"
-        android:text="Num crit viols"
+        android:text="@string/num_crit_viols"
         android:textSize="18sp" />
 
     <TextView
@@ -38,7 +38,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:fontFamily="@font/roboto_light"
-        android:text="Num nonCrit viols"
+        android:text="@string/num_noncrit_viols"
         android:textSize="18sp" />
 
     <ImageView
