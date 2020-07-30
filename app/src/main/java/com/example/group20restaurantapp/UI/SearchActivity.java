@@ -105,6 +105,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+
         FavoriteSpinner = (Spinner) findViewById(R.id.ChooseFavorite);
         ArrayAdapter<CharSequence> favoriteAdapter = ArrayAdapter.createFromResource(this,
                 R.array.ChooseFavor, android.R.layout.simple_spinner_dropdown_item);
@@ -113,11 +114,16 @@ public class SearchActivity extends AppCompatActivity {
         FavoriteSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                manager.setViolationNum(position);
+                boolean temp = false;
+                if(position==0){
+                    temp = true;
+                }
+                manager.setFavorite(temp);
+
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                manager.setViolationNum(0);
+                manager.setFavorite(false);
             }
         });
     }

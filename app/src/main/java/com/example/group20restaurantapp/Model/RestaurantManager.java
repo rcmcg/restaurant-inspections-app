@@ -55,10 +55,15 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private String violationNum = "All";
     private String itemSearch = "";
     private int violationBound;
-
+    private boolean favorite;
     // Iterable and a singleton class of restaurants object
     private RestaurantManager(){
         // Prevent from instantiating
+    }
+
+    //set the favorite of search
+    public void setFavorite(boolean favorite){
+        this.favorite = favorite;
     }
 
     //set the limit of the violationNum from search
