@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -181,9 +182,22 @@ public class MapsActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent i3 = new Intent(MapsActivity.this, SearchActivity.class);
-                startActivityForResult(i3, 458);
+                startActivityForResult(i3, MainActivity.LAUNCH_SEARCH_ACTIVITY);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == SearchActivity.RESULT_OK) {
+            // Update the map
+            mClusterManager.clearItems();
+            mClusterManager.cluster();
+            setUpClusterer();
+            mClusterManager.cluster();
+        }
     }
 
     private void getLocationPermissionFromUser() {

@@ -35,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
+    public static final int LAUNCH_SEARCH_ACTIVITY = 458;
+
+    private ArrayAdapter<Restaurant> adapter;
 
     private RestaurantManager manager = RestaurantManager.getInstance();
 
@@ -57,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i3 = new Intent(MainActivity.this, SearchActivity.class);
-                startActivityForResult(i3, 458);
+                startActivityForResult(i3, LAUNCH_SEARCH_ACTIVITY);
             }
         });
     }
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         List<Restaurant> restaurantList = restaurantList();
 
         // Setup the listView
-        ArrayAdapter<Restaurant> adapter = new MyListAdapter(restaurantList);
+        adapter = new MyListAdapter(restaurantList);
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
@@ -191,6 +194,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == SearchActivity.RESULT_OK) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     public static Intent makeIntent(Context context) {

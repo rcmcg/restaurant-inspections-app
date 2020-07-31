@@ -49,25 +49,26 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private boolean isDownloadCancelled = false;
     OkHttpClient client = new OkHttpClient().newBuilder().build();
 
-    // Search parameters
-    private String hazardLevelStr = "All";
-    private String violationNum = "All";
-    private String itemSearch = "";
-    private int violationBound;
-    private boolean favorite;
+    // Search parameters, initialized with default values
+    private String searchTerm = "";
+    private String searchHazardLevelStr = "";
+    private int searchViolationNumEquality = 0;   // 0: N/A, 1: <=, 2: >=
+    private int searchViolationBound = -1;
+    private boolean searchFavouritesOnly = false;
+
     // Iterable and a singleton class of restaurants object
     private RestaurantManager(){
         // Prevent from instantiating
     }
 
     //set the favorite of search
-    public void setFavorite(boolean favorite){
-        this.favorite = favorite;
+    public void setSearchFavouritesOnly(boolean searchFavouritesOnly){
+        this.searchFavouritesOnly = searchFavouritesOnly;
     }
 
     //set the limit of the violationNum from search
-    public void setViolationBound(int violationBound) {
-        this.violationBound = violationBound;
+    public void setSearchViolationBound(int searchViolationBound) {
+        this.searchViolationBound = searchViolationBound;
     }
 
     // Returns a single instance of the RestaurantManager
@@ -78,21 +79,15 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return manager;
     }
 
-    public void setHazardLevelStr(int index) {
-        if (index == 0) this.hazardLevelStr = "All";
-        else if (index == 1) this.hazardLevelStr = "Low";
-        else if (index == 2) this.hazardLevelStr = "Moderate";
-        else if (index == 3) this.hazardLevelStr = "High";
+    public void setSearchHazardLevelStr(int index) {
+        if (index == 0) this.searchHazardLevelStr = "";
+        else if (index == 1) this.searchHazardLevelStr = "Low";
+        else if (index == 2) this.searchHazardLevelStr = "Moderate";
+        else if (index == 3) this.searchHazardLevelStr = "High";
     }
 
-    public void setViolationNum(int index) {
-        if (index == 0) {
-            this.violationNum = "All";
-        } else if (index == 1) {
-            this.violationNum = "Greater or Equal";
-        } else if (index == 2) {
-            this.violationNum = "Lesser or Equal";
-        }
+    public void setSearchViolationNumEquality(int index) {
+        this.searchViolationNumEquality = index;
     }
 
     public int getSizeAllRestaurants() {
@@ -158,13 +153,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public Iterator<Restaurant> iterator() {
         if (filteredRestaurantList.size() == 0) {
             // Fill filtered restaurant with all restaurants
-            updateFilteredRestaurants(
-                    "",
-                    "",
-                    -1,
-                    -1,
-                    false
-                    );
+            updateFilteredRestaurants();
         }
         return filteredRestaurantList.iterator();
     }
@@ -215,13 +204,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         filteredRestaurantList.clear();
     }
 
-    public void updateFilteredRestaurants(
-            String searchTerm,
-            String hazardRatingLastInspection,
-            int isNumCritViolationsLessThanOrEqualTo,        // -1, 0, 1: N/A, >=, <=
-            int numCritViolationsInLastYear,
-            boolean favouritesOnly
-    ) {
+    public void updateFilteredRestaurants() {
         // searchTerm: Restaurant name must contain searchTerm as a substring
         // hazardLevelLastInspection: Restaurants last inspection have this hazard level
         // Clear the filtered restaurant list before updating
@@ -230,12 +213,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
         // Refill filtered list with the correct restaurants
         for (Restaurant restaurant : manager.getRestaurantList()) {
             if (restaurant.getName().toLowerCase().contains(searchTerm.toLowerCase())   // Check the name contains the search term
-                && (hazardRatingLastInspection.equals("") // If user doesn't care about hazard level the condition evaluates to true
-                    || (restaurant.getInspectionList().size() != 0 && restaurant.getInspection(0).getHazardRating().contains(hazardRatingLastInspection)))   // Verify most recent inspection is correct
-                && (isNumCritViolationsLessThanOrEqualTo == -1  // User doesn't care about violations, evaluates to true
-                    || (isNumCritViolationsLessThanOrEqualTo == 0 && restaurant.countCriticalViolationInLastYear() >= numCritViolationsInLastYear)    // User wants to check if number >= N
-                    || (isNumCritViolationsLessThanOrEqualTo == 1 && restaurant.countCriticalViolationInLastYear() <= numCritViolationsInLastYear))   // User wants to check if number <= N
-                && (!favouritesOnly || restaurant.isFavourite())    // If user doesn't care about favourites, evaluate to true, otherwise verify restaurant is a favourite or not
+                && (searchHazardLevelStr.equals("") // If user doesn't care about hazard level the condition evaluates to true
+                    || (restaurant.getInspectionList().size() != 0 && restaurant.getInspection(0).getHazardRating().equals(searchHazardLevelStr)))   // Verify most recent inspection is correct
+                && (searchViolationNumEquality == 0  // User doesn't care about violations, evaluates to true
+                    || (searchViolationNumEquality == 1 && restaurant.countCriticalViolationInLastYear() >= searchViolationBound)    // User wants to check if number >= N
+                    || (searchViolationNumEquality == 2 && restaurant.countCriticalViolationInLastYear() <= searchViolationBound))   // User wants to check if number <= N
+                && (!searchFavouritesOnly || restaurant.isFavourite())    // If user doesn't care about favourites, evaluate to true, otherwise verify restaurant is a favourite or not
             ) {
                 filteredRestaurantList.add(restaurant);
             }
@@ -639,5 +622,5 @@ public class RestaurantManager implements Iterable<Restaurant>{
             e.printStackTrace();
         }
     }
-    public void setItemSearch(String itemSearch) { this.itemSearch = itemSearch; }
+    public void setSearchTerm(String searchTerm) { this.searchTerm = searchTerm; }
 }

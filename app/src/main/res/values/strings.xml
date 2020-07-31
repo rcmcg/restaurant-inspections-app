@@ -62,8 +62,8 @@
     </string-array>
 
     <string-array name="ChooseFavor">
-        <item>YES</item>
         <item>No</item>
+        <item>Yes</item>
     </string-array>
     <string name="type_follow_up">Type: Follow-up</string>
     <string name="Date_place_holder">Jan 22nd 2020</string>
