@@ -87,7 +87,7 @@ public class RestaurantActivity extends AppCompatActivity {
         restaurantMenu = menu;
         setFavouritedImg();
         final MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
-        final Restaurant restaurant = manager.getIndex(restaurantIndex);
+        final Restaurant restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
 
         favouriteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -112,6 +112,9 @@ public class RestaurantActivity extends AppCompatActivity {
         return true;
     }
 
+
+    // Source
+    // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
@@ -122,12 +125,6 @@ public class RestaurantActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-    // Source
-    // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
-
-
 
     private void setRestaurantImg(Restaurant restaurant) {
         ImageView imgViewRestaurant = findViewById(R.id.restaurant_img);
@@ -149,7 +146,7 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     private void setFavouritedImg() {
-        Restaurant restaurant = manager.getIndex(restaurantIndex);
+        Restaurant restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
         MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
 
         //favourited = preferences.getBoolean(restaurant.getTrackingNumber(), false);
