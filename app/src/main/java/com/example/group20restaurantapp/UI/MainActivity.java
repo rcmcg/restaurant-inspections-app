@@ -201,7 +201,8 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == SearchActivity.RESULT_OK) {
-            adapter.notifyDataSetChanged();
+            // adapter.notifyDataSetChanged();
+            populateListView();
         }
     }
 
