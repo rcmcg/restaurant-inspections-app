@@ -36,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
+    public static final int LAUNCH_SEARCH_ACTIVITY = 458;
+
+    private ArrayAdapter<Restaurant> adapter;
 
     private RestaurantManager manager = RestaurantManager.getInstance();
 
@@ -66,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i3 = new Intent(MainActivity.this, SearchActivity.class);
-                startActivityForResult(i3, 458);
+                startActivityForResult(i3, LAUNCH_SEARCH_ACTIVITY);
             }
         });
     }
@@ -95,8 +98,14 @@ public class MainActivity extends AppCompatActivity {
 
     public ArrayList<Restaurant> restaurantList() {
         ArrayList<Restaurant> newRestaurantList = new ArrayList<>();
-        for (int i = 0; i < manager.getSize(); i++) {
-            newRestaurantList.add(manager.getIndex(i));
+        /*
+        for (int i = 0; i < manager.getSizeFilteredRestaurants(); i++) {
+            newRestaurantList.add(manager.getIndexFilteredRestaurants(i));
+        }
+
+         */
+        for (Restaurant restaurant : manager) {
+            newRestaurantList.add(restaurant);
         }
         return newRestaurantList;
     };
@@ -117,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Find the restaurant to work with
-            final Restaurant currentRestaurant = manager.getIndex(position);
+            final Restaurant currentRestaurant = manager.getIndexFilteredRestaurants(position);
 
             final ImageView imgFavourite = itemView.findViewById(R.id.img_favourite);
             final SharedPreferences preferences = getSharedPreferences("favourites", 0);
@@ -202,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                Restaurant clickedRestaurant = manager.getIndex(position);
+                Restaurant clickedRestaurant = manager.getIndexFilteredRestaurants(position);
 
                 // Launch restaurant activity
                 Intent intent = RestaurantActivity.makeLaunchIntent(MainActivity.this);
@@ -210,6 +219,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == SearchActivity.RESULT_OK) {
+            // adapter.notifyDataSetChanged();
+            populateListView();
+        }
     }
 
     public static Intent makeIntent(Context context) {

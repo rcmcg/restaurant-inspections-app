@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -116,7 +117,7 @@ public class MapsActivity extends AppCompatActivity
         long appLastUpdated = getAppLastUpdated(this);
 
         // read data on startup
-        if (manager.getSize() == 0) {
+        if (manager.getSizeAllRestaurants() == 0) {
             if (appLastUpdated == -1) {
                 Log.d(TAG, "onCreate: Filling with default restaurants");
                 manager.fillRestaurantManager(false, this);
@@ -181,9 +182,22 @@ public class MapsActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent i3 = new Intent(MapsActivity.this, SearchActivity.class);
-                startActivityForResult(i3, 458);
+                startActivityForResult(i3, MainActivity.LAUNCH_SEARCH_ACTIVITY);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == SearchActivity.RESULT_OK) {
+            // Update the map
+            mClusterManager.clearItems();
+            mClusterManager.cluster();
+            setUpClusterer();
+            mClusterManager.cluster();
+        }
     }
 
     private void getLocationPermissionFromUser() {
@@ -275,6 +289,9 @@ public class MapsActivity extends AppCompatActivity
 
             manager.refillRestaurantManagerNewData(this);
             saveAppLastUpdated(currentDate.getTime());
+
+            // Update filtered restaurant list
+            manager.updateFilteredRestaurants();
 
             // Update the map
             mClusterManager.clearItems();
@@ -522,7 +539,7 @@ public class MapsActivity extends AppCompatActivity
                 double lng = latLngF.longitude;
                 String restaurantName = marker.getTitle();
                 Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
-                int restaurantIndex = manager.findIndex(restaurant);
+                int restaurantIndex = manager.findIndexFromFilteredRestaurants(restaurant);
 
                 // Launch RestaurantActivity with the correct index
                 Intent intent = RestaurantActivity.makeLaunchIntent(MapsActivity.this);

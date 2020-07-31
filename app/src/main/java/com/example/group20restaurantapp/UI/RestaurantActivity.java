@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,7 +25,6 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,7 +63,7 @@ public class RestaurantActivity extends AppCompatActivity {
         if (restaurantIndex == -1) {
             Log.e("RestaurantActivity", "onCreate: Activity opened with no restaurant");
         } else {
-            restaurant = manager.getIndex(restaurantIndex);
+            restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
         }
 
         assert restaurant != null;
@@ -89,7 +87,7 @@ public class RestaurantActivity extends AppCompatActivity {
         restaurantMenu = menu;
         setFavouritedImg();
         final MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
-        final Restaurant restaurant = manager.getIndex(restaurantIndex);
+        final Restaurant restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
 
         favouriteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -114,6 +112,9 @@ public class RestaurantActivity extends AppCompatActivity {
         return true;
     }
 
+
+    // Source
+    // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
@@ -124,12 +125,6 @@ public class RestaurantActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-    // Source
-    // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
-
-
 
     private void setRestaurantImg(Restaurant restaurant) {
         ImageView imgViewRestaurant = findViewById(R.id.restaurant_img);
@@ -151,7 +146,7 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     private void setFavouritedImg() {
-        Restaurant restaurant = manager.getIndex(restaurantIndex);
+        Restaurant restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
         MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
 
         //favourited = preferences.getBoolean(restaurant.getTrackingNumber(), false);
