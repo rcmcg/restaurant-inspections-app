@@ -1,13 +1,17 @@
 package com.example.group20restaurantapp.UI;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +43,10 @@ public class RestaurantActivity extends AppCompatActivity {
     public static final String RESTAURANT_NAME_INTENT_TAG = "Restaurant name";
     private RestaurantManager manager;
     List<Inspection> inspections;
+    //private boolean favourited = false;
+    SharedPreferences preferences;
+    private Menu restaurantMenu;
+    int restaurantIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +56,7 @@ public class RestaurantActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        int restaurantIndex = getIntent().getIntExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG,-1);
+        restaurantIndex = getIntent().getIntExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG,-1);
 
         // Get singleton
         manager = RestaurantManager.getInstance();
@@ -68,15 +76,47 @@ public class RestaurantActivity extends AppCompatActivity {
         setCoordsTextAndClickCallback(restaurant);
         setRestaurantImg(restaurant);
 
+        preferences = getSharedPreferences("favourites", 0);
+
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
         // setupDefaultIntent();
     }
 
-    // Source
-    // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.restaurant_menu, menu);
+        restaurantMenu = menu;
+        setFavouritedImg();
+        final MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
+        final Restaurant restaurant = manager.getIndex(restaurantIndex);
+
+        favouriteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (restaurant.isFavourite()){
+                    favouriteItem.setIcon(R.drawable.star_off);
+                    restaurant.setFavourite(false);
+                }
+                else{
+                    favouriteItem.setIcon(R.drawable.star_on);
+                    restaurant.setFavourite(true);
+                }
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean(restaurant.getTrackingNumber(), restaurant.isFavourite());
+                editor.apply();
+
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
         switch (item.getItemId()){
             case android.R.id.home:
                 onBackPressed();
@@ -84,6 +124,12 @@ public class RestaurantActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    // Source
+    // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
+
+
 
     private void setRestaurantImg(Restaurant restaurant) {
         ImageView imgViewRestaurant = findViewById(R.id.restaurant_img);
@@ -102,6 +148,19 @@ public class RestaurantActivity extends AppCompatActivity {
         txtViewAddress.setText(
                 getString(R.string.restaurant_activity_restaurant_address,restaurant.getAddress())
         );
+    }
+
+    private void setFavouritedImg() {
+        Restaurant restaurant = manager.getIndex(restaurantIndex);
+        MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
+
+        //favourited = preferences.getBoolean(restaurant.getTrackingNumber(), false);
+        if (restaurant.isFavourite()){
+            favouriteItem.setIcon(R.drawable.star_on);
+        }
+        else{
+            favouriteItem.setIcon(R.drawable.star_off);
+        }
     }
 
     private void setCoordsTextAndClickCallback(final Restaurant restaurant) {

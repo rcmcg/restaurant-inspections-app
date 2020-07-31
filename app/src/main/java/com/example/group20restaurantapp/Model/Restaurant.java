@@ -19,6 +19,7 @@ public class Restaurant {
         private String city;
         private String facType;
         private int iconImgId;
+        private boolean isFavourite;
         List<Inspection> inspectionList = new ArrayList<>();
         //Constructor
         public Restaurant(String name, String address, double latitude, double longitude, String trackingNumber, String city, String facType, int icon) {
@@ -93,6 +94,14 @@ public class Restaurant {
 
         public int getIconImgId() {
             return iconImgId;
+        }
+
+        public boolean isFavourite() {
+            return isFavourite;
+        }
+
+        public void setFavourite(boolean favourite) {
+            isFavourite = favourite;
         }
 
         public List<Inspection> getInspectionList() {

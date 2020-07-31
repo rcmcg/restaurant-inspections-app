@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -51,6 +52,14 @@ public class MainActivity extends AppCompatActivity {
         wireLaunchMapButton();
         wireLaunchSearchButton();
     }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        finish();
+        startActivity(getIntent());
+    }
+
     private void wireLaunchSearchButton() {
         Button btnSearch = findViewById(R.id.GoToSearch);
         btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -108,7 +117,23 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Find the restaurant to work with
-            Restaurant currentRestaurant = manager.getIndex(position);
+            final Restaurant currentRestaurant = manager.getIndex(position);
+
+            final ImageView imgFavourite = itemView.findViewById(R.id.img_favourite);
+            final SharedPreferences preferences = getSharedPreferences("favourites", 0);
+            // Check 'favourited' status of restaurant
+            boolean favStatus = preferences.getBoolean(currentRestaurant.getTrackingNumber(), false);
+            currentRestaurant.setFavourite(favStatus);
+
+            // Set imgFavourite accordingly
+            if (currentRestaurant.isFavourite()){
+                imgFavourite.setImageResource(R.drawable.star_on);
+                imgFavourite.setTag("favourited");
+            }
+            else{
+                imgFavourite.setImageResource(R.drawable.star_off);
+                imgFavourite.setTag("unfavourited");
+            }
 
             // Fill the restaurantIcon
             ImageView imgRestaurant = (ImageView) itemView.findViewById(R.id.restaurant_item_imgRestaurantIcon);
