@@ -39,17 +39,17 @@
     <string name="launch_list">Switch to list</string>
     <string name="launch_map">Switch to map</string>
     <string name="no_inspection_data_available">No inspection data available.</string>
-    <string name="enter_the_key_word_here">Enter the key word here</string>
+    <string name="enter_the_key_word_here">Search restaurants</string>
     <string name="please_enter_some_key_words_to_help_search">please_enter_some_key_words_to_help_search</string>
-    <string name="search_by_violation_num">Search by violation num</string>
-    <string name="search_by_the_hazard_level">Search by the hazard level</string>
-    <string name="click_to_start">Click to start</string>
-    <string name="click_to_clean">Click to clean</string>
-    <string name="num">Num</string>
-    <string name="please_enter_the_key_word">Please enter the key word</string>
-    <string name="click_to_get_favorite_only">Click to get favorite only</string>
+    <string name="search_by_violation_num">Critical violations in last year</string>
+    <string name="search_by_the_hazard_level">Hazard level of last inspection</string>
+    <string name="submit_search">Submit search</string>
+    <string name="reset_search">Reset search</string>
+    <string name="num">Enter an integer</string>
+    <string name="please_enter_the_key_word">Enter search parameters</string>
+    <string name="click_to_get_favorite_only">Favourite restaurants only?</string>
     <string-array name="HazardlevelStr">
-        <item>All</item>
+        <item>Any</item>
         <item>Low</item>
         <item>Moderate</item>
         <item>High</item>
@@ -62,8 +62,8 @@
     </string-array>
 
     <string-array name="ChooseFavor">
-        <item>YES</item>
         <item>No</item>
+        <item>Yes</item>
     </string-array>
     <string name="type_follow_up">Type: Follow-up</string>
     <string name="Date_place_holder">Jan 22nd 2020</string>

@@ -11,8 +11,10 @@
 
         <TextView
             android:id="@+id/info_item_address"
-            android:layout_width="104dp"
-            android:layout_height="39dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_width="195dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="@string/n_a"
             app:layout_constraintStart_toEndOf="@+id/info_item_restaurantLogo"
@@ -28,13 +30,13 @@
 
         <TextView
             android:id="@+id/info_item_restaurantName"
-            android:layout_width="196dp"
+            android:layout_width="195dp"
             android:layout_height="23dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
-            android:text="N/A"
             android:ellipsize="end"
             android:maxLines="1"
+            android:text="N/A"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/info_item_restaurantLogo"
@@ -51,12 +53,12 @@
 
         <TextView
             android:id="@+id/info_item_lastInspection"
-            android:layout_width="111dp"
-            android:layout_height="33dp"
-            android:layout_marginTop="1dp"
-            android:layout_marginEnd="4dp"
+            android:layout_width="195dp"
+            android:layout_height="wrap_content"
             android:text="@string/no_inspection_data_available"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/info_item_hazardImage" />
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintStart_toStartOf="@+id/info_item_address"
+            app:layout_constraintTop_toBottomOf="@+id/info_item_address" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

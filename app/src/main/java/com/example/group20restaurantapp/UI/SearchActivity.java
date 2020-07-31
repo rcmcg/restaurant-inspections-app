@@ -17,24 +17,34 @@ import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
 public class SearchActivity extends AppCompatActivity {
-    //Search filters
+    // public int RESULT_SEARCH_UPDATED = 1;
+
+    // Search filters
     private EditText searchField;
     private EditText violationCountField;
     private Button btnSearch;
     private Button clearBtn;
     private Spinner hazardSpinner;
-    private Spinner ViolationSpinner;
-    private Spinner FavoriteSpinner;
+    private Spinner violationSpinner;
+    private Spinner favouriteSpinner;
+
+    // Search terms
+    // note, these need to be set by this activity, only update the
+    // values in manager if the user presses search
+    private String searchTerm;
+    private int searchHazardLevelStrIndex;
+    private int searchViolationNumEquality;
+    private int searchViolationBound;
+    private boolean searchFavouritesOnly;
 
     private RestaurantManager manager = RestaurantManager.getInstance();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setDefaultIntent();
+        // setDefaultIntent();
         generateSearch();
     }
 
@@ -79,81 +89,118 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                manager.setHazardLevelStr(position);
+                // manager.setSearchHazardLevelStr(position);
+                searchHazardLevelStrIndex = position;
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                manager.setHazardLevelStr(0);
+                // manager.setSearchHazardLevelStr(0);
+                searchHazardLevelStrIndex = 0;
             }
         });
 
-        ViolationSpinner = (Spinner) findViewById(R.id.ViolationNum);
+        violationSpinner = (Spinner) findViewById(R.id.ViolationNum);
         ArrayAdapter<CharSequence> ViolationAdapter = ArrayAdapter.createFromResource(this,
                 R.array.ViolationNumBound, android.R.layout.simple_spinner_dropdown_item);
         ViolationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        ViolationSpinner.setAdapter(ViolationAdapter);
-        ViolationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        violationSpinner.setAdapter(ViolationAdapter);
+        violationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                manager.setViolationNum(position);
+                searchViolationNumEquality = position;
+                // manager.setSearchViolationNumEquality(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                manager.setViolationNum(0);
+                searchViolationNumEquality = 0;
+                // manager.setSearchViolationNumEquality(0);
             }
         });
 
 
-        FavoriteSpinner = (Spinner) findViewById(R.id.ChooseFavorite);
+        favouriteSpinner = (Spinner) findViewById(R.id.ChooseFavorite);
         ArrayAdapter<CharSequence> favoriteAdapter = ArrayAdapter.createFromResource(this,
                 R.array.ChooseFavor, android.R.layout.simple_spinner_dropdown_item);
         favoriteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        FavoriteSpinner.setAdapter(favoriteAdapter);
-        FavoriteSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        favouriteSpinner.setAdapter(favoriteAdapter);
+        favouriteSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                boolean temp = false;
-                if(position==0){
-                    temp = true;
-                }
-                manager.setFavorite(temp);
-
+                searchFavouritesOnly = position != 0;
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                manager.setFavorite(false);
+                searchFavouritesOnly = false;
             }
         });
     }
 
-    //submit the users's input
+    // Submit the users's input
     private void submitSearch() {
+        // Get the search term
+        searchTerm = searchField.getText().toString();
+        // Update search term in manager
+        manager.setSearchTerm(searchTerm);
+        // String itemSearch = searchField.getText().toString();
+
+        // Update the hazard level of last inspection in manager
+        manager.setSearchHazardLevelStr(searchHazardLevelStrIndex);
+
+        // Set the searchViolationNumEquality in manager
+        manager.setSearchViolationNumEquality(searchViolationNumEquality);
+
+        // Set the violation bound in manager
         updateViolationCountRestriction();
-        String itemSearch = searchField.getText().toString();
-        manager.setItemSearch(itemSearch);
+
+        // Set searchFavouritesOnly in manager
+        manager.setSearchFavouritesOnly(searchFavouritesOnly);
+
+        // Update filtered restaurant list with new terms
+        manager.updateFilteredRestaurants();
+
+        setUpdateResult();
+
         this.finish();
+    }
+
+    private void setUpdateResult() {
+        // Let the calling activity know they need to update their data
+        Intent returnIntent = new Intent();
+        setResult(Activity.RESULT_OK, returnIntent);
     }
 
     private void updateViolationCountRestriction() {
         try {
             int bound = Integer.parseInt(violationCountField.getText().toString());
-            manager.setViolationBound(bound);
+            manager.setSearchViolationBound(bound);
+        } catch (Exception e) {
+            // Invalid entry or other error
+            manager.setSearchViolationBound(-1);
         }
-        catch (Exception e) {}
     }
 
     private void clearFilters() {
-        manager.setItemSearch(null);
-        manager.setHazardLevelStr(0);
-        manager.setViolationNum(0);
+        // Reset search parametres in manager
+        manager.setSearchTerm("");
+        manager.setSearchHazardLevelStr(0);
+        manager.setSearchViolationNumEquality(0);
+        manager.setSearchViolationBound(-1);
+        manager.setSearchFavouritesOnly(false);
+
+        // Update filtered restaurant list with new terms
+        manager.updateFilteredRestaurants();
+
+        setUpdateResult();
     }
 
+    /*
     private void setDefaultIntent() {
         Intent i = new Intent();
         setResult(Activity.RESULT_OK, i);
     }
+     */
 
     //solve the action bar return to the previous activity
     @Override
