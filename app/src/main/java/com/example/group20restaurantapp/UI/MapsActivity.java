@@ -290,6 +290,9 @@ public class MapsActivity extends AppCompatActivity
             manager.refillRestaurantManagerNewData(this);
             saveAppLastUpdated(currentDate.getTime());
 
+            // Update filtered restaurant list
+            manager.updateFilteredRestaurants();
+
             // Update the map
             mClusterManager.clearItems();
             mClusterManager.cluster();
