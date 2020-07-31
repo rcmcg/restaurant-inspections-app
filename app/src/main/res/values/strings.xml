@@ -45,8 +45,8 @@
     <string name="search_by_the_hazard_level">Hazard level of last inspection</string>
     <string name="submit_search">Submit search</string>
     <string name="reset_search">Reset search</string>
-    <string name="num">Num</string>
-    <string name="please_enter_the_key_word">Enter search parameters then press "Submit search"</string>
+    <string name="num">Enter an integer</string>
+    <string name="please_enter_the_key_word">Enter search parameters</string>
     <string name="click_to_get_favorite_only">Favourite restaurants only?</string>
     <string-array name="HazardlevelStr">
         <item>Any</item>
