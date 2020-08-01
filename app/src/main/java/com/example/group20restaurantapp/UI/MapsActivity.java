@@ -51,7 +51,9 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -185,6 +187,7 @@ public class MapsActivity extends AppCompatActivity
                 startActivityForResult(i3, MainActivity.LAUNCH_SEARCH_ACTIVITY);
             }
         });
+
     }
 
     @Override
@@ -287,6 +290,10 @@ public class MapsActivity extends AppCompatActivity
             manager.writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV, this);
             Log.d(TAG, "initiateDownload: finished writing newInspectionData");
 
+            // Save list of favourite restaurants pre update
+            manager.setPreupdateFavList();
+            manager.getFavRestaurantsList().clear();
+
             manager.refillRestaurantManagerNewData(this);
             saveAppLastUpdated(currentDate.getTime());
 
@@ -298,6 +305,25 @@ public class MapsActivity extends AppCompatActivity
             mClusterManager.cluster();
             setUpClusterer();
             mClusterManager.cluster();
+
+            setModifiedFlags();
+
+        }
+    }
+
+    private void setModifiedFlags() {
+        for (Restaurant restaurant : manager.getFavRestaurantsList()){
+            if (restaurant.getInspectionSize() > 0){
+                // Compare size of inspection list preupdate to size post update
+                // => set a flag to indicate new inspections were added
+                for (Restaurant r : manager.getPreupdateFavList())
+                    if (r.getTrackingNumber().equals(restaurant.getTrackingNumber())){
+                        if (restaurant.getInspectionSize() > r.getInspectionSize()){
+                            restaurant.setModified(true);
+                            break;
+                    }
+                }
+            }
         }
     }
 

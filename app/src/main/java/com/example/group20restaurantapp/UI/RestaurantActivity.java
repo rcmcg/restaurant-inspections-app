@@ -93,12 +93,14 @@ public class RestaurantActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if (restaurant.isFavourite()){
+                    manager.getFavRestaurantsList().remove(restaurant);
                     favouriteItem.setIcon(R.drawable.star_off);
                     restaurant.setFavourite(false);
                 }
                 else{
                     favouriteItem.setIcon(R.drawable.star_on);
                     restaurant.setFavourite(true);
+                    manager.getFavRestaurantsList().add(restaurant);
                 }
 
                 SharedPreferences.Editor editor = preferences.edit();
@@ -111,8 +113,6 @@ public class RestaurantActivity extends AppCompatActivity {
 
         return true;
     }
-
-
     // Source
     // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
     @Override

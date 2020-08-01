@@ -54,6 +54,11 @@ public class MainActivity extends AppCompatActivity {
         registerClickCallback();
         wireLaunchMapButton();
         wireLaunchSearchButton();
+        for (Restaurant restaurant : manager.getFavRestaurantsList()){
+            if (restaurant.isModified()){
+                Log.d("MAIN!!!!!!!!!!!!", restaurant.getName());
+            }
+        }
     }
 
     @Override
@@ -129,10 +134,6 @@ public class MainActivity extends AppCompatActivity {
             final Restaurant currentRestaurant = manager.getIndexFilteredRestaurants(position);
 
             final ImageView imgFavourite = itemView.findViewById(R.id.img_favourite);
-            final SharedPreferences preferences = getSharedPreferences("favourites", 0);
-            // Check 'favourited' status of restaurant
-            boolean favStatus = preferences.getBoolean(currentRestaurant.getTrackingNumber(), false);
-            currentRestaurant.setFavourite(favStatus);
 
             // Set imgFavourite accordingly
             if (currentRestaurant.isFavourite()){

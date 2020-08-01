@@ -1,10 +1,12 @@
 package com.example.group20restaurantapp.Model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.util.Log;
 
 import com.example.group20restaurantapp.R;
+import com.example.group20restaurantapp.UI.MapsActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,11 +19,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -40,6 +46,13 @@ public class RestaurantManager implements Iterable<Restaurant>{
     // Variables
     private List<Restaurant> restaurantList = new ArrayList<>();            // Master list of restaurants
     private List<Restaurant> filteredRestaurantList = new ArrayList<>();    // Filtered list for use by app
+    private List<Restaurant> favRestaurantsList = new ArrayList<>();
+
+    public List<Restaurant> getPreupdateFavList() {
+        return preupdateFavList;
+    }
+
+    private List<Restaurant> preupdateFavList;
     private List<Integer> violNumbers;
     private List<String> violBriefDescriptions;
     private static RestaurantManager manager;
@@ -59,6 +72,10 @@ public class RestaurantManager implements Iterable<Restaurant>{
     // Iterable and a singleton class of restaurants object
     private RestaurantManager(){
         // Prevent from instantiating
+    }
+
+    public void setPreupdateFavList() {
+        preupdateFavList = new ArrayList<Restaurant>(favRestaurantsList);
     }
 
     //set the favorite of search
@@ -96,6 +113,10 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     public int getSizeFilteredRestaurants() {
         return filteredRestaurantList.size();
+    }
+
+    public List<Restaurant> getFavRestaurantsList() {
+        return favRestaurantsList;
     }
 
     public boolean isDownloadCancelled() {
@@ -347,6 +368,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     newRestaurant.setLongitude(Double.parseDouble(tokens[6]));
                     newRestaurant.setImgId();
 
+                    SharedPreferences preferences = context.getSharedPreferences("favourites", 0);
+                    // Check 'favourited' status of restaurant
+                    boolean favStatus = preferences.getBoolean(newRestaurant.getTrackingNumber(), false);
+                    newRestaurant.setFavourite(favStatus);
+                    if (favStatus){
+                        Restaurant restaurantRef = newRestaurant;
+                        favRestaurantsList.add(restaurantRef);
+                    }
                     // Adding the created Restaurants object to the manager instance
                     add(newRestaurant);
                     Log.d("Main activity","Just created" + newRestaurant);
@@ -391,6 +420,13 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 newRestaurant.setLongitude(Double.parseDouble(restaurantData[6]));
                 newRestaurant.setImgId();
 
+                SharedPreferences preferences = context.getSharedPreferences("favourites", 0);
+                // Check 'favourited' status of restaurant
+                boolean favStatus = preferences.getBoolean(newRestaurant.getTrackingNumber(), false);
+                newRestaurant.setFavourite(favStatus);
+                if (favStatus){
+                    favRestaurantsList.add(newRestaurant);
+                }
                 add(newRestaurant);
             }
         } catch (IOException e) {
@@ -553,6 +589,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     //Initializing inspection object variables
                 Inspection inspection = new Inspection();
                 inspection.setTrackingNumber(lineSplit[0].replace(" ", ""));
+
+                if (inspection.getTrackingNumber().equals("SWOD-APSP3X")){
+                    String name;
+                    name = "Adam";
+                }
+
                 inspection.setInspectionDate(lineSplit[1]);
                 inspection.setInspType(lineSplit[2]);
                 inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
@@ -622,5 +664,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
             e.printStackTrace();
         }
     }
+
     public void setSearchTerm(String searchTerm) { this.searchTerm = searchTerm; }
 }
