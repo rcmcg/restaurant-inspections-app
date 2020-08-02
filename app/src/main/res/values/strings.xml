@@ -79,4 +79,9 @@
     <string name="num_crit_viols">Num crit viols</string>
     <string name="num_noncrit_viols">Num nonCrit viols</string>
 
+    <string name="modified_fav_restaurants_message">
+        These are your favourite restaurants which have had new inspections since you last updated.
+    </string>
+    <string name="modified_fav_ok">OK</string>
+
 </resources>

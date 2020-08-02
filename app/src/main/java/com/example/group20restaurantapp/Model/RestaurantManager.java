@@ -134,6 +134,16 @@ public class RestaurantManager implements Iterable<Restaurant>{
         favRestaurantsList.add(restaurant);
     }
 
+    public List<Restaurant> getListOfModifiedRestaurants() {
+        List<Restaurant> modifiedRestaurants = new ArrayList<>();
+        for (Restaurant restaurant : favRestaurantsList) {
+            if (restaurant.isModified()) {
+                modifiedRestaurants.add(restaurant);
+            }
+        }
+        return modifiedRestaurants;
+    }
+
     public boolean isDownloadCancelled() {
         return isDownloadCancelled;
     }
@@ -681,4 +691,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
 
     public void setSearchTerm(String searchTerm) { this.searchTerm = searchTerm; }
+
+    public Restaurant getIndexFavouriteRestaurants(int position) {
+        return favRestaurantsList.get(position);
+    }
 }

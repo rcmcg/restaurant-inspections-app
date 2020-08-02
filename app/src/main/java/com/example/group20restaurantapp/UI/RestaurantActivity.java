@@ -41,7 +41,6 @@ public class RestaurantActivity extends AppCompatActivity {
     public static final String RESTAURANT_NAME_INTENT_TAG = "Restaurant name";
     private RestaurantManager manager;
     List<Inspection> inspections;
-    //private boolean favourited = false;
     SharedPreferences preferences;
     private Menu restaurantMenu;
     int restaurantIndex;
@@ -117,7 +116,6 @@ public class RestaurantActivity extends AppCompatActivity {
     // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
         switch (item.getItemId()){
             case android.R.id.home:
                 onBackPressed();

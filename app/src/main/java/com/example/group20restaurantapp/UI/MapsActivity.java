@@ -1,7 +1,9 @@
 package com.example.group20restaurantapp.UI;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,8 +16,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,10 +54,12 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -289,9 +296,8 @@ public class MapsActivity extends AppCompatActivity
             manager.writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV, this);
             Log.d(TAG, "initiateDownload: finished writing newInspectionData");
 
-            // Save list of favourite restaurants pre update
+            // Save list of favourite restaurants pre update and clear current favRestaurantsList
             manager.setPreUpdateFavList();
-            // manager.getFavRestaurantsList().clear();
             manager.clearFavRestaurantsList();
 
             manager.refillRestaurantManagerNewData(this);
@@ -308,7 +314,9 @@ public class MapsActivity extends AppCompatActivity
 
             Boolean atLeastOneRestaurantModified = setRestaurantModifiedFlagsPostUpdate();
             if (atLeastOneRestaurantModified) {
-                // Display an AlertDialog with a list of the modified restaurants
+                // Launch an activity displaying which restaurants have been modified
+                Intent intent = ModifiedFavRestaurantsActivity.makeIntent(MapsActivity.this);
+                startActivity(intent);
             }
         }
     }
@@ -327,8 +335,8 @@ public class MapsActivity extends AppCompatActivity
                             restaurant.setModified(true);
                             atLeastOneRestaurantModified = true;
                             break;
+                        }
                     }
-                }
                 }
             }
         }
