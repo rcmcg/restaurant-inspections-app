@@ -93,14 +93,14 @@ public class RestaurantActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if (restaurant.isFavourite()){
-                    manager.getFavRestaurantsList().remove(restaurant);
+                    manager.removeFavRestaurant(restaurant);
                     favouriteItem.setIcon(R.drawable.star_off);
                     restaurant.setFavourite(false);
                 }
                 else{
                     favouriteItem.setIcon(R.drawable.star_on);
                     restaurant.setFavourite(true);
-                    manager.getFavRestaurantsList().add(restaurant);
+                    manager.addFavRestaurant(restaurant);
                 }
 
                 SharedPreferences.Editor editor = preferences.edit();

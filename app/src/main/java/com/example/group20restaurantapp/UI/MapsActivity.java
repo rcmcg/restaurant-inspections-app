@@ -51,9 +51,8 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -291,8 +290,9 @@ public class MapsActivity extends AppCompatActivity
             Log.d(TAG, "initiateDownload: finished writing newInspectionData");
 
             // Save list of favourite restaurants pre update
-            manager.setPreupdateFavList();
-            manager.getFavRestaurantsList().clear();
+            manager.setPreUpdateFavList();
+            // manager.getFavRestaurantsList().clear();
+            manager.clearFavRestaurantsList();
 
             manager.refillRestaurantManagerNewData(this);
             saveAppLastUpdated(currentDate.getTime());
@@ -306,25 +306,33 @@ public class MapsActivity extends AppCompatActivity
             setUpClusterer();
             mClusterManager.cluster();
 
-            setModifiedFlags();
-
+            Boolean atLeastOneRestaurantModified = setRestaurantModifiedFlagsPostUpdate();
+            if (atLeastOneRestaurantModified) {
+                // Display an AlertDialog with a list of the modified restaurants
+            }
         }
     }
 
-    private void setModifiedFlags() {
-        for (Restaurant restaurant : manager.getFavRestaurantsList()){
+    private boolean setRestaurantModifiedFlagsPostUpdate() {
+        boolean atLeastOneRestaurantModified = false;
+        for (Iterator<Restaurant> it = manager.favRestaurantIterator(); it.hasNext(); ) {
+            Restaurant restaurant = it.next();
             if (restaurant.getInspectionSize() > 0){
                 // Compare size of inspection list preupdate to size post update
                 // => set a flag to indicate new inspections were added
-                for (Restaurant r : manager.getPreupdateFavList())
+                for (Iterator<Restaurant> iter = manager.preUpdateFavRestaurantIterator(); iter.hasNext(); ) {
+                    Restaurant r = iter.next();
                     if (r.getTrackingNumber().equals(restaurant.getTrackingNumber())){
                         if (restaurant.getInspectionSize() > r.getInspectionSize()){
                             restaurant.setModified(true);
+                            atLeastOneRestaurantModified = true;
                             break;
                     }
                 }
+                }
             }
         }
+       return atLeastOneRestaurantModified;
     }
 
     private void finishPleaseWaitDialog() {

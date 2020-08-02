@@ -25,6 +25,7 @@ import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -54,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
         registerClickCallback();
         wireLaunchMapButton();
         wireLaunchSearchButton();
-        for (Restaurant restaurant : manager.getFavRestaurantsList()){
+        for (Iterator<Restaurant> it = manager.favRestaurantIterator(); it.hasNext(); ) {
+            Restaurant restaurant = it.next();
             if (restaurant.isModified()){
                 Log.d("MAIN!!!!!!!!!!!!", restaurant.getName());
             }

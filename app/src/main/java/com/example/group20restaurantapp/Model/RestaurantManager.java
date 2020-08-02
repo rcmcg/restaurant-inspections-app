@@ -6,7 +6,6 @@ import android.os.StrictMode;
 import android.util.Log;
 
 import com.example.group20restaurantapp.R;
-import com.example.group20restaurantapp.UI.MapsActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,15 +18,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -48,11 +43,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private List<Restaurant> filteredRestaurantList = new ArrayList<>();    // Filtered list for use by app
     private List<Restaurant> favRestaurantsList = new ArrayList<>();
 
-    public List<Restaurant> getPreupdateFavList() {
-        return preupdateFavList;
-    }
-
-    private List<Restaurant> preupdateFavList;
+    private List<Restaurant> preUpdateFavList;
     private List<Integer> violNumbers;
     private List<String> violBriefDescriptions;
     private static RestaurantManager manager;
@@ -74,8 +65,16 @@ public class RestaurantManager implements Iterable<Restaurant>{
         // Prevent from instantiating
     }
 
-    public void setPreupdateFavList() {
-        preupdateFavList = new ArrayList<Restaurant>(favRestaurantsList);
+    private List<Restaurant> getPreUpdateFavList() {
+        return preUpdateFavList;
+    }
+
+    public void setPreUpdateFavList() {
+        preUpdateFavList = new ArrayList<Restaurant>(favRestaurantsList);
+    }
+
+    public Iterator<Restaurant> preUpdateFavRestaurantIterator() {
+        return preUpdateFavList.iterator();
     }
 
     //set the favorite of search
@@ -115,8 +114,24 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return filteredRestaurantList.size();
     }
 
-    public List<Restaurant> getFavRestaurantsList() {
+    private List<Restaurant> getFavRestaurantsList() {
         return favRestaurantsList;
+    }
+
+    public void clearFavRestaurantsList() {
+        favRestaurantsList.clear();
+    }
+
+    public Iterator<Restaurant> favRestaurantIterator() {
+        return favRestaurantsList.iterator();
+    }
+
+    public void removeFavRestaurant(Restaurant favRestaurant) {
+        favRestaurantsList.remove(favRestaurant);
+    }
+
+    public void addFavRestaurant(Restaurant restaurant) {
+        favRestaurantsList.add(restaurant);
     }
 
     public boolean isDownloadCancelled() {
