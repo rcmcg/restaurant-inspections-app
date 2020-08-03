@@ -121,7 +121,6 @@ public class MapsActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
         long appLastUpdated = getAppLastUpdated(this);
 
         // read data on startup
@@ -199,7 +198,6 @@ public class MapsActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode == SearchActivity.RESULT_OK) {
             // Update the map
             mClusterManager.clearItems();

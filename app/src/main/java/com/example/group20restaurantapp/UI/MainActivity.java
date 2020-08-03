@@ -75,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i3 = new Intent(MainActivity.this, SearchActivity.class);
-                startActivityForResult(i3, LAUNCH_SEARCH_ACTIVITY);
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                startActivityForResult(intent, LAUNCH_SEARCH_ACTIVITY);
             }
         });
     }
@@ -105,12 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
     public ArrayList<Restaurant> restaurantList() {
         ArrayList<Restaurant> newRestaurantList = new ArrayList<>();
-        /*
-        for (int i = 0; i < manager.getSizeFilteredRestaurants(); i++) {
-            newRestaurantList.add(manager.getIndexFilteredRestaurants(i));
-        }
-
-         */
         for (Restaurant restaurant : manager) {
             newRestaurantList.add(restaurant);
         }
@@ -184,12 +178,9 @@ public class MainActivity extends AppCompatActivity {
                 String temp2=String.format(getResources().getString(R.string.main_activity_restaurant_item_last_inspection_date,
                         lastInspection.intelligentInspectDate()));
                 lastInspectionDate.setText(temp2);
-
-
             } else {
                 lastInspectionDate.setText(getString(R.string.main_activity_restaurant_item_last_inspection_date_no_inspection));
             }
-
 
             // Set number of violations text
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
@@ -199,8 +190,6 @@ public class MainActivity extends AppCompatActivity {
                 String sumOfViolations = "" + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical());
                 String temp3= String.format(getResources().getString(R.string.main_activity_restaurant_item_violations, sumOfViolations));
                 numViolationsLastInspection.setText(temp3);
-
-
             } else {
                 numViolationsLastInspection.setText(getString(R.string.main_activity_restaurant_item_violations_no_inspection));
             }
@@ -229,7 +218,6 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == SearchActivity.RESULT_OK) {
-            // adapter.notifyDataSetChanged();
             populateListView();
         }
     }
