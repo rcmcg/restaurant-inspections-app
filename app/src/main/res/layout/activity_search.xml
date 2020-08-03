@@ -13,11 +13,10 @@
         android:layout_height="88dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="440dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.511"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/message">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/search_message"
@@ -28,39 +27,39 @@
 
     <TextView
         android:id="@+id/message"
-        android:layout_width="367dp"
+        android:layout_width="0dp"
         android:layout_height="32dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
         android:text="@string/please_enter_the_key_word"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/search"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.878" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/com1"
         android:layout_width="267dp"
         android:layout_height="30dp"
+        android:layout_marginTop="5dp"
         android:text="@string/search_by_violation_num"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.159"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search"
-        app:layout_constraintVertical_bias="0.13" />
+        app:layout_constraintTop_toBottomOf="@+id/search" />
 
     <Spinner
         android:id="@+id/ViolationNum"
         android:layout_width="136dp"
         android:layout_height="51dp"
-        android:layout_marginBottom="308dp"
+        android:layout_marginTop="16dp"
         android:background="#20050505"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/com1"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/com1" />
+        app:layout_constraintStart_toStartOf="@+id/com1"
+        app:layout_constraintTop_toBottomOf="@+id/com1" />
 
     <EditText
         android:id="@+id/count_text_search"
@@ -84,12 +83,10 @@
         android:layout_height="26dp"
         android:text="@string/search_by_the_hazard_level"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.139"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ViolationNum"
-        app:layout_constraintVertical_bias="0.053" />
+        app:layout_constraintTop_toBottomOf="@+id/ViolationNum" />
 
     <Spinner
         android:id="@+id/Hazardlevel"
@@ -120,10 +117,10 @@
         android:layout_width="150dp"
         android:layout_height="57dp"
         android:layout_marginStart="36dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginTop="32dp"
         android:text="@string/submit_search"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ChooseFavorite" />
 
     <Button
         android:id="@+id/btn_clean"
