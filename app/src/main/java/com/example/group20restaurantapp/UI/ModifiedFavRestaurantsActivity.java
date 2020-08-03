@@ -7,12 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -24,96 +23,37 @@ import com.example.group20restaurantapp.Model.Restaurant;
 import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-/**
- * Activity that displays restaurants in internal storage in list form. User can switch to the
- * MapActivity or select a restaurant in the list to launch RestaurantActivity for that restaurant
- */
-
-public class MainActivity extends AppCompatActivity {
-    public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
-    private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
-    private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
-    public static final int LAUNCH_SEARCH_ACTIVITY = 458;
-
-    private ArrayAdapter<Restaurant> adapter;
+public class ModifiedFavRestaurantsActivity extends AppCompatActivity {
 
     private RestaurantManager manager = RestaurantManager.getInstance();
-
-    // Yellow, orange, red, with 20% transparency
-    public static int[] itemViewBackgroundColours = {0x33FFFF00, 0x33FFA500, 0x33FF0000};
+    private List<Restaurant> modifiedRestaurantList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_modified_fav_restaurants);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         populateListView();
-        registerClickCallback();
-        wireLaunchMapButton();
-        wireLaunchSearchButton();
-        for (Iterator<Restaurant> it = manager.favRestaurantIterator(); it.hasNext(); ) {
-            Restaurant restaurant = it.next();
-            if (restaurant.isModified()){
-                Log.d("MAIN!!!!!!!!!!!!", restaurant.getName());
-            }
-        }
+        wireOkButton();
     }
 
-    @Override
-    public void onRestart() {
-        super.onRestart();
-        finish();
-        startActivity(getIntent());
-    }
-
-    private void wireLaunchSearchButton() {
-        Button btnSearch = findViewById(R.id.GoToSearch);
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-                startActivityForResult(intent, LAUNCH_SEARCH_ACTIVITY);
-            }
-        });
-    }
-
-    private void wireLaunchMapButton() {
-        Button btn = findViewById(R.id.btnLaunchMap);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = MapsActivity.makeIntent(MainActivity.this);
-                finish();
-                startActivity(intent);
-            }
-        });
-    }
 
     private void populateListView() {
-        // Construct a new ArrayList from the manager Singleton to fill the listView
-        List<Restaurant> restaurantList = restaurantList();
+        // Fill the list of favourite restaurants that have been modified since last update
+        modifiedRestaurantList = manager.getListOfModifiedRestaurants();
 
-        // Setup the listView
-        ArrayAdapter<Restaurant> adapter = new MyListAdapter(restaurantList);
-        ListView list = (ListView) findViewById(R.id.restaurantsListView);
+        // Setup the ListView
+        ArrayAdapter<Restaurant> adapter = new MyListAdapter(modifiedRestaurantList);
+        ListView list = (ListView) findViewById(R.id.modifiedFavRestaurantsListView);
         list.setAdapter(adapter);
     }
 
-    public ArrayList<Restaurant> restaurantList() {
-        ArrayList<Restaurant> newRestaurantList = new ArrayList<>();
-        for (Restaurant restaurant : manager) {
-            newRestaurantList.add(restaurant);
-        }
-        return newRestaurantList;
-    };
-
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
         public MyListAdapter(List<Restaurant> restaurantList) {
-            super(MainActivity.this, R.layout.restaurant_item_view, restaurantList);
+            super(ModifiedFavRestaurantsActivity.this, R.layout.restaurant_item_view, restaurantList);
         }
 
         @SuppressLint({"StringFormatMatches", "StringFormatInvalid"})
@@ -127,10 +67,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Find the restaurant to work with
-            final Restaurant currentRestaurant = manager.getIndexFilteredRestaurants(position);
+            final Restaurant currentRestaurant = modifiedRestaurantList.get(position);
 
             final ImageView imgFavourite = itemView.findViewById(R.id.img_favourite);
-
             // Set imgFavourite accordingly
             if (currentRestaurant.isFavourite()){
                 imgFavourite.setImageResource(R.drawable.star_on);
@@ -153,13 +92,13 @@ public class MainActivity extends AppCompatActivity {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
                 if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
-                    itemView.setBackgroundColor(itemViewBackgroundColours[0]);
+                    itemView.setBackgroundColor(MainActivity.itemViewBackgroundColours[0]);
                 } else if (lastInspection.getHazardRating().equals("Moderate")) {
                     imgHazardIcon.setImageResource(R.drawable.orange_diamond);
-                    itemView.setBackgroundColor(itemViewBackgroundColours[1]);
+                    itemView.setBackgroundColor(MainActivity.itemViewBackgroundColours[1]);
                 } else if (lastInspection.getHazardRating().equals("High")) {
                     imgHazardIcon.setImageResource(R.drawable.red_octogon);
-                    itemView.setBackgroundColor(itemViewBackgroundColours[2]);
+                    itemView.setBackgroundColor(MainActivity.itemViewBackgroundColours[2]);
                 }
             } else {
                 // No inspection for this restaurant
@@ -184,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
             // Set number of violations text
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
-
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
                 String sumOfViolations = "" + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical());
@@ -198,31 +136,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void registerClickCallback() {
-        ListView list = (ListView) findViewById(R.id.restaurantsListView);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    private void wireOkButton() {
+        Button btn = findViewById(R.id.btnOkModifiedFav);
+        btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                Restaurant clickedRestaurant = manager.getIndexFilteredRestaurants(position);
-
-                // Launch restaurant activity
-                Intent intent = RestaurantActivity.makeLaunchIntent(MainActivity.this);
-                intent.putExtra(RESTAURANT_INDEX_INTENT_TAG, position);
-                startActivity(intent);
+            public void onClick(View v) {
+                finish();
             }
         });
     }
 
+    // Source
+    // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == SearchActivity.RESULT_OK) {
-            populateListView();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public static Intent makeIntent(Context context) {
-        return new Intent(context, MainActivity.class);
+        return new Intent(context, ModifiedFavRestaurantsActivity.class);
     }
 }

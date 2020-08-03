@@ -1,6 +1,7 @@
 package com.example.group20restaurantapp.Model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.util.Log;
 
@@ -40,6 +41,9 @@ public class RestaurantManager implements Iterable<Restaurant>{
     // Variables
     private List<Restaurant> restaurantList = new ArrayList<>();            // Master list of restaurants
     private List<Restaurant> filteredRestaurantList = new ArrayList<>();    // Filtered list for use by app
+    private List<Restaurant> favRestaurantsList = new ArrayList<>();
+
+    private List<Restaurant> preUpdateFavList;
     private List<Integer> violNumbers;
     private List<String> violBriefDescriptions;
     private static RestaurantManager manager;
@@ -59,6 +63,18 @@ public class RestaurantManager implements Iterable<Restaurant>{
     // Iterable and a singleton class of restaurants object
     private RestaurantManager(){
         // Prevent from instantiating
+    }
+
+    private List<Restaurant> getPreUpdateFavList() {
+        return preUpdateFavList;
+    }
+
+    public void setPreUpdateFavList() {
+        preUpdateFavList = new ArrayList<Restaurant>(favRestaurantsList);
+    }
+
+    public Iterator<Restaurant> preUpdateFavRestaurantIterator() {
+        return preUpdateFavList.iterator();
     }
 
     //set the favorite of search
@@ -96,6 +112,36 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
     public int getSizeFilteredRestaurants() {
         return filteredRestaurantList.size();
+    }
+
+    private List<Restaurant> getFavRestaurantsList() {
+        return favRestaurantsList;
+    }
+
+    public void clearFavRestaurantsList() {
+        favRestaurantsList.clear();
+    }
+
+    public Iterator<Restaurant> favRestaurantIterator() {
+        return favRestaurantsList.iterator();
+    }
+
+    public void removeFavRestaurant(Restaurant favRestaurant) {
+        favRestaurantsList.remove(favRestaurant);
+    }
+
+    public void addFavRestaurant(Restaurant restaurant) {
+        favRestaurantsList.add(restaurant);
+    }
+
+    public List<Restaurant> getListOfModifiedRestaurants() {
+        List<Restaurant> modifiedRestaurants = new ArrayList<>();
+        for (Restaurant restaurant : favRestaurantsList) {
+            if (restaurant.isModified()) {
+                modifiedRestaurants.add(restaurant);
+            }
+        }
+        return modifiedRestaurants;
     }
 
     public boolean isDownloadCancelled() {
@@ -347,6 +393,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     newRestaurant.setLongitude(Double.parseDouble(tokens[6]));
                     newRestaurant.setImgId();
 
+                    SharedPreferences preferences = context.getSharedPreferences("favourites", 0);
+                    // Check 'favourited' status of restaurant
+                    boolean favStatus = preferences.getBoolean(newRestaurant.getTrackingNumber(), false);
+                    newRestaurant.setFavourite(favStatus);
+                    if (favStatus){
+                        Restaurant restaurantRef = newRestaurant;
+                        favRestaurantsList.add(restaurantRef);
+                    }
                     // Adding the created Restaurants object to the manager instance
                     add(newRestaurant);
                     Log.d("Main activity","Just created" + newRestaurant);
@@ -391,6 +445,13 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 newRestaurant.setLongitude(Double.parseDouble(restaurantData[6]));
                 newRestaurant.setImgId();
 
+                SharedPreferences preferences = context.getSharedPreferences("favourites", 0);
+                // Check 'favourited' status of restaurant
+                boolean favStatus = preferences.getBoolean(newRestaurant.getTrackingNumber(), false);
+                newRestaurant.setFavourite(favStatus);
+                if (favStatus){
+                    favRestaurantsList.add(newRestaurant);
+                }
                 add(newRestaurant);
             }
         } catch (IOException e) {
@@ -553,6 +614,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     //Initializing inspection object variables
                 Inspection inspection = new Inspection();
                 inspection.setTrackingNumber(lineSplit[0].replace(" ", ""));
+
+                if (inspection.getTrackingNumber().equals("SWOD-APSP3X")){
+                    String name;
+                    name = "Adam";
+                }
+
                 inspection.setInspectionDate(lineSplit[1]);
                 inspection.setInspType(lineSplit[2]);
                 inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
@@ -622,5 +689,10 @@ public class RestaurantManager implements Iterable<Restaurant>{
             e.printStackTrace();
         }
     }
+
     public void setSearchTerm(String searchTerm) { this.searchTerm = searchTerm; }
+
+    public Restaurant getIndexFavouriteRestaurants(int position) {
+        return favRestaurantsList.get(position);
+    }
 }

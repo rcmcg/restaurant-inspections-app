@@ -24,6 +24,7 @@ public class Restaurant {
     private String facType;
     private int iconImgId;
     private boolean isFavourite;
+    private boolean isModified;
 
     List<Inspection> inspectionList = new ArrayList<>();
     //Constructor
@@ -102,13 +103,21 @@ public class Restaurant {
         return iconImgId;
     }
 
-        public boolean isFavourite() {
-            return isFavourite;
-        }
+    public boolean isFavourite() {
+        return isFavourite;
+    }
 
-        public void setFavourite(boolean favourite) {
-            isFavourite = favourite;
-        }
+    public void setFavourite(boolean favourite) {
+        isFavourite = favourite;
+    }
+
+    public boolean isModified() {
+        return isModified;
+    }
+
+    public void setModified(boolean modified) {
+        isModified = modified;
+    }
 
     public List<Inspection> getInspectionList() {
         if(this==null){

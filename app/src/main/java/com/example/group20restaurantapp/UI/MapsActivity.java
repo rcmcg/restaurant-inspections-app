@@ -1,7 +1,9 @@
 package com.example.group20restaurantapp.UI;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,8 +16,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,9 +54,12 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -104,15 +112,12 @@ public class MapsActivity extends AppCompatActivity
         setContentView(R.layout.activity_maps);
         Log.d("MapsActivity", "Working onCreate");
 
-        Toast.makeText(this, "ONCREATE TOAST", Toast.LENGTH_SHORT).show();
-
         getLocationPermissionFromUser();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
 
         long appLastUpdated = getAppLastUpdated(this);
 
@@ -185,12 +190,12 @@ public class MapsActivity extends AppCompatActivity
                 startActivityForResult(i3, MainActivity.LAUNCH_SEARCH_ACTIVITY);
             }
         });
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode == SearchActivity.RESULT_OK) {
             // Update the map
             mClusterManager.clearItems();
@@ -287,6 +292,10 @@ public class MapsActivity extends AppCompatActivity
             manager.writeToFile(newInspectionData, WEB_SERVER_INSPECTIONS_CSV, this);
             Log.d(TAG, "initiateDownload: finished writing newInspectionData");
 
+            // Save list of favourite restaurants pre update and clear current favRestaurantsList
+            manager.setPreUpdateFavList();
+            manager.clearFavRestaurantsList();
+
             manager.refillRestaurantManagerNewData(this);
             saveAppLastUpdated(currentDate.getTime());
 
@@ -298,7 +307,36 @@ public class MapsActivity extends AppCompatActivity
             mClusterManager.cluster();
             setUpClusterer();
             mClusterManager.cluster();
+
+            Boolean atLeastOneRestaurantModified = setRestaurantModifiedFlagsPostUpdate();
+            if (atLeastOneRestaurantModified) {
+                // Launch an activity displaying which restaurants have been modified
+                Intent intent = ModifiedFavRestaurantsActivity.makeIntent(MapsActivity.this);
+                startActivity(intent);
+            }
         }
+    }
+
+    private boolean setRestaurantModifiedFlagsPostUpdate() {
+        boolean atLeastOneRestaurantModified = false;
+        for (Iterator<Restaurant> it = manager.favRestaurantIterator(); it.hasNext(); ) {
+            Restaurant restaurant = it.next();
+            if (restaurant.getInspectionSize() > 0){
+                // Compare size of inspection list preupdate to size post update
+                // => set a flag to indicate new inspections were added
+                for (Iterator<Restaurant> iter = manager.preUpdateFavRestaurantIterator(); iter.hasNext(); ) {
+                    Restaurant r = iter.next();
+                    if (r.getTrackingNumber().equals(restaurant.getTrackingNumber())){
+                        if (restaurant.getInspectionSize() > r.getInspectionSize()){
+                            restaurant.setModified(true);
+                            atLeastOneRestaurantModified = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+       return atLeastOneRestaurantModified;
     }
 
     private void finishPleaseWaitDialog() {
