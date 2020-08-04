@@ -117,6 +117,7 @@ public class MapsActivity extends AppCompatActivity
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        //Initializes the map
         mapFragment.getMapAsync(this);
 
         long appLastUpdated = getAppLastUpdated(this);
@@ -180,7 +181,7 @@ public class MapsActivity extends AppCompatActivity
                 }
             }
         }
-
+         //This button launches the list activity from Map Activity
         wireLaunchListButton();
         Button searchButton = findViewById(R.id.MaptoSearch);
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -197,7 +198,7 @@ public class MapsActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == SearchActivity.RESULT_OK) {
-            // Update the map
+            // Update the map,clear items, cluster items
             mClusterManager.clearItems();
             mClusterManager.cluster();
             setUpClusterer();
@@ -207,12 +208,18 @@ public class MapsActivity extends AppCompatActivity
 
     private void getLocationPermissionFromUser() {
         Log.d("MapsActivity", "Working till get location permission");
+        //String array that sends the permission location
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION};
+        //Access_Fine_Location and Access_Coarse_Location is made global
+        //Package manager actually checks if the permission was granted for Fine_Location
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            //Package manager checks if the Coarse_Location has been granted
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                //If they both have been granted, Then permission is actually granted
                 mLocationPermissionsGranted = true;
             } else {
+                //Else going to receive a result
                 ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
             }
         } else {
@@ -224,13 +231,13 @@ public class MapsActivity extends AppCompatActivity
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         return sdf.parse(rawString);
     }
-
+    //Converts the last update time to hours and checks if it is more than 20
     private long timeSinceLastAppUpdateInHours(Date currentDate) {
         long appLastUpdatedInMs = getAppLastUpdated(this);
         long diffInMs = currentDate.getTime() - appLastUpdatedInMs;
         return TimeUnit.HOURS.convert(diffInMs, TimeUnit.MILLISECONDS);
     }
-
+    //Asks the user for update, the user might choose to download or cancel the update
     public void showAskUserToUpdateDialog() {
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new AskUserToUpdateDialogFragment();
@@ -252,15 +259,15 @@ public class MapsActivity extends AppCompatActivity
     }
 
     public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog) {
-        // User touched the dialog's negative button
+        // User tries to cancel the button
     }
-
+    //Tells the user to wait, while the application is downloading the data
     public void showPleaseWaitDialog() {
         // Create an instance of the dialog fragment and show it
         pleaseWaitDialog = new PleaseWaitDialogFragment();
         pleaseWaitDialog.show(getSupportFragmentManager(), "PleaseWaitFragment");
     }
-
+    //Cancels the download, if the user presses cancel while downloading data
     @Override
     public void onPleaseWaitDialogNegativeClick(DialogFragment dialog) {
         // User pressed dialog's negative button, ie, wants to cancel the download
@@ -270,6 +277,7 @@ public class MapsActivity extends AppCompatActivity
 
     private void initiateDownload() {
         String newRestaurantData = "", newInspectionData = "";
+        //Initiates the download, if the user haven't pressed cancel throughout the process
         if(!manager.isDownloadCancelled()) {
             newRestaurantData = manager.getCSV(restaurantDataURL); //Request updated restaurant data csv
         }
@@ -295,7 +303,7 @@ public class MapsActivity extends AppCompatActivity
             // Save list of favourite restaurants pre update and clear current favRestaurantsList
             manager.setPreUpdateFavList();
             manager.clearFavRestaurantsList();
-
+            //Manager singleton instance is filled with new data
             manager.refillRestaurantManagerNewData(this);
             saveAppLastUpdated(currentDate.getTime());
 
@@ -316,9 +324,10 @@ public class MapsActivity extends AppCompatActivity
             }
         }
     }
-
+   //If any restaurant got modified in the last update
     private boolean setRestaurantModifiedFlagsPostUpdate() {
         boolean atLeastOneRestaurantModified = false;
+        //it.hasNext() returns true if the iteration has more elements
         for (Iterator<Restaurant> it = manager.favRestaurantIterator(); it.hasNext(); ) {
             Restaurant restaurant = it.next();
             if (restaurant.getInspectionSize() > 0){
@@ -346,21 +355,26 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void getDeviceLocation() {
-        Log.d("MapsActivity", "Getting device location...");
+
+        //mFusedLocationProvider interacting with location using fused location provider
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
             if (mLocationPermissionsGranted) {
+                //Returns the last location
+                //If the task.isSuccessful is true, that means we have found location
                 Task<Location> location = mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            Log.d("MapsActivity", "Found Location");
+                            //Gets the current location
                             Location currentLocation = (Location) task.getResult();
                             followUser = true;
+                            //Moves the camera to that result
                             moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), ZOOM_STREETS);
                         } else {
-                            Log.d("MapsActivity", "Current location cannot be found");
+                            //Location can not be found
+
                             Toast.makeText(MapsActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -370,13 +384,15 @@ public class MapsActivity extends AppCompatActivity
             Log.e(TAG, "getDeviceLocation: " + e.getMessage());
         }
     }
-
+    //This function is checks for permission result for getpermissionfromuser() function
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d("MapsActivity", "Working onRequestPermissionsResult");
+        //Assume the permission is false to begin with
         mLocationPermissionsGranted = false;
         switch (requestCode) {
             case LOCATION_PERMISSION_REQUEST_CODE: {
+                //If grant results.length> 0 that means some kind of permission was granted
+                //IF grant results does not equal, permission granted, then permission has been denied
                 if (grantResults.length > 0) {
                     for (int i = 0; i < grantResults.length; i++) {
                         if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
@@ -384,9 +400,11 @@ public class MapsActivity extends AppCompatActivity
                             return;
                         }
                     }
+                    //If the loop goes through all the grant permissions, then the permission has been granted
                     mLocationPermissionsGranted = true;
 
                     // Restart activity with new permission
+                    //Every time asks the user for permission
                     finish();
                     Intent refreshIntent = makeIntent(this);
                     overridePendingTransition(0, 0);
@@ -397,7 +415,7 @@ public class MapsActivity extends AppCompatActivity
             }
         }
     }
-
+   //This button launches list from Main activity
     private void wireLaunchListButton() {
         Button btn = findViewById(R.id.btnLaunchList);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -421,7 +439,7 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        //Package manager checks if the permission is granted to access fine and coarse location
         if (mLocationPermissionsGranted) {
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -432,6 +450,7 @@ public class MapsActivity extends AppCompatActivity
             ) {
                 return;
             }
+            //If the permission is granted then, a blue dot is set to the user's location
             mMap.setMyLocationEnabled(true);
             mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
                 @Override
@@ -478,12 +497,13 @@ public class MapsActivity extends AppCompatActivity
         Log.d(TAG, "onMapReady: chosenRestaurantLatLon = ["
                 + chosenRestaurantLatLon[0]
                 + "," + chosenRestaurantLatLon[1] + "]");
-
+        //If the user doesn't chose a restaurant location then switching to the map starts at user's location
         LatLng chosenRestaurantCoords = null;
         if (chosenRestaurantLatLon[0] == -1 || chosenRestaurantLatLon[1] == -1) {
             Log.d(TAG, "onMapReady: Setting map to user's location");
             getDeviceLocation();
         } else {
+            //If the user have chosen any restaurant coordinates then switching to map, starts at restaurant's coordinates
             Log.d(TAG, "onMapReady: Setting map to chosen restaurant coords");
             Log.d(TAG, "onMapReady: chosen restaurant lat: "
                     + chosenRestaurantLatLon[0] + " chosen restaurant lon: "
@@ -528,7 +548,7 @@ public class MapsActivity extends AppCompatActivity
         // Get Singleton RestaurantManager
         RestaurantManager manager = RestaurantManager.getInstance();
         Log.d(TAG, "populateMapWithMarkers: Populating map with markers");
-
+        //Sets the up the restaurant's peg variables
         for (Restaurant restaurant : manager) {
             PegItem pegItem = new PegItem(
                     restaurant.getLatitude(),
@@ -539,6 +559,7 @@ public class MapsActivity extends AppCompatActivity
             mClusterManager.addItem(pegItem);
         }
     }
+    //Setting hazard icon according to the most inspection
 
     private BitmapDescriptor getHazardIcon(Restaurant restaurant) {
         Inspection RecentInspection = restaurant.getInspection(0);
@@ -566,7 +587,7 @@ public class MapsActivity extends AppCompatActivity
                 .getDoubleExtra(RestaurantActivity.RESTAURANT_LONGITUDE_INTENT_TAG,-1);
         return new double[]{restaurantLatitude, restaurantLongitude};
     }
-
+   //If the user presses on any restaurant then, it launches the restaurant activity with details of that restaurant
     private void registerClickCallback() {
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -577,6 +598,7 @@ public class MapsActivity extends AppCompatActivity
                 double lng = latLngF.longitude;
                 String restaurantName = marker.getTitle();
                 Restaurant restaurant = manager.findRestaurantByLatLng(lat, lng, restaurantName);
+                //Restaurant's index is needed to launch the restaurant activity with that particular restaurant
                 int restaurantIndex = manager.findIndexFromFilteredRestaurants(restaurant);
 
                 // Launch RestaurantActivity with the correct index
@@ -621,7 +643,7 @@ public class MapsActivity extends AppCompatActivity
             }
         });
     }
-
+    //Moves the camera to track user location
     private void moveCamera(LatLng latLng, float zoom) {
         Log.d(TAG, "moveCamera (zoom): moving: " + latLng + ", zoom: " + zoom);
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
@@ -649,14 +671,15 @@ public class MapsActivity extends AppCompatActivity
                 }
         }
     }
-
+    //Shared preferences to keep track of the update history across the application
+    //Mode private means this value will be used only in this application
     private void saveAppLastUpdated(long currentDateInMs) {
         SharedPreferences prefs = this.getSharedPreferences("AppPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong("appLastUpdated", currentDateInMs);
         editor.apply();
     }
-
+    //Default value is -1, if no value is shared
     static public long getAppLastUpdated(Context context) {
         SharedPreferences prefs = context.getSharedPreferences("AppPrefs", MODE_PRIVATE);
         return prefs.getLong("appLastUpdated", -1);
@@ -679,7 +702,7 @@ public class MapsActivity extends AppCompatActivity
         public View getInfoContents(Marker marker) {
             View itemView = context.getLayoutInflater().inflate(R.layout.map_infowindow_layout, null);
 
-            // Find the restaurant to work with.
+            // Find the restaurant to work with by searching and matching latitude, longitude and name
             LatLng latLngF = marker.getPosition();
             double lat = latLngF.latitude;
             double lng = latLngF.longitude;
@@ -689,19 +712,19 @@ public class MapsActivity extends AppCompatActivity
                 Log.d(TAG, "Cluster Click!");
                 return null;
             }
-
+             //Setting the restaurant's image
             ImageView logo = itemView.findViewById(R.id.info_item_restaurantLogo);
             logo.setImageResource(restaurant.getIconImgId());
-
+            //Setting the restaurant's name
             TextView restaurantNameText = itemView.findViewById(R.id.info_item_restaurantName);
             restaurantNameText.setText(restaurant.getName());
-
+            //Setting the restaurant's address
             TextView addressText = itemView.findViewById(R.id.info_item_address);
             addressText.setText(restaurant.getAddress());
-
+            //Info about the last inspection
             TextView lastInspectionText = itemView.findViewById(R.id.info_item_lastInspection);
             ImageView hazard = itemView.findViewById(R.id.info_item_hazardImage);
-
+            //Sets the most recent inspection to as the last inspection, which determines hazard icon
             Inspection recentInspection = null;
             if (restaurant.getInspectionSize() > 0) {
                 recentInspection = restaurant.getInspectionList().get(0);
@@ -710,7 +733,7 @@ public class MapsActivity extends AppCompatActivity
                                 R.string.restaurant_activity_inspection_item_date,
                                 recentInspection.intelligentInspectDate())
                 );
-
+                //Hazard rating to determine, right hazard icon
                 String level = recentInspection.getHazardRating();
                 if (level.equals("Low")) {
                     hazard.setImageResource(R.drawable.yellow_triangle);
@@ -731,6 +754,7 @@ public class MapsActivity extends AppCompatActivity
     // Learned from:https://stackoverflow.com/questions/42365658/custom-marker-in-google-maps-in-android-with-vector-asset-icon
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        //Sets bound to the height and width of the position to that the image matches
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
                 vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -740,7 +764,7 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private class MarkerClusterRenderer extends DefaultClusterRenderer<PegItem> {
-
+        //Pegs the restaurants in the Map Activity
         public MarkerClusterRenderer(Context context, GoogleMap map,
                                      ClusterManager<PegItem> clusterManager) {
             super(context, map, mClusterManager);
@@ -757,6 +781,7 @@ public class MapsActivity extends AppCompatActivity
 
         @Override
         protected boolean shouldRenderAsCluster(Cluster<PegItem> cluster) {
+            //If there are more than 8 restaurants in a cluster
             return (cluster.getSize() >= 8);
         }
     }

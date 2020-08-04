@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         finish();
         startActivity(getIntent());
     }
-
+    //Launches the searchActivity
     private void wireLaunchSearchButton() {
         Button btnSearch = findViewById(R.id.GoToSearch);
         btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    //Launches the Map Activity
     private void wireLaunchMapButton() {
         Button btn = findViewById(R.id.btnLaunchMap);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
-
+    //Adds the new restaurants to the manager singleton
     public ArrayList<Restaurant> restaurantList() {
         ArrayList<Restaurant> newRestaurantList = new ArrayList<>();
         for (Restaurant restaurant : manager) {
@@ -174,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
             // Set last inspection date text
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
             if (currentRestaurant.getInspectionList().size() != 0) {
+                //Inspections list is sorted, so the first inspection is the latest
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
                 String temp2=String.format(getResources().getString(R.string.main_activity_restaurant_item_last_inspection_date,
                         lastInspection.intelligentInspectDate()));
@@ -187,10 +188,12 @@ public class MainActivity extends AppCompatActivity {
 
             if (currentRestaurant.getInspectionList().size() != 0) {
                 Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+                //Sums up number of critical and non-critical violations
                 String sumOfViolations = "" + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical());
                 String temp3= String.format(getResources().getString(R.string.main_activity_restaurant_item_violations, sumOfViolations));
                 numViolationsLastInspection.setText(temp3);
             } else {
+                //If the restaurant had no violation in an inspection
                 numViolationsLastInspection.setText(getString(R.string.main_activity_restaurant_item_violations_no_inspection));
             }
 

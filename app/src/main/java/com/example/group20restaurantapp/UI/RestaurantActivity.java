@@ -66,9 +66,11 @@ public class RestaurantActivity extends AppCompatActivity {
         }
 
         assert restaurant != null;
+        //inspection list of a single restaurant
         inspections = restaurant.getInspectionList();
-
+        //sets a Textview with restaurant name
         setRestaurantText(restaurant);
+        //sets a TextView with restaurant address
         setAddressText(restaurant);
         setCoordsTextAndClickCallback(restaurant);
         setRestaurantImg(restaurant);
@@ -85,17 +87,20 @@ public class RestaurantActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.restaurant_menu, menu);
         restaurantMenu = menu;
         setFavouritedImg();
+        //list of favourite restaurants
         final MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
         final Restaurant restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
-
+        //if the user clicks on a favourite restaurant
         favouriteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                //it is removed from the favourite restaurant
                 if (restaurant.isFavourite()){
                     manager.removeFavRestaurant(restaurant);
                     favouriteItem.setIcon(R.drawable.star_off);
                     restaurant.setFavourite(false);
                 }
+                //It is marked as favourite restaurant
                 else{
                     favouriteItem.setIcon(R.drawable.star_on);
                     restaurant.setFavourite(true);
@@ -123,12 +128,12 @@ public class RestaurantActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
+    //sets the restaurant image in image view
     private void setRestaurantImg(Restaurant restaurant) {
         ImageView imgViewRestaurant = findViewById(R.id.restaurant_img);
         imgViewRestaurant.setImageResource(restaurant.getIconImgId());
     }
-
+    //sets the restaurant name
     private void setRestaurantText(Restaurant restaurant) {
         TextView txtViewRestaurantName = findViewById(R.id.name_resActivity);
         txtViewRestaurantName.setText(
@@ -142,7 +147,7 @@ public class RestaurantActivity extends AppCompatActivity {
                 getString(R.string.restaurant_activity_restaurant_address,restaurant.getAddress())
         );
     }
-
+     //if a restaurant is favourite then it has a yellow star or else a grey star
     private void setFavouritedImg() {
         Restaurant restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
         MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
@@ -155,7 +160,8 @@ public class RestaurantActivity extends AppCompatActivity {
             favouriteItem.setIcon(R.drawable.star_off);
         }
     }
-
+     //If an user presses any restaurant's address then the latitude and longitude is passed to the maps activity
+    //to launch the map from that location
     private void setCoordsTextAndClickCallback(final Restaurant restaurant) {
         TextView txtViewCoords = findViewById(R.id.coords_resActivity);
         String coordsString = "" + restaurant.getLatitude() + "," + restaurant.getLongitude();
@@ -177,7 +183,7 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
     }
-
+    //populates each restaurant with it's own inspection list
     private void populateInspectionList(Restaurant restaurant) {
         manager = RestaurantManager.getInstance();
 
@@ -200,6 +206,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
             // Set icon and background color for each itemView
             String temp = currentInspection.getHazardRating();
+            //Sets each violation with the appropriate image
             ImageView imageview = (ImageView) itemView.findViewById(R.id.imgViewViolationIcon);
             if (temp.equals("Low")) {
                 imageview.setImageResource(R.drawable.yellow_triangle);
@@ -247,6 +254,8 @@ public class RestaurantActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Inspection selectedInspection = restaurant.getInspectionList().get(position);
+                //If a user clicks on any inspection then launches the inspection activity
+                //where a list of violation is displayed with details and an image
                 Intent intent = InspectionActivity.makeIntent(RestaurantActivity.this);
                 intent.putExtra(RESTAURANT_ACTIVITY_INSPECTION_TAG, selectedInspection);
                 startActivity(intent);

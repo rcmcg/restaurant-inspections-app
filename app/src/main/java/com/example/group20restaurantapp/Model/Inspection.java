@@ -28,10 +28,10 @@ public class Inspection implements Serializable {
     private int numNonCritical;
     private String hazardRating;
     List <Violation> violLump = new ArrayList<>();
-    // private int diffInDay;
 
     public Inspection(){}
 
+    // Returns the tracking number, so that it can be incorporated with the restaurant
     public String getTrackingNumber() {
         return trackingNumber;
     }
@@ -40,6 +40,7 @@ public class Inspection implements Serializable {
         this.trackingNumber = trackingNumber;
     }
 
+    // Returns the date of the inspection
     public String getInspectionDate() {
         return inspectionDate;
     }
@@ -58,7 +59,7 @@ public class Inspection implements Serializable {
             Calendar inspectionCalendar = Calendar.getInstance();
             assert inspectionD != null;
             inspectionCalendar.setTime(inspectionD);
-
+            //Date format is changed to month,day,year from year,month,day
             fullFormattedDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)] + " "
                         + inspectionCalendar.get(Calendar.DAY_OF_MONTH)
                         + ", "
@@ -75,8 +76,8 @@ public class Inspection implements Serializable {
     public String intelligentInspectDate() {
         String intelligentDate = "";
         try {
-            // Get the current date
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+            // Get the current date
             Date currentDate = new Date();
 
             // Get the difference in days between inspectionDate and currentDate
@@ -84,7 +85,7 @@ public class Inspection implements Serializable {
             Date inspectionD = sdf.parse(rawInspectionDate);
             long diffInMS = Math.abs(currentDate.getTime() - inspectionD.getTime());
             long diffInDay = TimeUnit.DAYS.convert(diffInMS, TimeUnit.MILLISECONDS);
-            // this.diffInDay = (int) diffInDay;
+
             //https://stackoverflow.com/questions/36370895/getyear-getmonth-getday-are-deprecated-in-calendar-what-to-use-then
             String[] indexToMonth = new DateFormatSymbols().getMonths();
             Calendar inspectionCalendar = Calendar.getInstance();
@@ -92,12 +93,12 @@ public class Inspection implements Serializable {
 
             if (diffInDay <= 1) {
                 intelligentDate = diffInDay + " day";
-            } else if (diffInDay <= 30) {
+            } else if (diffInDay <= 30) {   // Show days since last inspection
                 intelligentDate = diffInDay + " days";
-            } else if (diffInDay <= 365) {
+            } else if (diffInDay <= 365) {  // Show month and day of inspection
                 intelligentDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)]
                         + " " + inspectionCalendar.get(Calendar.DAY_OF_MONTH);
-            } else {
+            } else {                        // Show month and year of inspection
                 intelligentDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)]
                         + " " + inspectionCalendar.get(Calendar.YEAR);
             }
@@ -109,14 +110,14 @@ public class Inspection implements Serializable {
         return intelligentDate;
     }
 
-
+   // Sets the inspection day
     public void setInspectionDate(String inspectionDate) {
         this.inspectionDate = inspectionDate;
     }
-
+    // Returns the inspection type, if the device language is french, then french word is returned
     public String getInspType() {
         if(Locale.getDefault().getLanguage()=="fr"){
-            return"suivre";
+            return "suivre";
         }
         return inspType;
     }
@@ -125,6 +126,7 @@ public class Inspection implements Serializable {
         this.inspType = inspType;
     }
 
+    // Returns the number of critical violation in an inspection
     public int getNumCritical() {
         return numCritical;
     }
@@ -133,6 +135,7 @@ public class Inspection implements Serializable {
         this.numCritical = numCritical;
     }
 
+    // Returns number of noncritical in an inspection
     public int getNumNonCritical() {
         return numNonCritical;
     }
@@ -181,21 +184,14 @@ public class Inspection implements Serializable {
                 ", violLump= " + Arrays.toString(getViolLump().toArray()) +
                 '}';
     }
+    //Returns hazard icon based on the hazard rating
     public int getHazardIcon() {
-
         if (hazardRating.equals("Low")) {
-
             return R.drawable.green;
-
         } else if (hazardRating.equals("Moderate")) {
-
             return R.drawable.yellow;
-
         } else {
-
             return R.drawable.red;
-
         }
-
     }
 }

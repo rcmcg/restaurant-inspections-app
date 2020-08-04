@@ -55,10 +55,12 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setupFields() {
+        //takes restaurant name as an input from user
         searchField = (EditText) findViewById(R.id.search_message);
+        //takes violation count as an input from user
         violationCountField = (EditText) findViewById(R.id.count_text_search);
     }
-
+    //This function sets up all the button
     private void setupButtons() {
         btnSearch= (Button) findViewById(R.id.btn_search);
         clearBtn = (Button) findViewById(R.id.btn_clean);
@@ -83,16 +85,19 @@ public class SearchActivity extends AppCompatActivity {
         hazardSpinner = (Spinner) findViewById(R.id.Hazardlevel);
         ArrayAdapter<CharSequence> hazardAdapter = ArrayAdapter.createFromResource(this,
                 R.array.HazardlevelStr, android.R.layout.simple_spinner_dropdown_item);
+        //Dropdown is used for dropping down the choices as simple spinner dropdown is not appropriate
         hazardAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Sets the spinner to hazard adapter, so that it gets all the choices
         hazardSpinner.setAdapter(hazardAdapter);
+        //When an option is clicked, it can be processed
         hazardSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
+            //On clicked in one of the options, it gets the index position
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // manager.setSearchHazardLevelStr(position);
                 searchHazardLevelStrIndex = position;
             }
-
+            //If the user selects nothing
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 // manager.setSearchHazardLevelStr(0);

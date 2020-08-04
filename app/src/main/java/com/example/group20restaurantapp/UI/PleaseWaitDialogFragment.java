@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.group20restaurantapp.R;
-
+//This activity is reviewed
 /**
  * Dialog to give user a change to cancel dialog initiated by AskUserToUpdateDialogFragment.
  * MapsActivity implements the listener.
