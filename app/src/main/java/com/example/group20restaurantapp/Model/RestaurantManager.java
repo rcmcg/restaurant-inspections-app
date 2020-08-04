@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +28,8 @@ import java.util.List;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Singleton class which contains all instances of Restaurant
@@ -117,7 +120,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private List<Restaurant> getFavRestaurantsList() {
         return favRestaurantsList;
     }
-    //Clears all the restaurants from the favourite list.
+
     public void clearFavRestaurantsList() {
         favRestaurantsList.clear();
     }
@@ -281,16 +284,13 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
     //If the manager list has been updated then, does nothing or else updates the list with new data
     public void fillRestaurantManager(boolean hasAppBeenUpdated, Context context) {
+        readRestaurantData(hasAppBeenUpdated, context);
         if (!hasAppBeenUpdated) {
-            readRestaurantData(context);
             initInspectionLists(context);
         } else {
-            readNewRestaurantData(context);
             initNewInspectionLists(context);
         }
-        //sorts the inspections list by date
         sortInspListsByDate();
-        //Sorts the manager list by name
         sortRestaurantsByName();
     }
 
@@ -377,61 +377,24 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
     }
 
-    public void readRestaurantData(Context context) {
-        // Get instance of RestaurantManager
-        if (getSizeAllRestaurants() == 0) {
-            // To read a resource, need an input stream
-            InputStream is = context.getResources().openRawResource(R.raw.restaurants_itr1);
-
-            // To read from stream reader line by line, need a buffered reader
-            // Need to build an input stream based on a character set
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            String line = "";
+    public void readRestaurantData(boolean hasAppBeenUpdatedAtLeastOnce, Context context) {
+        InputStream is = null;
+        if (hasAppBeenUpdatedAtLeastOnce) {
+            // App has been updated at least once, so read from internal storage
             try {
-                // Escaping the header lines of the CSV file
-                reader.readLine();
-                while ((line = reader.readLine()) != null) {
-                    line = line.replace("\"", "");
-                    // Splitting every line based on "," , Tokens are variables of Restaurant class
-                    String[] tokens=line.split(",");
-                    //First token is restaurant tracking number, second token is name, third is address and so on
-                    Restaurant newRestaurant = new Restaurant();
-                    newRestaurant.setTrackingNumber(tokens[0]);
-                    newRestaurant.setName(tokens[1]);
-                    newRestaurant.setAddress(tokens[2]);
-                    newRestaurant.setCity(tokens[3]);
-                    newRestaurant.setFacType(tokens[4]);
-                    newRestaurant.setLatitude(Double.parseDouble(tokens[5]));
-                    newRestaurant.setLongitude(Double.parseDouble(tokens[6]));
-                    newRestaurant.setImgId();
-
-                    SharedPreferences preferences = context.getSharedPreferences("favourites", 0);
-                    // Check 'favourited' status of restaurant
-                    boolean favStatus = preferences.getBoolean(newRestaurant.getTrackingNumber(), false);
-                    newRestaurant.setFavourite(favStatus);
-                    if (favStatus){
-                        Restaurant restaurantRef = newRestaurant;
-                        favRestaurantsList.add(restaurantRef);
-                    }
-                    // Adding the created Restaurants object to the manager instance
-                    add(newRestaurant);
-                    Log.d("Main activity","Just created" + newRestaurant);
-                }
-            } catch (IOException e) {
-                Log.wtf("MyActivity", "Error reading data file on line" + line, e);
+                is = context.openFileInput(WEB_SERVER_RESTAURANTS_CSV);
+            } catch (FileNotFoundException e) {
+                Log.e(TAG, "readRestaurantDataTest: ", e);
                 e.printStackTrace();
             }
+        } else {
+            // App has never been updated, read from raw
+            is = context.getResources().openRawResource(R.raw.restaurants_itr1);
         }
-    }
 
-    public void readNewRestaurantData(Context context) {
-        FileInputStream fis = null;
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        String line;
         try {
-            fis = context.openFileInput(WEB_SERVER_RESTAURANTS_CSV);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader br = new BufferedReader(isr);
-            String line;
-            //Reads line by line
             br.readLine(); // Header line
 
             while ((line = br.readLine()) != null) {
@@ -469,14 +432,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 add(newRestaurant);
             }
         } catch (IOException e) {
+            Log.e(TAG, "readRestaurantDataTest: ", e);
             e.printStackTrace();
         } finally {
-            if (fis != null){
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                is.close();
+            } catch (IOException e) {
+                Log.e(TAG, "readRestaurantDataTest: ", e);
+                e.printStackTrace();
             }
         }
     }
