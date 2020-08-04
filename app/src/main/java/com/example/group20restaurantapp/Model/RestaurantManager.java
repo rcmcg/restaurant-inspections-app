@@ -64,15 +64,15 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private RestaurantManager(){
         // Prevent from instantiating
     }
-
+    //returns a list of restaurants that are marked as favourite
     private List<Restaurant> getPreUpdateFavList() {
         return preUpdateFavList;
     }
-
+    // If a new restaurant is added in the favourite list, it updates the list
     public void setPreUpdateFavList() {
         preUpdateFavList = new ArrayList<Restaurant>(favRestaurantsList);
     }
-
+    //If the any of the favourite restaurant in the favourite list had any new update on inspections
     public Iterator<Restaurant> preUpdateFavRestaurantIterator() {
         return preUpdateFavList.iterator();
     }
@@ -94,7 +94,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return manager;
     }
-
+    //Hazard level is sorted and marked low, moderate and high according to index position
     public void setSearchHazardLevelStr(int index) {
         if (index == 0) this.searchHazardLevelStr = "";
         else if (index == 1) this.searchHazardLevelStr = "Low";
@@ -105,11 +105,11 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public void setSearchViolationNumEquality(int index) {
         this.searchViolationNumEquality = index;
     }
-
+    //Returns the number of restaurants
     public int getSizeAllRestaurants() {
         return restaurantList.size();
     }
-
+    //Returns the number of favourite restaurants
     public int getSizeFilteredRestaurants() {
         return filteredRestaurantList.size();
     }
@@ -117,7 +117,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private List<Restaurant> getFavRestaurantsList() {
         return favRestaurantsList;
     }
-
+    //Clears all the restaurants from the favourite list.
     public void clearFavRestaurantsList() {
         favRestaurantsList.clear();
     }
@@ -125,11 +125,11 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public Iterator<Restaurant> favRestaurantIterator() {
         return favRestaurantsList.iterator();
     }
-
+    //Removes a particular restaurant from the favourite list
     public void removeFavRestaurant(Restaurant favRestaurant) {
         favRestaurantsList.remove(favRestaurant);
     }
-
+    //Adds a restaurant to the favourite list, if the user chooses it to be favourite
     public void addFavRestaurant(Restaurant restaurant) {
         favRestaurantsList.add(restaurant);
     }
@@ -143,7 +143,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return modifiedRestaurants;
     }
-
+    //If the user cancels the download after being started
     public boolean isDownloadCancelled() {
         return isDownloadCancelled;
     }
@@ -151,7 +151,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public void setDownloadCancelled(boolean downloadCancelled) {
         isDownloadCancelled = downloadCancelled;
     }
-
+    //Tells if the user was asked about the update or not
     public boolean hasUserBeenAskedToUpdateThisSession() {
         return userBeenAskedToUpdateThisSession;
     }
@@ -194,7 +194,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return -1;
     }
-
+   //Iterator for iterating filtered restaurants
     @Override
     public Iterator<Restaurant> iterator() {
         if (filteredRestaurantList.size() == 0) {
@@ -203,11 +203,11 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return filteredRestaurantList.iterator();
     }
-
+    //Clears the restaurants lists
     private void resetRestaurantList() {
         restaurantList.clear();
     }
-
+    //Comparator compares the restaurants by their name, so that the restaurant list is sorted.
     public void sortRestaurantsByName() {
         // Sorts master list of restaurants
         Comparator<Restaurant> compareByName = new Comparator<Restaurant>() { //Compares restaurant names
@@ -218,7 +218,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
         };
         Collections.sort(restaurantList, compareByName);
     }
-
+    //Sorts the inspection list so that, the last inspection is at the top position
     public void sortInspListsByDate() {
         Comparator<Inspection> compareByDate = new Comparator<Inspection>() { //Compares inspection dates
             @Override
@@ -231,7 +231,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
             Collections.sort(restaurant.inspectionList, compareByDate.reversed()); //Sort arraylist in reverse order
         }
     }
-
+    //Returns the restaurant which has the passed latitude, longitude, and name, will be used in MAPS ACTIVITY
     public Restaurant findRestaurantByLatLng(double latitude, double longtitude, String name) {
         for (Restaurant restaurant : restaurantList) {
             if (
@@ -274,12 +274,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private List<Restaurant> getFilteredRestaurantList() {
         return filteredRestaurantList;
     }
-
+    //Calls the fill restaurant manager method
     public void refillRestaurantManagerNewData(Context context) {
         resetRestaurantList();
         fillRestaurantManager(true, context);
     }
-
+    //If the manager list has been updated then, does nothing or else updates the list with new data
     public void fillRestaurantManager(boolean hasAppBeenUpdated, Context context) {
         if (!hasAppBeenUpdated) {
             readRestaurantData(context);
@@ -288,14 +288,20 @@ public class RestaurantManager implements Iterable<Restaurant>{
             readNewRestaurantData(context);
             initNewInspectionLists(context);
         }
+        //sorts the inspections list by date
         sortInspListsByDate();
+        //Sorts the manager list by name
         sortRestaurantsByName();
     }
 
     public String[] getURLDateLastModified(String requestURL) {
+        //Construct Thread policy instant
+        //permitAll disables the detection of everything
+        //Strict mode is used to detect accidental network changes
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
+        //To create OKHTTP a request object is needed
+        //url is the requested URl
         Request request = new Request.Builder()
                 .url(requestURL)
                 .method("GET", null)
@@ -303,14 +309,18 @@ public class RestaurantManager implements Iterable<Restaurant>{
         String dataURL = "";
         String lastModifiedDate = "";
         try {
+            //Make the response request
             Response response = client.newCall(request).execute();
+            //Get response
             String getJSON = response.body().string();
+            //Transform response to JSon object
             JSONObject jsonObj = new JSONObject(getJSON);
             JSONObject resultObj = jsonObj.getJSONObject("result");
-
+            //Setting a Json array
             JSONArray resArr = resultObj.getJSONArray("resources");
             JSONObject data = resArr.getJSONObject(0);
             dataURL = data.getString("url");
+            //Matching with the last modified date, update if needed
             if (restaurantsLastModified.equals("")){
                 restaurantsLastModified = data.getString("last_modified");
             } else{
@@ -328,13 +338,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public String getCSV(String DataURL) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
+        //To create Ok Http a request object is needed
         Request request = new Request.Builder()
                 .url(DataURL)
                 .method("GET", null)
                 .build();
         String csv = "";
         try {
+            //Make the response request
             Response response = client.newCall(request).execute();
             csv = response.body().string();
             //Log.d("MyActivity", getCSV); // Dump updated restaurants CSV into logcat
@@ -347,6 +358,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
 
     public void writeToFile(String newData, String fileName, Context context) {
+        //fileoutputStream to write to a file
         FileOutputStream fos = null;
         try {
             fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
@@ -382,7 +394,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     line = line.replace("\"", "");
                     // Splitting every line based on "," , Tokens are variables of Restaurant class
                     String[] tokens=line.split(",");
-
+                    //First token is restaurant tracking number, second token is name, third is address and so on
                     Restaurant newRestaurant = new Restaurant();
                     newRestaurant.setTrackingNumber(tokens[0]);
                     newRestaurant.setName(tokens[1]);
@@ -419,10 +431,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             String line;
+            //Reads line by line
             br.readLine(); // Header line
 
             while ((line = br.readLine()) != null) {
                 line = line.replace("\"", "");
+                //Splits the line in multiple tokens, based on commas
                 String[] tokens = line.split(",");
 
                 String [] restaurantData = new String[7];
@@ -434,7 +448,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 } else {
                     restaurantData = tokens.clone();
                 }
-
+                //As the tokens are serialized, so using setter functions to set the parameters of each restaurant
                 Restaurant newRestaurant = new Restaurant();
                 newRestaurant.setTrackingNumber(restaurantData[0].replace(" ", ""));
                 newRestaurant.setName(restaurantData[1]);
@@ -510,7 +524,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 }
                 //Initializing inspection object variables
                 Inspection inspection = new Inspection();
-
+                //First split is tracking number, second is inspection date adn so on
                 inspection.setTrackingNumber(lineSplit[0]);
                 inspection.setInspectionDate(lineSplit[1]);
                 inspection.setInspType(lineSplit[2]);
@@ -567,6 +581,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
         try {
             while ( (line = bufferedReader.readLine()) != null) {
+                //adding violation number and description to each violation
                 String[] lineSplit = line.split(",");
                 violNumbers.add(Integer.parseInt(lineSplit[0]));
                 violBriefDescriptions.add(lineSplit[1]);
@@ -579,10 +594,12 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
         FileInputStream fis;
         try {
+            //Getting the web server inspection csv
             fis = context.openFileInput(WEB_SERVER_INSPECTIONS_CSV);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             line = "";
+            //reads the header line but don't process it.
             br.readLine(); //Header line
             String prevTrackingNum = "";
             boolean unknownRestaurant = false;
@@ -622,9 +639,10 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
                 inspection.setInspectionDate(lineSplit[1]);
                 inspection.setInspType(lineSplit[2]);
+                //Numcritical is in string format so changed to integer
                 inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
                 inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
-
+                //Setting hazard ratings
                 if (lineSplit[5].equals(",Low") || lineSplit[5].equals(",")) {
                     inspection.setHazardRating("Low");
                     getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list

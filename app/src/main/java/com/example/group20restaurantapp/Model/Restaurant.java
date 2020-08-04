@@ -7,7 +7,7 @@ import com.example.group20restaurantapp.R;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
+//This class is reviewed.
 /**
  * Contains information and list of Inspections for a single restaurant
  */
@@ -25,7 +25,7 @@ public class Restaurant {
     private int iconImgId;
     private boolean isFavourite;
     private boolean isModified;
-
+    //List of inspections, the restaurant had
     List<Inspection> inspectionList = new ArrayList<>();
     //Constructor
     public Restaurant(String name, String address, double latitude, double longitude, String trackingNumber, String city, String facType, int icon) {
@@ -46,11 +46,11 @@ public class Restaurant {
     public String getName() {
         return name;
     }
-
+    //sets the name of the restaurant
     public void setName(String name) {
         this.name = name;
     }
-
+    //gets the address of the restaurant
     public String getAddress() {
         return address;
     }
@@ -58,35 +58,35 @@ public class Restaurant {
     public void setAddress(String address) {
         this.address = address;
     }
-
+    //gets the latitude of the restaurant
     public double getLatitude() {
         return latitude;
     }
-
+    //sets the latitude of the restaurant
     public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
-
+    //Gets the longitude of the restaurant
     public double getLongitude() {
         return longitude;
     }
-
+    //Sets the longitude of the restaurant
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
-
+    //Gets the tracking number of the restaurant
     public String getTrackingNumber() {
         return trackingNumber;
     }
-
+    //Sets the tracking number of the restaurant
     public void setTrackingNumber(String trackingNumber) {
         this.trackingNumber = trackingNumber;
     }
-
+    //Gets the city to the restaurant
     public String getCity() {
         return city;
     }
-
+    //Sets the city of the restaurant
     public void setCity(String city) {
         this.city = city;
     }
@@ -98,19 +98,19 @@ public class Restaurant {
     public void setFacType(String facType) {
         this.facType = facType;
     }
-
+    //Used to set restaurant logo in the listView
     public int getIconImgId() {
         return iconImgId;
     }
-
+    //Returns if a restaurant is favourite or not
     public boolean isFavourite() {
         return isFavourite;
     }
-
+    //Sets if the restaurant is a favourite
     public void setFavourite(boolean favourite) {
         isFavourite = favourite;
     }
-
+    //If any information about a restaurant is modified by last update
     public boolean isModified() {
         return isModified;
     }
@@ -118,14 +118,14 @@ public class Restaurant {
     public void setModified(boolean modified) {
         isModified = modified;
     }
-
+    //List of inspections for each restaurant
     public List<Inspection> getInspectionList() {
         if(this==null){
          return inspectionList = null;
         }
         return inspectionList;
     }
-
+    //returns a list inspection for each restaureant if there is any
     public Inspection getInspection(int inspection) {
         if (inspectionList.size() <= inspection || inspection < 0){
             return null;
@@ -133,12 +133,12 @@ public class Restaurant {
 
         return inspectionList.get(inspection);
     }
-
+    //A processed list of inspection is set to that particular restaurant
     public void setInspectionList(List<Inspection> inspectionList) {
         this.inspectionList = inspectionList;
     }
 
-
+    //Sets restaurant image, If there is a restaurant chain then, they have the same image.
     public void setImgId() {
         name = this.getName();
         String first = String.valueOf(name.charAt(0));
@@ -186,7 +186,7 @@ public class Restaurant {
         }
     }
 
-
+    //returns the number of inspections, the restaurant had
     public int getInspectionSize() {
     return inspectionList.size();
 }
@@ -203,16 +203,16 @@ public class Restaurant {
                 ", icon=" + iconImgId +
                 '}';
     }
-
+   //Returns the hazard level of the last inspection
     public String getLastHazardLevel() {
         if (inspectionList.isEmpty()) return null;
         return inspectionList.get(0).getHazardRating();
     }
-
+    //Returns the number of critical violations in last year.
     public int countCriticalViolationInLastYear() {
         int count = 0;
         for (Inspection inspection : inspectionList) {
-            try {
+            try { //if there is any critical violation
                 if (inspection.getDiffInDay() <= 365) {
                     count = count + inspection.getNumCritical();
                 }

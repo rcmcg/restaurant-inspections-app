@@ -72,7 +72,7 @@ public class InspectionActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
+    //Populates each inspection with the list of associated violations
     private void populateListView(Inspection inspection) {
         // Construct a new ArrayList from the list of Violations in inspection
         List<Violation> violationList = inspection.getViolLump();
@@ -98,7 +98,7 @@ public class InspectionActivity extends AppCompatActivity {
                 itemView = getLayoutInflater().inflate(R.layout.violation_item_view, parent, false);
             }
 
-            // Grab the correct violation
+            // Grab the current violation
             Violation currentViolation = InspectionActivity.getViolationList().get(position);
 
             // Set violation icon
@@ -112,7 +112,7 @@ public class InspectionActivity extends AppCompatActivity {
                             currentViolation.getBriefDetails())
                     );
 
-            // Set the severity icon
+            // Set the severity icon, if the violation is critical
             ImageView violationSeverityIcon = itemView.findViewById(R.id.violation_item_imgSeverityIcon);
             if (currentViolation.getCritical()) {
                 violationSeverityIcon.setImageResource(R.drawable.violation_icon_crit_skull);
@@ -125,7 +125,8 @@ public class InspectionActivity extends AppCompatActivity {
             return itemView;
         }
     }
-
+    // IF any violation is clicked in the violation list then, details of the violation
+    //is shown in a toast message
     private void registerClickCallback() {
         ListView list = (ListView) findViewById(R.id.lstViewViolations);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -145,35 +146,35 @@ public class InspectionActivity extends AppCompatActivity {
             }
         });
     }
-
+    //Returns a list of violations for any particular inspection
     private static List<Violation> getViolationList() {
         return violationList;
     }
-
+    //Sets the formatted inspection date in the textview
     private void setInspectionDateText(Inspection inspection) {
         TextView inspectionDate = findViewById(R.id.txtInspectionDate);
         inspectionDate.setText(getString(R.string.inspection_activity_date,
                 inspection.fullFormattedDate()));
     }
-
+    //If the inspection was routine or a follow-up
     private void setInspectionTypeText(Inspection inspection) {
         TextView inspectionType = findViewById(R.id.txtInspectionType);
         inspectionType.setText(getString(R.string.inspection_activity_type,
                 inspection.getInspType()));
     }
-
+    //Number of critical violation is set to a text view
     private void setInspectionCritViolText(Inspection inspection) {
         TextView inspectionNumCrit = findViewById(R.id.txtNumberCritViolations);
         inspectionNumCrit.setText(getString(R.string.inspection_activity_critical_violations,
                 "" + inspection.getNumCritical()));
     }
-
+    //Number of non-critical violation is set to a text view
     private void setInspectionNonCritViolText(Inspection inspection) {
         TextView inspectionNumNonCrit = findViewById(R.id.txtNumberNonCritViolations);
         inspectionNumNonCrit.setText(getString(R.string.inspection_activity_non_critical_violations,
                 "" + inspection.getNumNonCritical()));
     }
-
+    //Sets the appropriate icon for inspection, based on last inspection
     private void setHazardRatingIcon(Inspection inspection) {
         ImageView hazardIcon = findViewById(R.id.imgHazardIcon);
         if (inspection.getHazardRating().equals("Low")) {

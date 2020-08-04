@@ -24,7 +24,7 @@ import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
 import java.util.List;
-
+//This activity is viewed
 public class ModifiedFavRestaurantsActivity extends AppCompatActivity {
 
     private RestaurantManager manager = RestaurantManager.getInstance();

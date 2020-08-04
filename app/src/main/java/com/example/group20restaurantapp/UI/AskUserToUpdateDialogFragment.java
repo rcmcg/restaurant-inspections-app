@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.group20restaurantapp.R;
-
+//This activity is reviewed
 /**
  * Dialog to ask user if they want to update. MapsActivity implements listener
  */
