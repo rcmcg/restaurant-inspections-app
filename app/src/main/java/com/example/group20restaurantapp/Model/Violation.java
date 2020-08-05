@@ -90,6 +90,7 @@ public class Violation implements Serializable {
         return critical;
     }
     //Returns the violation details, The details are translated to French if the device language is french
+    //Returns spanish if the device language is spanish
     public String getViolDetails() {
         if(Locale.getDefault().getLanguage()=="fr"){
             if(this.getViolNumber()==201){
@@ -136,13 +137,63 @@ public class Violation implements Serializable {
                         return "violation générique";
             }
 
-        }else{
+
+
+        }
+        else if(Locale.getDefault().getLanguage()=="es"){
+            if (this.getViolNumber () == 201) {
+                return "Alimentos contaminados o no aptos para el consumo humano [art. 13]";
+            } else if (this.getViolNumber () == 202) {
+                return "Los alimentos no procesados ​​de manera que sea seguro consumirlos [s. 14 (1)]";
+            } else if (this.getViolNumber () == 203) {
+                return "Alimentos no enfriados de manera aceptable [art. 12 (a)]";
+            } else if (this.getViolNumber () == 205) {
+                return "Alimentos fríos potencialmente peligrosos almacenados / exhibidos por encima de 4 ° C. [S. 14 (2)]";
+            } else if (this.getViolNumber () == 206) {
+                return "Alimentos calientes potencialmente peligrosos almacenados / exhibidos por debajo de 60 ° C [S. 14 (2)]";
+            } else if (this.getViolNumber () == 209) {
+                return "Alimentos no protegidos de la contaminación [párr. 12 (a)]";
+            } else if (this.getViolNumber () == 210) {
+                return "Alimentos no descongelados de manera aceptable [sección 14 (2)]";
+            } else if (this.getViolNumber () == 211) {
+                return"Alimentos congelados potencialmente peligrosos almacenados / exhibidos por encima de -18 ° C [s. 14 (3)]";
+            } else if (this.getViolNumber () == 301) {
+                return "Equipo / utensilios / superficies en contacto con alimentos que no se mantienen bajo condiciones sanitarias [s. 17 (1)]";
+            } else if (this.getViolNumber () == 302) {
+                return "Equipo / utensilios / superficies en contacto con alimentos lavados y desinfectados de manera inadecuada [s. 17 (2)]";
+            } else if (this.getViolNumber () == 304) {
+                return "Locales libres de plagas [párr. 26 (a)]";
+            } else if (this.getViolNumber () == 305) {
+                return "Condiciones observadas que pueden permitir la entrada / albergue / reproducción de organismos nocivos [párrafo 26 (b) (c)]";
+            } else if (this.getViolNumber () == 306) {
+                return "Locales de alimentos no mantenidos en un estado sanitario [art. 17 (1)]";
+            } else if (this.getViolNumber () == 308) {
+                return "El equipo / utensilios / superficies en contacto con los alimentos no funcionan correctamente [art. 16 (b)]";
+            } else if (this.getViolNumber () == 309) {
+                return "Limpiadores químicos y agentes similares almacenados o etiquetados incorrectamente [art. 27]";
+            } else if (this.getViolNumber () == 315) {
+                return "Las unidades de refrigeración y los equipos de calentamiento carecen de termómetros precisos [sección 19 (2)]";
+            } else if (this.getViolNumber () == 401) {
+                return "Estaciones de lavado de manos adecuadas no disponibles para empleados [s. 21 (4)]";
+            } else if (this.getViolNumber () == 402) {
+                return "El empleado no se lava las manos adecuadamente o con la frecuencia adecuada [s. 21 (3)]";
+            } else if (this.getViolNumber () == 501) {
+                return "el operador no tiene el nivel 1 FOODSAFE o el equivalente [sección 10 (1)]";
+            } else {
+
+
+                return "violación genérica";
+            }
+
+        }
+        else{
         return violDetails;}
 
 
     }
    //Returns brief details of the violation, used in Toast messages if the user presses any violation for details
     //returns in French if the device language is french
+    //returns spanish if the device language is spanish
     public String getBriefDetails() {
         if (Locale.getDefault().getLanguage() == "fr") {
             if (this.getViolNumber() == 101) {
@@ -222,7 +273,88 @@ public class Violation implements Serializable {
                 return "Violation générique trouvée";
 
             }
-        } else {
+        }
+        else if(Locale.getDefault().getLanguage()=="es"){
+            if (this.getViolNumber () == 101) {
+                return "Planes de construcción ignorando regulaciones";
+            } else if (this.getViolNumber () == 102) {
+                return "premisa no aprobada";
+            } else if (this.getViolNumber () == 103) {
+                return "Permiso inválido";
+
+            } else if (this.getViolNumber () == 104) {
+                return "permiso oculto";
+            } else if (this.getViolNumber () == 201) {
+                return "alimentos contaminados";
+            } else if (this.getViolNumber () == 202) {
+                return "Alimentos mal procesados";
+            } else if (this.getViolNumber () == 203) {
+                return "la comida no se enfría adecuadamente";
+            } else if (this.getViolNumber () == 204) {
+                return "La comida no se cocina correctamente";
+            } else if (this.getViolNumber () == 205) {
+                return "alimentos fríos mal almacenados";
+            } else if (this.getViolNumber () == 206) {
+                return "comida caliente mal almacenada";
+            } else if (this.getViolNumber () == 208) {
+                return "Alimentos obtenidos de una fuente no aprobada";
+            } else if (this.getViolNumber () == 209) {
+                return "Alimentos no protegidos contra la contaminación";
+            } else if (this.getViolNumber () == 210) {
+                return "alimentos no descongelados correctamente";
+            } else if (this.getViolNumber () == 211) {
+                return "los alimentos congelados no se almacenan correctamente";
+            } else if (this.getViolNumber () == 212) {
+                return "Procedimientos de manejo de alimentos por escrito deficientes";
+            } else if (this.getViolNumber () == 301) {
+                return "Superficies y equipos de cocina sucios";
+            } else if (this.getViolNumber () == 302) {
+                return "Superficies y equipos de cocina sucios";
+            } else if (this.getViolNumber () == 303) {
+                return "Mal equipo o instalaciones sanitarias";
+            } else if (this.getViolNumber () == 304) {
+                return "plagas encontradas localmente";
+            } else if (this.getViolNumber () == 305) {
+                return "prevención de malas plagas";
+            } else if (this.getViolNumber () == 306) {
+                return "locales insalubres";
+            } else if (this.getViolNumber () == 307) {
+                return "Materiales o utensilios de mala calidad";
+            } else if (this.getViolNumber () == 308) {
+                return "Mantenimiento deficiente del equipo";
+            } else if (this.getViolNumber () == 309) {
+                return "productos químicos de limpieza almacenados incorrectamente";
+            } else if (this.getViolNumber () == 310) {
+                return "artículos de un solo uso no desechados después del uso";
+            } else if (this.getViolNumber () == 311) {
+                return "Locales mal mantenidos";
+            } else if (this.getViolNumber () == 312) {
+                return "artículos que no sean de cocina almacenados en el sitio";
+            } else if (this.getViolNumber () == 313) {
+                return "animal que no ayuda en el sitio";
+            } else if (this.getViolNumber () == 314) {
+                return "Procedimientos sanitarios escritos incorrectos";
+            } else if (this.getViolNumber () == 315) {
+                return "termómetros inexactos o inexistentes";
+            } else if (this.getViolNumber () == 401) {
+                return "estaciones de lavado de manos pobres o inexistentes";
+            } else if (this.getViolNumber () == 402) {
+                return "Mala práctica de lavar las manos de los empleados";
+            } else if (this.getViolNumber () == 403) {
+                return "mala higiene personal de los empleados";
+            } else if (this.getViolNumber () == 404) {
+                return "Empleado que fuma cerca de áreas críticas";
+            } else if (this.getViolNumber () == 501) {
+                return "el operador no tiene certificación FOODSAFE";
+            } else if (this.getViolNumber () == 502) {
+                return "sin certificación FOODSAFE en el sitio";
+            } else {
+                return "Violación genérica encontrada";
+
+            }
+
+        }
+        else {
 
             return briefDetails;
         }
