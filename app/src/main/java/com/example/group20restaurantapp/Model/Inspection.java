@@ -118,20 +118,18 @@ public class Inspection implements Serializable {
     //Returns the inspection type, if the device language is french, then french word is returned
     //Returns spanish if the language is spanish
     public String getInspType() {
-        if(Locale.getDefault().getLanguage()=="fr"){
-            if(this.inspType.matches("(.*)Fo(.*)")){
+        if (Locale.getDefault().getLanguage()=="fr") {
+            if (this.inspType.matches("(.*)Fo(.*)")) {
             return"suivre";}
-        }
-        else if(Locale.getDefault().getLanguage()=="es"){
-            if(this.inspType.matches("(.*)Fo(.*)")){
+        } else if(Locale.getDefault().getLanguage()=="es") {
+            if (this.inspType.matches("(.*)Fo(.*)")) {
                 return"Seguimiento";
             }else if(this.inspType.matches("(.*)Ro(.*)")){
                 return "Routina";
             }
-
+        } else {
+            return inspType;
         }
-        else{
-        return inspType;}
         return inspType;
     }
 

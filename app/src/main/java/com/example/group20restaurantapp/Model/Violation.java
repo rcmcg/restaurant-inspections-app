@@ -132,15 +132,9 @@ public class Violation implements Serializable {
             }else if(this.getViolNumber()==501){
                 return"l'exploitant n'a pas le niveau FOODSAFE 1 ou l'équivalent [par. 10 (1)]";
             }else{
-                //Log.d("");
-
-                        return "violation générique";
+                return "violation générique";
             }
-
-
-
-        }
-        else if(Locale.getDefault().getLanguage()=="es"){
+        } else if(Locale.getDefault().getLanguage()=="es") {
             if (this.getViolNumber () == 201) {
                 return "Alimentos contaminados o no aptos para el consumo humano [art. 13]";
             } else if (this.getViolNumber () == 202) {
@@ -180,16 +174,11 @@ public class Violation implements Serializable {
             } else if (this.getViolNumber () == 501) {
                 return "el operador no tiene el nivel 1 FOODSAFE o el equivalente [sección 10 (1)]";
             } else {
-
-
                 return "violación genérica";
             }
-
+        } else {
+            return violDetails;
         }
-        else{
-        return violDetails;}
-
-
     }
    //Returns brief details of the violation, used in Toast messages if the user presses any violation for details
     //returns in French if the device language is french
@@ -202,7 +191,6 @@ public class Violation implements Serializable {
                 return "prémisse non approuvée";
             } else if (this.getViolNumber() == 103) {
                 return "Permis invalide";
-
             } else if (this.getViolNumber() == 104) {
                 return "permis caché";
             } else if (this.getViolNumber() == 201) {
@@ -271,17 +259,14 @@ public class Violation implements Serializable {
                 return "pas de certification FOODSAFE sur site";
             } else {
                 return "Violation générique trouvée";
-
             }
-        }
-        else if(Locale.getDefault().getLanguage()=="es"){
+        } else if(Locale.getDefault().getLanguage()=="es") {
             if (this.getViolNumber () == 101) {
                 return "Planes de construcción ignorando regulaciones";
             } else if (this.getViolNumber () == 102) {
                 return "premisa no aprobada";
             } else if (this.getViolNumber () == 103) {
                 return "Permiso inválido";
-
             } else if (this.getViolNumber () == 104) {
                 return "permiso oculto";
             } else if (this.getViolNumber () == 201) {
@@ -350,22 +335,13 @@ public class Violation implements Serializable {
                 return "sin certificación FOODSAFE en el sitio";
             } else {
                 return "Violación genérica encontrada";
-
             }
-
-        }
-        else {
-
+        } else {
             return briefDetails;
         }
     }
 
-
-
-
-
     public Boolean getRepeat() {
-
         return repeat;
     }
 }
