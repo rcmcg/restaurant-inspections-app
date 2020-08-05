@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,12 +34,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public static final String RESTAURANT_INDEX_INTENT_TAG = "restaurantIndex";
-    private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
-    private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
     public static final int LAUNCH_SEARCH_ACTIVITY = 458;
-
-    private ArrayAdapter<Restaurant> adapter;
-
     private RestaurantManager manager = RestaurantManager.getInstance();
 
     // Yellow, orange, red, with 20% transparency
@@ -55,12 +49,6 @@ public class MainActivity extends AppCompatActivity {
         registerClickCallback();
         wireLaunchMapButton();
         wireLaunchSearchButton();
-        for (Iterator<Restaurant> it = manager.favRestaurantIterator(); it.hasNext(); ) {
-            Restaurant restaurant = it.next();
-            if (restaurant.isModified()){
-                Log.d("MAIN!!!!!!!!!!!!", restaurant.getName());
-            }
-        }
     }
 
     @Override
@@ -69,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
         finish();
         startActivity(getIntent());
     }
-    //Launches the searchActivity
+
+    // Wires button to launch SearchActivity
     private void wireLaunchSearchButton() {
         Button btnSearch = findViewById(R.id.GoToSearch);
         btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    //Launches the Map Activity
+
+    // Wires button to launch MapsActivity
     private void wireLaunchMapButton() {
         Button btn = findViewById(R.id.btnLaunchMap);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
-    //Adds the new restaurants to the manager singleton
+
+    // Creates a new list for the listView from the manager Singleton
     public ArrayList<Restaurant> restaurantList() {
         ArrayList<Restaurant> newRestaurantList = new ArrayList<>();
         for (Restaurant restaurant : manager) {
@@ -135,8 +126,7 @@ public class MainActivity extends AppCompatActivity {
             if (currentRestaurant.isFavourite()){
                 imgFavourite.setImageResource(R.drawable.star_on);
                 imgFavourite.setTag("favourited");
-            }
-            else{
+            } else {
                 imgFavourite.setImageResource(R.drawable.star_off);
                 imgFavourite.setTag("unfavourited");
             }
@@ -148,9 +138,9 @@ public class MainActivity extends AppCompatActivity {
 
             // Fill the hazard icon and the background color of each item
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
-            if (currentRestaurant.getInspectionList().size() != 0) {
+            if (currentRestaurant.getInspectionSize() != 0) {
                 // Inspection list in Restaurant is sorted on startup so the first index is the most recent
-                Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+                Inspection lastInspection = currentRestaurant.getInspection(0);
                 if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
                     itemView.setBackgroundColor(itemViewBackgroundColours[0]);
@@ -173,9 +163,9 @@ public class MainActivity extends AppCompatActivity {
 
             // Set last inspection date text
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
-            if (currentRestaurant.getInspectionList().size() != 0) {
+            if (currentRestaurant.getInspectionSize() != 0) {
                 //Inspections list is sorted, so the first inspection is the latest
-                Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+                Inspection lastInspection = currentRestaurant.getInspection(0);
                 String temp2=String.format(getResources().getString(R.string.main_activity_restaurant_item_last_inspection_date,
                         lastInspection.intelligentInspectDate()));
                 lastInspectionDate.setText(temp2);
@@ -186,14 +176,14 @@ public class MainActivity extends AppCompatActivity {
             // Set number of violations text
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
 
-            if (currentRestaurant.getInspectionList().size() != 0) {
-                Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                //Sums up number of critical and non-critical violations
-                String sumOfViolations = "" + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical());
+            if (currentRestaurant.getInspectionSize() != 0) {
+                Inspection lastInspection = currentRestaurant.getInspection(0);
+                // Sums up number of critical and non-critical violations
+                String sumOfViolations = "" + (lastInspection.getNumCriticalViolations() + lastInspection.getNumNonCriticalViolations());
                 String temp3= String.format(getResources().getString(R.string.main_activity_restaurant_item_violations, sumOfViolations));
                 numViolationsLastInspection.setText(temp3);
             } else {
-                //If the restaurant had no violation in an inspection
+                // If the restaurant had no violation in an inspection
                 numViolationsLastInspection.setText(getString(R.string.main_activity_restaurant_item_violations_no_inspection));
             }
 
@@ -219,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode == SearchActivity.RESULT_OK) {
             populateListView();
         }

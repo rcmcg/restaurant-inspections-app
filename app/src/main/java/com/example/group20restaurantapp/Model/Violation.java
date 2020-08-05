@@ -13,7 +13,7 @@ import java.util.Locale;
 /**
  * Contains information about a particular violation
  */
-//Contains information about each violation
+
 public class Violation implements Serializable {
     private int violNumber;
     private Boolean critical;
@@ -21,7 +21,8 @@ public class Violation implements Serializable {
     private String briefDetails;
     private Boolean repeat;
     private int violImgId;
-    //Constructor
+
+    // Constructor
     public Violation(int violNumber, Boolean critical, String violDetails, String briefDetails, Boolean repeat) {
         this.violNumber = violNumber;
         this.critical = critical;
@@ -34,7 +35,8 @@ public class Violation implements Serializable {
     public int getViolImgId() {
         return violImgId;
     }
-    //Sets image that matches a collection of violation
+
+    // Sets image of violation depending on what the violation is
     public void setViolImgId(int violNumber) {
         // Create collection of permit related violations
         List<Integer> permitViolNums = Arrays.asList(103, 104, 212, 314, 501, 502);
@@ -81,11 +83,11 @@ public class Violation implements Serializable {
             this.violImgId = R.drawable.violation_generic;
         }
     }
-    //Returns the violation number of the violation
+
     public int getViolNumber() {
         return violNumber;
     }
-    //Tells if the violation is critical or not
+
     public Boolean getCritical() {
         return critical;
     }

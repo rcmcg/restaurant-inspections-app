@@ -45,7 +45,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private List<Restaurant> restaurantList = new ArrayList<>();            // Master list of restaurants
     private List<Restaurant> filteredRestaurantList = new ArrayList<>();    // Filtered list for use by app
     private List<Restaurant> favRestaurantsList = new ArrayList<>();
-
     private List<Restaurant> preUpdateFavList;
     private List<Integer> violNumbers;
     private List<String> violBriefDescriptions;
@@ -63,31 +62,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private int searchViolationBound = -1;
     private boolean searchFavouritesOnly = false;
 
-    // Iterable and a singleton class of restaurants object
     private RestaurantManager(){
         // Prevent from instantiating
-    }
-    //returns a list of restaurants that are marked as favourite
-    private List<Restaurant> getPreUpdateFavList() {
-        return preUpdateFavList;
-    }
-    // If a new restaurant is added in the favourite list, it updates the list
-    public void setPreUpdateFavList() {
-        preUpdateFavList = new ArrayList<Restaurant>(favRestaurantsList);
-    }
-    //If the any of the favourite restaurant in the favourite list had any new update on inspections
-    public Iterator<Restaurant> preUpdateFavRestaurantIterator() {
-        return preUpdateFavList.iterator();
-    }
-
-    //set the favorite of search
-    public void setSearchFavouritesOnly(boolean searchFavouritesOnly){
-        this.searchFavouritesOnly = searchFavouritesOnly;
-    }
-
-    //set the limit of the violationNum from search
-    public void setSearchViolationBound(int searchViolationBound) {
-        this.searchViolationBound = searchViolationBound;
     }
 
     // Returns a single instance of the RestaurantManager
@@ -97,22 +73,23 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return manager;
     }
-    //Hazard level is sorted and marked low, moderate and high according to index position
-    public void setSearchHazardLevelStr(int index) {
-        if (index == 0) this.searchHazardLevelStr = "";
-        else if (index == 1) this.searchHazardLevelStr = "Low";
-        else if (index == 2) this.searchHazardLevelStr = "Moderate";
-        else if (index == 3) this.searchHazardLevelStr = "High";
+
+    private List<Restaurant> getPreUpdateFavList() {
+        return preUpdateFavList;
     }
 
-    public void setSearchViolationNumEquality(int index) {
-        this.searchViolationNumEquality = index;
+    public void setPreUpdateFavList() {
+        preUpdateFavList = new ArrayList<Restaurant>(favRestaurantsList);
     }
-    //Returns the number of restaurants
+
+    public Iterator<Restaurant> preUpdateFavRestaurantIterator() {
+        return preUpdateFavList.iterator();
+    }
+
     public int getSizeAllRestaurants() {
         return restaurantList.size();
     }
-    //Returns the number of favourite restaurants
+
     public int getSizeFilteredRestaurants() {
         return filteredRestaurantList.size();
     }
@@ -128,13 +105,19 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public Iterator<Restaurant> favRestaurantIterator() {
         return favRestaurantsList.iterator();
     }
-    //Removes a particular restaurant from the favourite list
+
+    // Removes a particular restaurant from the favourite list
     public void removeFavRestaurant(Restaurant favRestaurant) {
         favRestaurantsList.remove(favRestaurant);
     }
+
     //Adds a restaurant to the favourite list, if the user chooses it to be favourite
     public void addFavRestaurant(Restaurant restaurant) {
         favRestaurantsList.add(restaurant);
+    }
+
+    public Restaurant getIndexFavouriteRestaurants(int position) {
+        return favRestaurantsList.get(position);
     }
 
     public List<Restaurant> getListOfModifiedRestaurants() {
@@ -146,38 +129,17 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return modifiedRestaurants;
     }
-    //If the user cancels the download after being started
-    public boolean isDownloadCancelled() {
-        return isDownloadCancelled;
-    }
-
-    public void setDownloadCancelled(boolean downloadCancelled) {
-        isDownloadCancelled = downloadCancelled;
-    }
-    //Tells if the user was asked about the update or not
-    public boolean hasUserBeenAskedToUpdateThisSession() {
-        return userBeenAskedToUpdateThisSession;
-    }
-
-    public void setUserBeenAskedToUpdateThisSession(boolean userBeenAskedToUpdateThisSession) {
-        this.userBeenAskedToUpdateThisSession = userBeenAskedToUpdateThisSession;
-    }
 
     private List<Restaurant> getRestaurantList() {
         return restaurantList;
     }
 
-    // Return a restaurant object by taking an input of index in restaurant List
     public Restaurant getIndexAllRestaurants(int n){
         return restaurantList.get(n);
     }
 
     public Restaurant getIndexFilteredRestaurants(int n) {
         return filteredRestaurantList.get(n);
-    }
-
-    public void cancelDownloads() {
-        client.dispatcher().cancelAll();
     }
 
     public void add(Restaurant restaurant){
@@ -188,7 +150,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
         restaurantList.remove(restaurant);
     }
 
-    // Singleton class and adding restaurants from CSV
     public int findIndexFromFilteredRestaurants(Restaurant restaurant){
         for(int i = 0 ; i < filteredRestaurantList.size() ; i++){
             if(restaurant == filteredRestaurantList.get(i)){
@@ -197,7 +158,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return -1;
     }
-   //Iterator for iterating filtered restaurants
+
+    // Iterator for iterating filtered restaurants
     @Override
     public Iterator<Restaurant> iterator() {
         if (filteredRestaurantList.size() == 0) {
@@ -206,13 +168,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
         }
         return filteredRestaurantList.iterator();
     }
-    //Clears the restaurants lists
+
     private void resetRestaurantList() {
         restaurantList.clear();
     }
-    //Comparator compares the restaurants by their name, so that the restaurant list is sorted.
+
+    // Comparator compares the restaurants by their name, so that the restaurant list is sorted.
     public void sortRestaurantsByName() {
-        // Sorts master list of restaurants
+        // Sorts master list of restaurants by name
         Comparator<Restaurant> compareByName = new Comparator<Restaurant>() { //Compares restaurant names
             @Override
             public int compare(Restaurant r1, Restaurant r2) {
@@ -221,27 +184,22 @@ public class RestaurantManager implements Iterable<Restaurant>{
         };
         Collections.sort(restaurantList, compareByName);
     }
-    //Sorts the inspection list so that, the last inspection is at the top position
-    public void sortInspListsByDate() {
-        Comparator<Inspection> compareByDate = new Comparator<Inspection>() { //Compares inspection dates
-            @Override
-            public int compare(Inspection i1, Inspection i2) {
-                return i1.getInspectionDate().compareTo(i2.getInspectionDate());
-            }
-        };
 
+    // Sorts inspection list in reverse order, ie, most recent first
+    public void sortInspListsByDate() {
         for (Restaurant restaurant : restaurantList){
-            Collections.sort(restaurant.inspectionList, compareByDate.reversed()); //Sort arraylist in reverse order
+            restaurant.sortInspListByDate();
         }
     }
-    //Returns the restaurant which has the passed latitude, longitude, and name, will be used in MAPS ACTIVITY
+
+    // Returns the restaurant which has the passed latitude, longitude, and name, used in MapsActivity
     public Restaurant findRestaurantByLatLng(double latitude, double longtitude, String name) {
         for (Restaurant restaurant : restaurantList) {
             if (
                     restaurant.getLatitude() == latitude
-                    && restaurant.getLongitude() == longtitude
-                    && restaurant.getName().equals(name)
-                )
+                            && restaurant.getLongitude() == longtitude
+                            && restaurant.getName().equals(name)
+            )
             {
                 return restaurant;
             }
@@ -254,20 +212,18 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
 
     public void updateFilteredRestaurants() {
-        // searchTerm: Restaurant name must contain searchTerm as a substring
-        // hazardLevelLastInspection: Restaurants last inspection have this hazard level
         // Clear the filtered restaurant list before updating
         filteredRestaurantList.clear();
 
         // Refill filtered list with the correct restaurants
         for (Restaurant restaurant : manager.getRestaurantList()) {
             if (restaurant.getName().toLowerCase().contains(searchTerm.toLowerCase())   // Check the name contains the search term
-                && (searchHazardLevelStr.equals("") // If user doesn't care about hazard level the condition evaluates to true
-                    || (restaurant.getInspectionList().size() != 0 && restaurant.getInspection(0).getHazardRating().equals(searchHazardLevelStr)))   // Verify most recent inspection is correct
-                && (searchViolationNumEquality == 0  // User doesn't care about violations, evaluates to true
+                    && (searchHazardLevelStr.equals("") // If user doesn't care about hazard level the condition evaluates to true
+                    || (restaurant.getInspectionSize() != 0 && restaurant.getInspection(0).getHazardRating().equals(searchHazardLevelStr)))   // Verify most recent inspection is correct
+                    && (searchViolationNumEquality == 0  // User doesn't care about violations, evaluates to true
                     || (searchViolationNumEquality == 1 && restaurant.countCriticalViolationInLastYear() >= searchViolationBound)    // User wants to check if number >= N
                     || (searchViolationNumEquality == 2 && restaurant.countCriticalViolationInLastYear() <= searchViolationBound))   // User wants to check if number <= N
-                && (!searchFavouritesOnly || restaurant.isFavourite())    // If user doesn't care about favourites, evaluate to true, otherwise verify restaurant is a favourite or not
+                    && (!searchFavouritesOnly || restaurant.isFavourite())    // If user doesn't care about favourites, evaluate to true, otherwise verify restaurant is a favourite or not
             ) {
                 filteredRestaurantList.add(restaurant);
             }
@@ -277,53 +233,109 @@ public class RestaurantManager implements Iterable<Restaurant>{
     private List<Restaurant> getFilteredRestaurantList() {
         return filteredRestaurantList;
     }
-    //Calls the fill restaurant manager method
+
+    /*
+    Search functions
+     */
+    public void setSearchFavouritesOnly(boolean searchFavouritesOnly){
+        this.searchFavouritesOnly = searchFavouritesOnly;
+    }
+
+    public void setSearchViolationBound(int searchViolationBound) {
+        this.searchViolationBound = searchViolationBound;
+    }
+
+    public void setSearchHazardLevelStr(int index) {
+        if (index == 0) this.searchHazardLevelStr = "";
+        else if (index == 1) this.searchHazardLevelStr = "Low";
+        else if (index == 2) this.searchHazardLevelStr = "Moderate";
+        else if (index == 3) this.searchHazardLevelStr = "High";
+    }
+
+    public void setSearchViolationNumEquality(int index) {
+        this.searchViolationNumEquality = index;
+    }
+
+    public void setSearchTerm(String searchTerm) { this.searchTerm = searchTerm; }
+
+    /*
+    Functions for downloading and managing data for restaurantList
+     */
+
+    // Checks if the user has cancelled download after it's begun
+    public boolean isDownloadCancelled() {
+        return isDownloadCancelled;
+    }
+
+    public void setDownloadCancelled(boolean downloadCancelled) {
+        isDownloadCancelled = downloadCancelled;
+    }
+
+    public boolean hasUserBeenAskedToUpdateThisSession() {
+        return userBeenAskedToUpdateThisSession;
+    }
+
+    public void setUserBeenAskedToUpdateThisSession(boolean userBeenAskedToUpdateThisSession) {
+        this.userBeenAskedToUpdateThisSession = userBeenAskedToUpdateThisSession;
+    }
+
     public void refillRestaurantManagerNewData(Context context) {
         resetRestaurantList();
         fillRestaurantManager(true, context);
     }
-    //If the manager list has been updated then, does nothing or else updates the list with new data
+
     public void fillRestaurantManager(boolean hasAppBeenUpdated, Context context) {
         readRestaurantData(hasAppBeenUpdated, context);
         if (!hasAppBeenUpdated) {
+            // Read inspection data from raw
             initInspectionLists(context);
         } else {
+            // Read inspection data from internal storage
             initNewInspectionLists(context);
         }
         sortInspListsByDate();
         sortRestaurantsByName();
     }
 
+    public void cancelDownloads() {
+        client.dispatcher().cancelAll();
+    }
+
     public String[] getURLDateLastModified(String requestURL) {
-        //Construct Thread policy instant
-        //permitAll disables the detection of everything
-        //Strict mode is used to detect accidental network changes
+        // Construct Thread policy instant
+        // permitAll disables the detection of everything
+        // Strict mode is used to detect accidental network changes
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        //To create OKHTTP a request object is needed
-        //url is the requested URl
+
+        //To create OkHttp a request object is needed
         Request request = new Request.Builder()
                 .url(requestURL)
                 .method("GET", null)
                 .build();
+
         String dataURL = "";
         String lastModifiedDate = "";
         try {
-            //Make the response request
+            // Make the response request
             Response response = client.newCall(request).execute();
-            //Get response
+
+            // Get response
             String getJSON = response.body().string();
-            //Transform response to JSon object
+
+            // Transform response to JSon object
             JSONObject jsonObj = new JSONObject(getJSON);
             JSONObject resultObj = jsonObj.getJSONObject("result");
-            //Setting a Json array
+
+            // Setting a Json array
             JSONArray resArr = resultObj.getJSONArray("resources");
             JSONObject data = resArr.getJSONObject(0);
+
             dataURL = data.getString("url");
-            //Matching with the last modified date, update if needed
+            // Matching with the last modified date, update if needed
             if (restaurantsLastModified.equals("")){
                 restaurantsLastModified = data.getString("last_modified");
-            } else{
+            } else {
                 inspectionsLastModified = data.getString("last_modified");
             }
             lastModifiedDate = data.getString("last_modified");
@@ -336,9 +348,13 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
 
     public String getCSV(String DataURL) {
+        // Construct Thread policy instant
+        // permitAll disables the detection of everything
+        // Strict mode is used to detect accidental network changes
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        //To create Ok Http a request object is needed
+
+        //To create OkHttp a request object is needed
         Request request = new Request.Builder()
                 .url(DataURL)
                 .method("GET", null)
@@ -348,8 +364,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
             //Make the response request
             Response response = client.newCall(request).execute();
             csv = response.body().string();
-            //Log.d("MyActivity", getCSV); // Dump updated restaurants CSV into logcat
 
+            // Log.d("MyActivity", getCSV); // Dump updated restaurants CSV into logcat
         } catch (IOException e) {
             Log.e("MYACTIVITY!", "ERROR!!!!");
             e.printStackTrace();
@@ -358,7 +374,6 @@ public class RestaurantManager implements Iterable<Restaurant>{
     }
 
     public void writeToFile(String newData, String fileName, Context context) {
-        //fileoutputStream to write to a file
         FileOutputStream fos = null;
         try {
             fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
@@ -399,7 +414,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
             while ((line = br.readLine()) != null) {
                 line = line.replace("\"", "");
-                //Splits the line in multiple tokens, based on commas
+                // Splits the line in multiple tokens, based on commas
                 String[] tokens = line.split(",");
 
                 String [] restaurantData = new String[7];
@@ -411,7 +426,8 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 } else {
                     restaurantData = tokens.clone();
                 }
-                //As the tokens are serialized, so using setter functions to set the parameters of each restaurant
+
+                // As the tokens are serialized, so using setter functions to set the parameters of each restaurant
                 Restaurant newRestaurant = new Restaurant();
                 newRestaurant.setTrackingNumber(restaurantData[0].replace(" ", ""));
                 newRestaurant.setName(restaurantData[1]);
@@ -420,15 +436,18 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 newRestaurant.setFacType(restaurantData[4]);
                 newRestaurant.setLatitude(Double.parseDouble(restaurantData[5]));
                 newRestaurant.setLongitude(Double.parseDouble(restaurantData[6]));
-                newRestaurant.setImgId();
+                newRestaurant.setIconImgId();
 
                 SharedPreferences preferences = context.getSharedPreferences("favourites", 0);
-                // Check 'favourited' status of restaurant
+
+                // Update favourite status of restaurant
                 boolean favStatus = preferences.getBoolean(newRestaurant.getTrackingNumber(), false);
                 newRestaurant.setFavourite(favStatus);
+
                 if (favStatus){
                     favRestaurantsList.add(newRestaurant);
                 }
+
                 add(newRestaurant);
             }
         } catch (IOException e) {
@@ -476,28 +495,29 @@ public class RestaurantManager implements Iterable<Restaurant>{
         try {
             reader.readLine();
             while ( (line = reader.readLine()) != null){ //Iterate through lines (reports) in CSV
-                //Log.d("MyActivity", "Line: " + line);
+                // Log.d("MyActivity", "Line: " + line);
                 int i = 0;
                 line = line.replace("\"", "");
 
                 String[] lineSplit = line.split(",", 7);
-                //Find restaurant matching report tracking number being read
+                // Find restaurant matching report tracking number being read
                 while (!lineSplit[0].equals(getIndexAllRestaurants(i).getTrackingNumber())){
                     i++;
                 }
-                //Initializing inspection object variables
+
                 Inspection inspection = new Inspection();
-                //First split is tracking number, second is inspection date adn so on
+
+                // First split is tracking number, second is inspection date and so on
                 inspection.setTrackingNumber(lineSplit[0]);
                 inspection.setInspectionDate(lineSplit[1]);
                 inspection.setInspType(lineSplit[2]);
-                inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
-                inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
+                inspection.setNumCriticalViolations(Integer.parseInt(lineSplit[3]));
+                inspection.setNumNonCriticalViolations(Integer.parseInt(lineSplit[4]));
                 inspection.setHazardRating(lineSplit[5]);
 
-                String[] violationsArr = lineSplit[6].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
+                String[] violationsArr = lineSplit[6].split("\\|"); // Split 'lump' of violations into array, each element containing a violation
 
-                if (!violationsArr[0].equals("")){ //Transfer each violation to class object's arraylist
+                if (!violationsArr[0].equals("")){ // Transfer each violation to class object's arraylist
                     // Log.d("MyActivity", "Violations for " + lineSplit[0] + ":" + Arrays.toString(violationsArr));
                     for (String violation : violationsArr){ // For each token, split it up farther into number, crit, details, repeat
                         // Log.d("MyActivity", "--Violations split: " + violation);
@@ -526,7 +546,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
                         inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
                     }
                 }
-                getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                getIndexAllRestaurants(i).addInspection(inspection); // Add inspection to Restaurant's inspection list
             }
         } catch (IOException e){
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
@@ -544,7 +564,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
         try {
             while ( (line = bufferedReader.readLine()) != null) {
-                //adding violation number and description to each violation
+                // adding violation number and description to each violation
                 String[] lineSplit = line.split(",");
                 violNumbers.add(Integer.parseInt(lineSplit[0]));
                 violBriefDescriptions.add(lineSplit[1]);
@@ -557,13 +577,13 @@ public class RestaurantManager implements Iterable<Restaurant>{
 
         FileInputStream fis;
         try {
-            //Getting the web server inspection csv
+            // Getting the web server inspection csv
             fis = context.openFileInput(WEB_SERVER_INSPECTIONS_CSV);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             line = "";
-            //reads the header line but don't process it.
-            br.readLine(); //Header line
+            // Reads the header line but don't process it.
+            br.readLine(); // Header line
             String prevTrackingNum = "";
             boolean unknownRestaurant = false;
             int i = 0;
@@ -574,7 +594,7 @@ public class RestaurantManager implements Iterable<Restaurant>{
                 String[] lineSplit = line.split(",", 6);
                 lineSplit[0] = lineSplit[0].replace(" ", "");
 
-                //Find restaurant with matching report tracking number being read
+                // Find restaurant with matching report tracking number being read
                 if (!prevTrackingNum.equals(lineSplit[0])){
                     i = 0;
                     while (!lineSplit[0].equals(getIndexAllRestaurants(i).getTrackingNumber())) {
@@ -591,37 +611,31 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     }
                 }
 
-                    //Initializing inspection object variables
+
                 Inspection inspection = new Inspection();
                 inspection.setTrackingNumber(lineSplit[0].replace(" ", ""));
-
-                if (inspection.getTrackingNumber().equals("SWOD-APSP3X")){
-                    String name;
-                    name = "Adam";
-                }
-
                 inspection.setInspectionDate(lineSplit[1]);
                 inspection.setInspType(lineSplit[2]);
-                //Numcritical is in string format so changed to integer
-                inspection.setNumCritical(Integer.parseInt(lineSplit[3]));
-                inspection.setNumNonCritical(Integer.parseInt(lineSplit[4]));
-                //Setting hazard ratings
+                inspection.setNumCriticalViolations(Integer.parseInt(lineSplit[3]));
+                inspection.setNumNonCriticalViolations(Integer.parseInt(lineSplit[4]));
+
+                // Setting hazard ratings
                 if (lineSplit[5].equals(",Low") || lineSplit[5].equals(",")) {
                     inspection.setHazardRating("Low");
-                    getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    getIndexAllRestaurants(i).addInspection(inspection); // Add inspection to Restaurant's inspection list
                     continue;
                 }
                 if (lineSplit[5].equals(",Moderate")) {
                     inspection.setHazardRating("Moderate");
-                    getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    getIndexAllRestaurants(i).addInspection(inspection); // Add inspection to Restaurant's inspection list
                     continue;
                 }
                 if (lineSplit[5].equals(",High")) {
                     inspection.setHazardRating("High");
-                    getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                    getIndexAllRestaurants(i).addInspection(inspection); // Add inspection to Restaurant's inspection list
                     continue;
                 }
-                String[] violationsArr = lineSplit[5].split("\\|"); //Split 'lump' of violations into array, each element containing a violation
+                String[] violationsArr = lineSplit[5].split("\\|"); // Split 'lump' of violations into array, each element containing a violation
 
                 for (int violCount = 0; violCount < violationsArr.length; violCount++) { // For each token, split it up farther into number, crit, details, repeat
                     String[] violSplit = violationsArr[violCount].split(",", 3);
@@ -664,16 +678,10 @@ public class RestaurantManager implements Iterable<Restaurant>{
                     Violation violObj = new Violation(violNumber, crit, violSplit[2], briefDesc, repeat);
                     inspection.getViolLump().add(violObj); // Append violation to violLump arraylist
                 }
-                getIndexAllRestaurants(i).getInspectionList().add(inspection); //Add inspection to Restaurant's inspection list
+                getIndexAllRestaurants(i).addInspection(inspection); // Add inspection to Restaurant's inspection list
             }
         } catch (IOException e){
             e.printStackTrace();
         }
-    }
-
-    public void setSearchTerm(String searchTerm) { this.searchTerm = searchTerm; }
-
-    public Restaurant getIndexFavouriteRestaurants(int position) {
-        return favRestaurantsList.get(position);
     }
 }

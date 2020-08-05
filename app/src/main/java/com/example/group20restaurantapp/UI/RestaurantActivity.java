@@ -3,7 +3,6 @@ package com.example.group20restaurantapp.UI;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import android.content.Context;
 import android.content.Intent;
@@ -34,16 +33,18 @@ import java.util.List;
  */
 
 public class RestaurantActivity extends AppCompatActivity {
-
+    // Constants
     public static final String RESTAURANT_ACTIVITY_INSPECTION_TAG = "inspection";
     public static final String RESTAURANT_LATITUDE_INTENT_TAG = "Restaurant latitude";
     public static final String RESTAURANT_LONGITUDE_INTENT_TAG = "Restaurant longitude";
     public static final String RESTAURANT_NAME_INTENT_TAG = "Restaurant name";
+
+    // Variables
     private RestaurantManager manager;
-    List<Inspection> inspections;
-    SharedPreferences preferences;
+    private List<Inspection> inspections;
+    private SharedPreferences preferences;
     private Menu restaurantMenu;
-    int restaurantIndex;
+    private int restaurantIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +54,11 @@ public class RestaurantActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        restaurantIndex = getIntent().getIntExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG,-1);
-
-        // Get singleton
+        // Get manager singleton
         manager = RestaurantManager.getInstance();
 
+        // Grab the restaurantIndex the activity was opened with
+        restaurantIndex = getIntent().getIntExtra(MainActivity.RESTAURANT_INDEX_INTENT_TAG,-1);
         Restaurant restaurant = null;
         if (restaurantIndex == -1) {
             Log.e("RestaurantActivity", "onCreate: Activity opened with no restaurant");
@@ -66,11 +67,9 @@ public class RestaurantActivity extends AppCompatActivity {
         }
 
         assert restaurant != null;
-        //inspection list of a single restaurant
         inspections = restaurant.getInspectionList();
-        //sets a Textview with restaurant name
-        setRestaurantText(restaurant);
-        //sets a TextView with restaurant address
+
+        setRestaurantNameText(restaurant);
         setAddressText(restaurant);
         setCoordsTextAndClickCallback(restaurant);
         setRestaurantImg(restaurant);
@@ -79,7 +78,6 @@ public class RestaurantActivity extends AppCompatActivity {
 
         populateInspectionList(restaurant);
         registerClickCallback(restaurant);
-        // setupDefaultIntent();
     }
 
     @Override
@@ -87,21 +85,19 @@ public class RestaurantActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.restaurant_menu, menu);
         restaurantMenu = menu;
         setFavouritedImg();
-        //list of favourite restaurants
+
         final MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
         final Restaurant restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
-        //if the user clicks on a favourite restaurant
+
+        // User can press star to favourite/unfavourite a restaurant
         favouriteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                //it is removed from the favourite restaurant
                 if (restaurant.isFavourite()){
                     manager.removeFavRestaurant(restaurant);
                     favouriteItem.setIcon(R.drawable.star_off);
                     restaurant.setFavourite(false);
-                }
-                //It is marked as favourite restaurant
-                else{
+                } else {
                     favouriteItem.setIcon(R.drawable.star_on);
                     restaurant.setFavourite(true);
                     manager.addFavRestaurant(restaurant);
@@ -110,13 +106,12 @@ public class RestaurantActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putBoolean(restaurant.getTrackingNumber(), restaurant.isFavourite());
                 editor.apply();
-
                 return false;
             }
         });
-
         return true;
     }
+
     // Source
     // https://stackoverflow.com/questions/36457564/display-back-button-of-action-bar-is-not-going-back-in-android/36457747
     @Override
@@ -128,13 +123,13 @@ public class RestaurantActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    //sets the restaurant image in image view
+
     private void setRestaurantImg(Restaurant restaurant) {
         ImageView imgViewRestaurant = findViewById(R.id.restaurant_img);
         imgViewRestaurant.setImageResource(restaurant.getIconImgId());
     }
-    //sets the restaurant name
-    private void setRestaurantText(Restaurant restaurant) {
+
+    private void setRestaurantNameText(Restaurant restaurant) {
         TextView txtViewRestaurantName = findViewById(R.id.name_resActivity);
         txtViewRestaurantName.setText(
                 getString(R.string.restaurant_activity_restaurant_name,restaurant.getName())
@@ -147,21 +142,21 @@ public class RestaurantActivity extends AppCompatActivity {
                 getString(R.string.restaurant_activity_restaurant_address,restaurant.getAddress())
         );
     }
-     //if a restaurant is favourite then it has a yellow star or else a grey star
+
+    // If a restaurant is favourite then it has a yellow star or else a grey star
     private void setFavouritedImg() {
         Restaurant restaurant = manager.getIndexFilteredRestaurants(restaurantIndex);
         MenuItem favouriteItem = restaurantMenu.findItem(R.id.favourite);
 
-        //favourited = preferences.getBoolean(restaurant.getTrackingNumber(), false);
         if (restaurant.isFavourite()){
             favouriteItem.setIcon(R.drawable.star_on);
-        }
-        else{
+        } else {
             favouriteItem.setIcon(R.drawable.star_off);
         }
     }
-     //If an user presses any restaurant's address then the latitude and longitude is passed to the maps activity
-    //to launch the map from that location
+
+    // If user presses restaurant's address then the latitude, longitude, and name is passed to the maps activity
+    // to launch the map with that restaurant centered and its info window opened
     private void setCoordsTextAndClickCallback(final Restaurant restaurant) {
         TextView txtViewCoords = findViewById(R.id.coords_resActivity);
         String coordsString = "" + restaurant.getLatitude() + "," + restaurant.getLongitude();
@@ -183,10 +178,9 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
     }
-    //populates each restaurant with it's own inspection list
-    private void populateInspectionList(Restaurant restaurant) {
-        manager = RestaurantManager.getInstance();
 
+    // Fill listView with inspections
+    private void populateInspectionList(Restaurant restaurant) {
         ArrayAdapter<Inspection> adapter = new CustomAdapter();
         ListView list = (ListView) findViewById(R.id.restaurant_view);
         list.setAdapter(adapter);
@@ -206,7 +200,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
             // Set icon and background color for each itemView
             String temp = currentInspection.getHazardRating();
-            //Sets each violation with the appropriate image
+            // Sets each violation with the appropriate image
             ImageView imageview = (ImageView) itemView.findViewById(R.id.imgViewViolationIcon);
             if (temp.equals("Low")) {
                 imageview.setImageResource(R.drawable.yellow_triangle);
@@ -232,7 +226,7 @@ public class RestaurantActivity extends AppCompatActivity {
             critViolationsTxt.setText(
                     getString(
                             R.string.restaurant_activity_inspection_item_crit_viols,
-                            "" + currentInspection.getNumCritical())
+                            "" + currentInspection.getNumCriticalViolations())
             );
 
             // Set non-critical violations text
@@ -240,9 +234,8 @@ public class RestaurantActivity extends AppCompatActivity {
             nonCritViolationsTxt.setText(
                     getString(
                             R.string.restaurant_activity_inspection_item_non_crit_viols,
-                            "" + currentInspection.getNumNonCritical())
+                            "" + currentInspection.getNumNonCriticalViolations())
             );
-
             return itemView;
         }
     }
@@ -253,9 +246,8 @@ public class RestaurantActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Inspection selectedInspection = restaurant.getInspectionList().get(position);
-                //If a user clicks on any inspection then launches the inspection activity
-                //where a list of violation is displayed with details and an image
+                // If a user clicks on any inspection then launches the inspection activity
+                Inspection selectedInspection = restaurant.getInspection(position);
                 Intent intent = InspectionActivity.makeIntent(RestaurantActivity.this);
                 intent.putExtra(RESTAURANT_ACTIVITY_INSPECTION_TAG, selectedInspection);
                 startActivity(intent);

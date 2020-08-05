@@ -17,8 +17,6 @@ import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
 public class SearchActivity extends AppCompatActivity {
-    // public int RESULT_SEARCH_UPDATED = 1;
-
     // Search filters
     private EditText searchField;
     private EditText violationCountField;
@@ -28,9 +26,8 @@ public class SearchActivity extends AppCompatActivity {
     private Spinner violationSpinner;
     private Spinner favouriteSpinner;
 
-    // Search terms
-    // note, these need to be set by this activity, only update the
-    // values in manager if the user presses search
+    // Search terms: these need to be set by this activity, only update the values in manager if the
+    // user presses search
     private String searchTerm;
     private int searchHazardLevelStrIndex;
     private int searchViolationNumEquality;
@@ -44,7 +41,6 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // setDefaultIntent();
         generateSearch();
     }
 
@@ -55,12 +51,11 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setupFields() {
-        //takes restaurant name as an input from user
         searchField = (EditText) findViewById(R.id.search_message);
-        //takes violation count as an input from user
+        // Takes violation count as an input from user
         violationCountField = (EditText) findViewById(R.id.count_text_search);
     }
-    //This function sets up all the button
+
     private void setupButtons() {
         btnSearch= (Button) findViewById(R.id.btn_search);
         clearBtn = (Button) findViewById(R.id.btn_clean);
@@ -79,57 +74,59 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    //https://www.youtube.com/watch?v=GeO5F0nnzAw
-    //set the hazardLevel and violationNum on spinners
+    // https://www.youtube.com/watch?v=GeO5F0nnzAw
+    // Set the hazardLevel and violationNum on spinners
     private void setupSpinners() {
+        // Get the hazard spinner
         hazardSpinner = (Spinner) findViewById(R.id.Hazardlevel);
+        // Set an adapter for the hazardSpinner
         ArrayAdapter<CharSequence> hazardAdapter = ArrayAdapter.createFromResource(this,
                 R.array.HazardlevelStr, android.R.layout.simple_spinner_dropdown_item);
-        //Dropdown is used for dropping down the choices as simple spinner dropdown is not appropriate
+        // Set spinner layout
         hazardAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //Sets the spinner to hazard adapter, so that it gets all the choices
         hazardSpinner.setAdapter(hazardAdapter);
-        //When an option is clicked, it can be processed
+
         hazardSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            //On clicked in one of the options, it gets the index position
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // manager.setSearchHazardLevelStr(position);
                 searchHazardLevelStrIndex = position;
             }
-            //If the user selects nothing
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // manager.setSearchHazardLevelStr(0);
                 searchHazardLevelStrIndex = 0;
             }
         });
 
+        // Get the violation spinner
         violationSpinner = (Spinner) findViewById(R.id.ViolationNum);
+        // Set an adapter for the violation spinner
         ArrayAdapter<CharSequence> ViolationAdapter = ArrayAdapter.createFromResource(this,
                 R.array.ViolationNumBound, android.R.layout.simple_spinner_dropdown_item);
+        // Set spinner layout
         ViolationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         violationSpinner.setAdapter(ViolationAdapter);
-        violationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
+        violationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 searchViolationNumEquality = position;
-                // manager.setSearchViolationNumEquality(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 searchViolationNumEquality = 0;
-                // manager.setSearchViolationNumEquality(0);
             }
         });
 
-
+        // Get the favourite spinner
         favouriteSpinner = (Spinner) findViewById(R.id.ChooseFavorite);
+        // Set an adapter for the favourite spinner
         ArrayAdapter<CharSequence> favoriteAdapter = ArrayAdapter.createFromResource(this,
                 R.array.ChooseFavor, android.R.layout.simple_spinner_dropdown_item);
+        // Set spinner layout
         favoriteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         favouriteSpinner.setAdapter(favoriteAdapter);
+
         favouriteSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -142,32 +139,29 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    // Submit the users's input
+    // Submit the users's input to the manager Singleton
     private void submitSearch() {
-        // Get the search term
+        // Get the search term and update searchTerm in manager
         searchTerm = searchField.getText().toString();
-        // Update search term in manager
         manager.setSearchTerm(searchTerm);
-        // String itemSearch = searchField.getText().toString();
 
-        // Update the hazard level of last inspection in manager
+        // Get global variable and update the hazard level of last inspection in manager
         manager.setSearchHazardLevelStr(searchHazardLevelStrIndex);
 
-        // Set the searchViolationNumEquality in manager
+        // Get global variable and set the searchViolationNumEquality in manager
         manager.setSearchViolationNumEquality(searchViolationNumEquality);
 
         // Set the violation bound in manager
         updateViolationCountRestriction();
 
-        // Set searchFavouritesOnly in manager
+        // Get global variable and set searchFavouritesOnly in manager
         manager.setSearchFavouritesOnly(searchFavouritesOnly);
 
         // Update filtered restaurant list with new terms
         manager.updateFilteredRestaurants();
 
         setUpdateResult();
-
-        this.finish();
+        finish();
     }
 
     private void setUpdateResult() {
@@ -178,8 +172,8 @@ public class SearchActivity extends AppCompatActivity {
 
     private void updateViolationCountRestriction() {
         try {
-            int bound = Integer.parseInt(violationCountField.getText().toString());
-            manager.setSearchViolationBound(bound);
+            searchViolationBound = Integer.parseInt(violationCountField.getText().toString());
+            manager.setSearchViolationBound(searchViolationBound);
         } catch (Exception e) {
             // Invalid entry or other error
             manager.setSearchViolationBound(-1);
@@ -187,7 +181,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void clearFilters() {
-        // Reset search parametres in manager
+        // Reset search parameters in manager
         manager.setSearchTerm("");
         manager.setSearchHazardLevelStr(0);
         manager.setSearchViolationNumEquality(0);
@@ -200,21 +194,13 @@ public class SearchActivity extends AppCompatActivity {
         setUpdateResult();
     }
 
-    /*
-    private void setDefaultIntent() {
-        Intent i = new Intent();
-        setResult(Activity.RESULT_OK, i);
-    }
-     */
-
-    //solve the action bar return to the previous activity
+    // Solve the action bar return to the previous activity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case (android.R.id.home):
                 onBackPressed();
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
