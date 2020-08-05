@@ -67,6 +67,23 @@
     <string name = "num_crit_viols"> Num crit viols </string>
     <string name = "num_noncrit_viols"> Num nonCrit viols </string>
     <string name="search">chercher</string>
+    <string-array name="HazardlevelStr">
+        <item>Tout</item>
+        <item>Faible</item>
+        <item>modéré</item>
+        <item>élevé</item>
+    </string-array>
+
+    <string-array name="ViolationNumBound">
+        <item>Tout</item>
+        <item>Supérieur ou égal</item>
+        <item>Inférieur ou égal</item>
+    </string-array>
+
+    <string-array name="ChooseFavor">
+        <item>non</item>
+        <item>oui</item>
+    </string-array>
 
 
 

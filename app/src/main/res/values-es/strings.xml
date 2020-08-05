@@ -68,6 +68,23 @@
     </string>
     <string name = "modified_fav_ok">OK</string>
     <string name="search">Buscar</string>
+    <string-array name="HazardlevelStr">
+        <item>Cualquier</item>
+        <item>bajo</item>
+        <item>Moderado</item>
+        <item>alto</item>
+    </string-array>
+
+    <string-array name="ViolationNumBound">
+        <item>Todas</item>
+        <item>Mayor o egual</item>
+        <item>Menor o egual</item>
+    </string-array>
+
+    <string-array name="ChooseFavor">
+        <item>no</item>
+        <item>si</item>
+    </string-array>
 
 
 </resources>
