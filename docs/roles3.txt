@@ -1,0 +1,4 @@
+Repo manager: Reece McGowan
+Product owner: Reece McGowan
+Scrum master: Tanvir RaHman Khan
+Team member: Adam Peterson
