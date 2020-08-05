@@ -91,6 +91,7 @@ public class Violation implements Serializable {
     public Boolean getCritical() {
         return critical;
     }
+
     //Returns the violation details, The details are translated to French if the device language is french
     //Returns spanish if the device language is spanish
     public String getViolDetails() {
@@ -182,9 +183,10 @@ public class Violation implements Serializable {
             return violDetails;
         }
     }
-   //Returns brief details of the violation, used in Toast messages if the user presses any violation for details
-    //returns in French if the device language is french
-    //returns spanish if the device language is spanish
+
+    // Returns brief details of the violation, used in Toast messages if the user presses any violation for details
+    // returns in French if the device language is french
+    // returns spanish if the device language is spanish
     public String getBriefDetails() {
         if (Locale.getDefault().getLanguage() == "fr") {
             if (this.getViolNumber() == 101) {
