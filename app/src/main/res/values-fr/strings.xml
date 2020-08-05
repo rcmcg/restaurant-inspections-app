@@ -48,10 +48,43 @@
     <string name = "last_inspection"> Dernière inspection </string>
     <string name = "of_violations_here"> Nombre de violations ici </string>
 
+    <string name = "enter_the_key_word_here"> Rechercher des restaurants </string>
+    <string name = "please_enter_some_key_words_to_help_search"> veuillez entrer quelques mots clés pour faciliter la recherche </string>
+    <string name = "search_by_violation_num"> Violations critiques au cours de lannée dernière </string>
+    <string name = "search_by_the_hazard_level"> Niveau de danger de la dernière inspection </string>
+    <string name = "submit_search"> Soumettre la recherche </string>
+    <string name = "reset_search"> Réinitialiser la recherche </string>
+    <string name = "num"> Entrez un entier </string>
+    <string name = "please_enter_the_key_word"> Entrez les paramètres de recherche </string>
+    <string name = "click_to_get_favorite_only"> Restaurants préférés uniquement? </string>
+    <string name = "modified_fav_restaurants_message">
+        Ce sont vos restaurants préférés qui ont subi de nouvelles inspections depuis votre dernière mise à jour.
+    </string>
+    <string name = "modified_fav_ok"> OK </string>
+
     <string name = "n_a"> N/A </string>
     <string name = "inspection_date_here"> Date dinspection ici </string>
     <string name = "num_crit_viols"> Num crit viols </string>
     <string name = "num_noncrit_viols"> Num nonCrit viols </string>
+    <string name="search">chercher</string>
+    <string-array name="HazardlevelStr">
+        <item>Tout</item>
+        <item>Faible</item>
+        <item>modéré</item>
+        <item>élevé</item>
+    </string-array>
+
+    <string-array name="ViolationNumBound">
+        <item>Tout</item>
+        <item>Supérieur ou égal</item>
+        <item>Inférieur ou égal</item>
+    </string-array>
+
+    <string-array name="ChooseFavor">
+        <item>non</item>
+        <item>oui</item>
+    </string-array>
+
 
 
 </resources>

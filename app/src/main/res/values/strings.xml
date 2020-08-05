@@ -83,5 +83,7 @@
         These are your favourite restaurants which have had new inspections since you last updated.
     </string>
     <string name="modified_fav_ok">OK</string>
+    <string name="search">Search</string>
+
 
 </resources>

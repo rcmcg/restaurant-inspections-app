@@ -1,0 +1,90 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name = "app_name">Inspecciones de restaurantes: Surrey</string>
+    <string name = "name">Nombre:</string>
+    <string name = "address">Dirección:</string>
+    <string name = "longitude">Longitud:</string>
+    <string name = "latitude">Latitud:</string>
+    <string name = "title_activity_restaurant">Restaurante</string>
+    <string name = "display_formate_criticalnum_non_criticalnum_relative_type_hazardlevel_icon"> Formato de visualización: Número crítico, número no crítico, relativo, tipo, nivel de peligro, icono </string>
+    <string name = "coordinates"> Coordenadas: </string>
+
+    <string name = "main_activity_restaurant_name" formatted = "true">%1$s</string>
+    <string name = "main_activity_restaurant_item_last_inspection_date">Última inspección: %1$s</string>
+    <string name = "main_activity_restaurant_item_last_inspection_date_no_inspection"> Este restaurante nunca ha tenido una inspección </string>
+    <string name = "main_activity_restaurant_item_violations">Infracciones: %1$s</string>
+    <string name = "main_activity_restaurant_item_violations_no_inspection" />
+
+    <string name = "restaurant_activity_restaurant_name">%1$s</string>
+    <string name = "restaurant_activity_restaurant_address">Dirección: %1$s</string>
+    <string name = "restaurant_activity_restaurant_coords">Coordenadas: %1$s</string>
+    <string name = "restaurant_activity_inspection_item_date">Última inspección: %1$s</string>
+    <string name = "restaurant_activity_inspection_item_crit_viols">Infracciones críticas: %1$s</string>
+    <string name = "restaurant_activity_inspection_item_non_crit_viols">Infracciones no críticas: %1$s</string>
+
+    <string name = "inspection_activity_violation_item_brief_description">%1$s</string>
+    <string name = "inspection_activity_violation_item_full_description">
+        Número de infracción: %1$s. Infracción crítica: %2$s. %3$s. Repetir: %4$s.
+    </string>
+    <string name = "inspection_activity_date">Fecha: %1$s</string>
+    <string name = "inspection_activity_type">Tipo: %1$s</string>
+    <string name = "inspection_activity_critical_violations">Infracciones críticas: %1$s</string>
+    <string name = "inspection_activity_non_critical_violations">Infracciones no críticas: %1$s</string>
+    <string name = "inspection_activity_hazard_rating">Clasificación de peligro: %1$s</string>
+    <string name = "title_activity_maps">Mapa</string>
+    <string name = "ask_user_to_update_message">Hay nuevos datos para descargar. ¿Desea descargarlo?</string>
+    <string name = "ask_user_to_update_accept">Sí</string>
+    <string name = "ask_user_to_update_decline">No</string>
+    <string name = "please_wait_dialog_message">Espere mientras se descargan los datos. Presione cancelar si desea cancelar la descarga.</string>
+    <string name = "please_wait_dialog_cancel">Cancelar</string>
+    <string name = "launch_list">Cambiar a la lista</string>
+    <string name = "launch_map">Cambiar al mapa</string>
+    <string name = "no_inspection_data_available">No hay datos de inspección disponibles.</string>
+    <string name = "enter_the_key_word_here">Buscar restaurantes</string>
+    <string name = "please_enter_some_key_words_to_help_search">please_enter_some_key_words_to_help_search</string>
+    <string name = "search_by_violation_num">Infracciones críticas en el año pasado</string>
+    <string name = "search_by_the_hazard_level">Nivel de peligro de la última inspección</string>
+    <string name = "submit_search">Enviar búsqueda</string>
+    <string name = "reset_search">Restablecer búsqueda</string>
+    <string name = "num">Ingrese un número entero</string>
+    <string name = "please_enter_the_key_word">Ingrese los parámetros de búsqueda</string>
+    <string name = "click_to_get_favorite_only">¿Solo restaurantes favoritos?</string>
+
+    <string name = "type_follow_up">Tipo: seguimiento</string>
+    <string name = "Date_place_holder">22 de enero de 2020</string>
+    <string name = "critical_violations_5"># Infracciones críticas: 5</string>
+    <string name = "non_critical_violations_5"># Infracciones no críticas: 5</string>
+    <string name = "hazard_rating_medium">Clasificación de peligro: medio</string>
+    <string name = "restaurant_name_here">Nombre del restaurante aquí</string>
+    <string name = "last_inspection">Última inspección</string>
+    <string name = "of_violations_here"># de violaciones aquí</string>
+
+    <string name = "n_a">N / A</string>
+    <string name = "inspection_date_here">Fecha de inspección aquí</string>
+    <string name = "num_crit_viols">Num crit viopes</string>
+    <string name = "num_noncrit_viols">Num violaciones no críticas</string>
+
+    <string name = "modified_fav_restaurants_message">
+        Estos son sus restaurantes favoritos que han tenido nuevas inspecciones desde su última actualización.
+    </string>
+    <string name = "modified_fav_ok">OK</string>
+    <string name="search">Buscar</string>
+    <string-array name="HazardlevelStr">
+        <item>Cualquier</item>
+        <item>bajo</item>
+        <item>Moderado</item>
+        <item>alto</item>
+    </string-array>
+
+    <string-array name="ViolationNumBound">
+        <item>Todas</item>
+        <item>Mayor o egual</item>
+        <item>Menor o egual</item>
+    </string-array>
+
+    <string-array name="ChooseFavor">
+        <item>no</item>
+        <item>si</item>
+    </string-array>
+
+
+</resources>

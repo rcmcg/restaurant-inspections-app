@@ -28,10 +28,10 @@ public class Inspection implements Serializable {
     private int numNonCritical;
     private String hazardRating;
     List <Violation> violLump = new ArrayList<>();
+    // private int diffInDay;
 
     public Inspection(){}
-
-    // Returns the tracking number, so that it can be incorporated with the restaurant
+    //Returns the tracking number, so that it can be incorporated with the restaurant
     public String getTrackingNumber() {
         return trackingNumber;
     }
@@ -39,8 +39,7 @@ public class Inspection implements Serializable {
     public void setTrackingNumber(String trackingNumber) {
         this.trackingNumber = trackingNumber;
     }
-
-    // Returns the date of the inspection
+    //Returns the date of the inspection
     public String getInspectionDate() {
         return inspectionDate;
     }
@@ -76,8 +75,8 @@ public class Inspection implements Serializable {
     public String intelligentInspectDate() {
         String intelligentDate = "";
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
             // Get the current date
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
             Date currentDate = new Date();
 
             // Get the difference in days between inspectionDate and currentDate
@@ -85,20 +84,22 @@ public class Inspection implements Serializable {
             Date inspectionD = sdf.parse(rawInspectionDate);
             long diffInMS = Math.abs(currentDate.getTime() - inspectionD.getTime());
             long diffInDay = TimeUnit.DAYS.convert(diffInMS, TimeUnit.MILLISECONDS);
-
+            // this.diffInDay = (int) diffInDay;
             //https://stackoverflow.com/questions/36370895/getyear-getmonth-getday-are-deprecated-in-calendar-what-to-use-then
             String[] indexToMonth = new DateFormatSymbols().getMonths();
             Calendar inspectionCalendar = Calendar.getInstance();
             inspectionCalendar.setTime(inspectionD);
-
+            //If the inspection date and today's date has difference of less than 30 days then it shows, days since the last inspection.
+            //If More than 30 days than shows the day and the month of the inspection.
+            //If more than 365 days then it shows only the year of the inspection.
             if (diffInDay <= 1) {
                 intelligentDate = diffInDay + " day";
-            } else if (diffInDay <= 30) {   // Show days since last inspection
+            } else if (diffInDay <= 30) {
                 intelligentDate = diffInDay + " days";
-            } else if (diffInDay <= 365) {  // Show month and day of inspection
+            } else if (diffInDay <= 365) {
                 intelligentDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)]
                         + " " + inspectionCalendar.get(Calendar.DAY_OF_MONTH);
-            } else {                        // Show month and year of inspection
+            } else {
                 intelligentDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)]
                         + " " + inspectionCalendar.get(Calendar.YEAR);
             }
@@ -110,14 +111,24 @@ public class Inspection implements Serializable {
         return intelligentDate;
     }
 
-   // Sets the inspection day
+   //Sets the inspection day
     public void setInspectionDate(String inspectionDate) {
         this.inspectionDate = inspectionDate;
     }
-    // Returns the inspection type, if the device language is french, then french word is returned
+    //Returns the inspection type, if the device language is french, then french word is returned
+    //Returns spanish if the language is spanish
     public String getInspType() {
-        if(Locale.getDefault().getLanguage()=="fr"){
-            return "suivre";
+        if (Locale.getDefault().getLanguage()=="fr") {
+            if (this.inspType.matches("(.*)Fo(.*)")) {
+            return"suivre";}
+        } else if(Locale.getDefault().getLanguage()=="es") {
+            if (this.inspType.matches("(.*)Fo(.*)")) {
+                return"Seguimiento";
+            }else if(this.inspType.matches("(.*)Ro(.*)")){
+                return "Routina";
+            }
+        } else {
+            return inspType;
         }
         return inspType;
     }
@@ -125,8 +136,7 @@ public class Inspection implements Serializable {
     public void setInspType(String inspType) {
         this.inspType = inspType;
     }
-
-    // Returns the number of critical violation in an inspection
+    //Returns the number of critical violation in an inspection
     public int getNumCritical() {
         return numCritical;
     }
@@ -134,8 +144,7 @@ public class Inspection implements Serializable {
     public void setNumCritical(int numCritical) {
         this.numCritical = numCritical;
     }
-
-    // Returns number of noncritical in an inspection
+    //Returns number of noncritical in an inspection
     public int getNumNonCritical() {
         return numNonCritical;
     }
@@ -186,12 +195,20 @@ public class Inspection implements Serializable {
     }
     //Returns hazard icon based on the hazard rating
     public int getHazardIcon() {
+
         if (hazardRating.equals("Low")) {
+
             return R.drawable.green;
+
         } else if (hazardRating.equals("Moderate")) {
+
             return R.drawable.yellow;
+
         } else {
+
             return R.drawable.red;
+
         }
+
     }
 }
