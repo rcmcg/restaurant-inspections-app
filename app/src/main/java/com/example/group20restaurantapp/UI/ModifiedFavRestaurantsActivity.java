@@ -24,7 +24,7 @@ import com.example.group20restaurantapp.Model.RestaurantManager;
 import com.example.group20restaurantapp.R;
 
 import java.util.List;
-//This activity is viewed
+
 public class ModifiedFavRestaurantsActivity extends AppCompatActivity {
 
     private RestaurantManager manager = RestaurantManager.getInstance();
@@ -87,9 +87,9 @@ public class ModifiedFavRestaurantsActivity extends AppCompatActivity {
 
             // Fill the hazard icon and the background color of each item
             ImageView imgHazardIcon = itemView.findViewById(R.id.restaurant_item_imgHazardRating);
-            if (currentRestaurant.getInspectionList().size() != 0) {
+            if (currentRestaurant.getInspectionSize() != 0) {
                 // Inspection list in Restaurant is sorted on startup so the first index is the most recent
-                Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+                Inspection lastInspection = currentRestaurant.getInspection(0);
                 if (lastInspection.getHazardRating().equals("Low")) {
                     imgHazardIcon.setImageResource(R.drawable.yellow_triangle);
                     itemView.setBackgroundColor(MainActivity.itemViewBackgroundColours[0]);
@@ -112,8 +112,8 @@ public class ModifiedFavRestaurantsActivity extends AppCompatActivity {
 
             // Set last inspection date text
             TextView lastInspectionDate = itemView.findViewById(R.id.restaurant_item_txtLastInspectionDate);
-            if (currentRestaurant.getInspectionList().size() != 0) {
-                Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
+            if (currentRestaurant.getInspectionSize() != 0) {
+                Inspection lastInspection = currentRestaurant.getInspection(0);
                 String temp2=String.format(getResources().getString(R.string.main_activity_restaurant_item_last_inspection_date,
                         lastInspection.intelligentInspectDate()));
                 lastInspectionDate.setText(temp2);
@@ -123,15 +123,14 @@ public class ModifiedFavRestaurantsActivity extends AppCompatActivity {
 
             // Set number of violations text
             TextView numViolationsLastInspection = itemView.findViewById(R.id.restaurant_item_txtNumViolations);
-            if (currentRestaurant.getInspectionList().size() != 0) {
-                Inspection lastInspection = currentRestaurant.getInspectionList().get(0);
-                String sumOfViolations = "" + (lastInspection.getNumCritical() + lastInspection.getNumNonCritical());
+            if (currentRestaurant.getInspectionSize() != 0) {
+                Inspection lastInspection = currentRestaurant.getInspection(0);
+                String sumOfViolations = "" + (lastInspection.getNumCriticalViolations() + lastInspection.getNumNonCriticalViolations());
                 String temp3= String.format(getResources().getString(R.string.main_activity_restaurant_item_violations, sumOfViolations));
                 numViolationsLastInspection.setText(temp3);
             } else {
                 numViolationsLastInspection.setText(getString(R.string.main_activity_restaurant_item_violations_no_inspection));
             }
-
             return itemView;
         }
     }

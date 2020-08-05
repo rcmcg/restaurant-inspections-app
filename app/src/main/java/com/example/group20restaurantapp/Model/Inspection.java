@@ -24,14 +24,14 @@ public class Inspection implements Serializable {
     private String trackingNumber;
     private String inspectionDate;
     private String inspType;    // Follow-up or routine
-    private int numCritical;
-    private int numNonCritical;
+    private int numCriticalViolations;
+    private int numNonCriticalViolations;
     private String hazardRating;
     List <Violation> violLump = new ArrayList<>();
 
     public Inspection(){}
 
-    // Returns the tracking number, so that it can be incorporated with the restaurant
+    // Returns the tracking number of the associated restaurant
     public String getTrackingNumber() {
         return trackingNumber;
     }
@@ -40,7 +40,6 @@ public class Inspection implements Serializable {
         this.trackingNumber = trackingNumber;
     }
 
-    // Returns the date of the inspection
     public String getInspectionDate() {
         return inspectionDate;
     }
@@ -51,15 +50,15 @@ public class Inspection implements Serializable {
         String rawInspectionDate = getInspectionDate();
 
         String fullFormattedDate = "";
-
         try {
+            // Create date object from inspectionDate
             Date inspectionD = sdf.parse(rawInspectionDate);
 
             String[] indexToMonth = new DateFormatSymbols().getMonths();
             Calendar inspectionCalendar = Calendar.getInstance();
             assert inspectionD != null;
             inspectionCalendar.setTime(inspectionD);
-            //Date format is changed to month,day,year from year,month,day
+            // Date format is changed to Month Day, Year from year,month,day
             fullFormattedDate = indexToMonth[inspectionCalendar.get(Calendar.MONTH)] + " "
                         + inspectionCalendar.get(Calendar.DAY_OF_MONTH)
                         + ", "
@@ -106,15 +105,13 @@ public class Inspection implements Serializable {
             Log.d("Inspection.java", "intelligentInspectDate: Failed to produce date");
             e.printStackTrace();
         }
-
         return intelligentDate;
     }
 
-   // Sets the inspection day
     public void setInspectionDate(String inspectionDate) {
         this.inspectionDate = inspectionDate;
     }
-    // Returns the inspection type, if the device language is french, then french word is returned
+
     public String getInspType() {
         if(Locale.getDefault().getLanguage()=="fr"){
             return "suivre";
@@ -126,22 +123,20 @@ public class Inspection implements Serializable {
         this.inspType = inspType;
     }
 
-    // Returns the number of critical violation in an inspection
-    public int getNumCritical() {
-        return numCritical;
+    public int getNumCriticalViolations() {
+        return numCriticalViolations;
     }
 
-    public void setNumCritical(int numCritical) {
-        this.numCritical = numCritical;
+    public void setNumCriticalViolations(int numCriticalViolations) {
+        this.numCriticalViolations = numCriticalViolations;
     }
 
-    // Returns number of noncritical in an inspection
-    public int getNumNonCritical() {
-        return numNonCritical;
+    public int getNumNonCriticalViolations() {
+        return numNonCriticalViolations;
     }
 
-    public void setNumNonCritical(int numNonCritical) {
-        this.numNonCritical = numNonCritical;
+    public void setNumNonCriticalViolations(int numNonCriticalViolations) {
+        this.numNonCriticalViolations = numNonCriticalViolations;
     }
 
     public String getHazardRating() {
@@ -156,6 +151,10 @@ public class Inspection implements Serializable {
         return violLump;
     }
 
+    public Violation getViolation(int index) {
+        return violLump.get(index);
+    }
+
     public int getDiffInDay() throws ParseException {
         // Get the current date
         Date currentDate = new Date();
@@ -168,30 +167,16 @@ public class Inspection implements Serializable {
         return (int) TimeUnit.DAYS.convert(diffInMS, TimeUnit.MILLISECONDS);
     }
 
-    public void setViolLump(List<Violation> violLump) {
-        this.violLump = violLump;
-    }
-
     @Override
     public String toString() {
         return "Inspection{" +
                 "trackingNumber='" + trackingNumber + '\'' +
                 ", inspectionDate='" + inspectionDate + '\'' +
                 ", inspType='" + inspType + '\'' +
-                ", numCritical=" + numCritical +
-                ", numNonCritical=" + numNonCritical +
+                ", numCritical=" + numCriticalViolations +
+                ", numNonCritical=" + numNonCriticalViolations +
                 ", hazardRating=" + hazardRating +
-                ", violLump= " + Arrays.toString(getViolLump().toArray()) +
+                ", violLump= " + Arrays.toString(violLump.toArray()) +
                 '}';
-    }
-    //Returns hazard icon based on the hazard rating
-    public int getHazardIcon() {
-        if (hazardRating.equals("Low")) {
-            return R.drawable.green;
-        } else if (hazardRating.equals("Moderate")) {
-            return R.drawable.yellow;
-        } else {
-            return R.drawable.red;
-        }
     }
 }

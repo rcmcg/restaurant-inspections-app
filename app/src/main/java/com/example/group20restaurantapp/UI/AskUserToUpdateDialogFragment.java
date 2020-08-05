@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.group20restaurantapp.R;
-//This activity is reviewed
+
 /**
  * Dialog to ask user if they want to update. MapsActivity implements listener
  */
@@ -44,8 +44,8 @@ public class AskUserToUpdateDialogFragment extends DialogFragment {
     }
 
     public interface AskUserToUpdateDialogListener {
-        public void onAskUserToUpdateDialogPositiveClick(DialogFragment dialog);
-        public void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog);
+        void onAskUserToUpdateDialogPositiveClick(DialogFragment dialog);
+        void onAskUserToUpdateDialogNegativeClick(DialogFragment dialog);
     }
 
     // Use this instance of the interface to deliver action events
