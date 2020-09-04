@@ -95,6 +95,8 @@ public class MapsActivity extends AppCompatActivity
     private static final String TAG = "MapActivity";
     private static final String WEB_SERVER_RESTAURANTS_CSV = "updatedRestaurants.csv";
     private static final String WEB_SERVER_INSPECTIONS_CSV = "updatedInspections.csv";
+    private static final String WEB_SERVER_RESTAURANTS_URL = "https://data.surrey.ca/api/3/action/package_show?id=restaurants";
+    private static final String WEB_SERVER_INSPECTIONS_URL = "https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
@@ -137,9 +139,9 @@ public class MapsActivity extends AppCompatActivity
 
             // Check server for new data, get URL as well as date data last updated
             String[] restaurantDataURLDate = manager
-                    .getURLDateLastModified("https://data.surrey.ca/api/3/action/package_show?id=restaurants"); //Retrieve url used to request csv
+                    .getURLDateLastModified(WEB_SERVER_RESTAURANTS_URL); //Retrieve url used to request csv
             String[] inspectionDataURLDate = manager
-                    .getURLDateLastModified("https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports");
+                    .getURLDateLastModified(WEB_SERVER_INSPECTIONS_URL);
 
             // Update global URL variables
             restaurantDataURL = restaurantDataURLDate[0];
@@ -467,7 +469,7 @@ public class MapsActivity extends AppCompatActivity
                     if (followUser && (updateLocationIter %3 == 0)) {   // Only update the location every 3 ticks
                         if (updateLocationIter > 8) {                   // Let the camera settle on user's location first
                             Log.d(TAG, "onMyLocationChange: moveCamera()");
-                            moveCamera(new LatLng(location.getLatitude(),location.getLongitude()), ZOOM_STREETS);
+                            moveCamera(new LatLng(location.getLatitude(),location.getLongitude()));
                         }
                     }
                 }
