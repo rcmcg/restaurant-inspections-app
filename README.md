@@ -6,7 +6,7 @@ If so, the app asks for permission to download the new data. If the user has fav
 
 If you would like to run this app yourself, clone the repo into Android Studio and install/run the app on a Pixel 2 API 29 emulator. You can also install through USB and run it on your own device, although I have not tested it on a wide range of devices. 
 
-A short video walking through and explaining the app can be found here: [Create a Youtube video and place the link here]
+[A short video walking through](https://youtu.be/6KwF1NZXy18) and explaining the app.
 
 An album of screenshots can be found here: [Create an imgur album and place here]
 
