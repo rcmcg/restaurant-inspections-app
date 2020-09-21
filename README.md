@@ -8,6 +8,8 @@ If you would like to run this app yourself, clone the repo into Android Studio a
 
 [A short video walking through](https://youtu.be/6KwF1NZXy18) and explaining the app.
 
+[Here's an imgur album of screenshots](https://imgur.com/a/nGQMcIq) of the app.
+
 [Here's a video](https://www.youtube.com/watch?v=KNrZBCeCSN8&feature=youtu.be) I created to help my team members use the Issue feature of GitLab.
 
 This app was a collaboration between myself and 3 other team members for CMPT 276 - Introduction to Software Engineering at Simon Fraser University. My commits are under rcmcg, reecem, or Reece McGowan.
